@@ -1,9 +1,11 @@
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.webdriver import WebDriver
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
 import time
 
-def parse_product(browser, url, category):
+def parse_product(browser: WebDriver, url: str, category: str):
     browser.get(url)
     time.sleep(2)
     soup = BeautifulSoup(browser.page_source, "lxml")
@@ -29,28 +31,37 @@ def parse_product(browser, url, category):
         "color": color_value,
     }
 
+def load_category_page(browser: WebDriver):
+    while True:
+        try:
+            load_more_link = browser.find_element(By.XPATH, "//a[text()='Više proizvoda']")
+            current_count = len(browser.find_elements(By.CSS_SELECTOR, 'article.sc-iyjcfA.kWVQpz.es-product'))
+            load_more_link.click()
+
+            WebDriverWait(browser, 10).until(
+                lambda browser: len(browser.find_elements(By.CSS_SELECTOR, 'article.sc-iyjcfA.kWVQpz.es-product')) > current_count
+            )
+        except:
+            break
+
+def extract_category_product_links(browser: WebDriver):
+    load_category_page(browser)
+
+    soup = BeautifulSoup(browser.page_source, "lxml")
+    links = []
+    for product in soup.select('article[class="sc-iyjcfA kWVQpz es-product"]'):
+        link = product.select_one('a')
+        if link != None:
+            links.append((link['href']))
+    return links
+
 if __name__ == "__main__":
     browser = webdriver.Firefox()
     browser.get("https://www.sinsay.com/rs/sr/zene/odeca/majice/majice")
     time.sleep(5)
 
-    while True:
-        try:
-            # <a href="https://www.sinsay.com/rs/sr/zene/odeca/majice/majice?page=6" class="sc-fYdeDz hNSbvz">Više proizvoda</a>
-            load_more_link = browser.find_element(By.XPATH, "//a[text()='Više proizvoda']")
-            load_more_link.click()
-            time.sleep(5)
-        except:
-            break
+    product_links = extract_category_product_links(browser)
+    for product_link in product_links:
+        print(product_link)
 
-
-    soup = BeautifulSoup(browser.page_source, "lxml")
-    all_products = soup.select('article[class="sc-iyjcfA kWVQpz es-product"]')
-    for product in all_products:
-        link = product.select_one('a')
-        if link != None:
-            print(link['href'])
-    # print(parse_product(browser, SINSAY_SITE_3, "sorc"))
     browser.close()
-
-

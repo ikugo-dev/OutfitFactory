@@ -1,145 +1,69 @@
-import sqlite3
-import time
-from selenium import webdriver
-from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
+import random
+from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.webdriver import WebDriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium import webdriver
+import time
 
-# Setup headless browser
-options = webdriver.ChromeOptions()
-options.add_argument("--headless=new")
-driver = webdriver.Chrome(options=options)
+def parse_product(browser: WebDriver, url: str, category: str):
+    browser.get(url)
+    time.sleep(2)
+    soup = BeautifulSoup(browser.page_source, "lxml")
 
-BASE_URL = "https://www.sinsay.com/rs/sr"
-CATEGORY_BASE = "https://www.sinsay.com/rs/sr/ona/odeca"
+    def safe_select(selector):
+        tag = soup.select_one(selector)
+        if (tag is None):
+            return "N/A"
+        else:
+            return tag.text.strip()
 
-# SQLite DB setup
-conn = sqlite3.connect("sinsay_clothes.db")
-cursor = conn.cursor()
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS clothes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    category TEXT,
-    price TEXT,
-    color TEXT,
-    material TEXT,
-    url TEXT UNIQUE
-)
-""")
-conn.commit()
+    id_value = url[29:] # da izbrisemo "https://www.sinsay.com/rs/sr/"
+    name_value   =  safe_select("h1[data-testid='product-name']")
+    price_value  =  safe_select("div[data-selen='product-price']").replace('\xa0', ' ') # zbog whitespaces koji stavljaju
+    color_value  =  safe_select("span[data-testid='color-picker-color-name']")
 
+    return {
+        "id": id_value,
+        "brand": "Sinsay",
+        "category": category,
+        "name":  name_value,
+        "price": price_value,
+        "color": color_value,
+    }
 
-def get_categories():
-    print("Fetching categories...")
-    driver.get(CATEGORY_BASE)
-    time.sleep(3)
-    soup = BeautifulSoup(driver.page_source, "html.parser")
-    links = soup.select('a.category-tile')
-
-    category_urls = {}
-    for link in links:
-        name = link.text.strip().lower()
-        url = link.get("href")
-        if url and "/ona/odeca/" in url:
-            category_urls[name] = BASE_URL + url
-
-    return category_urls
-
-
-def get_product_links(category_url):
-    print(f"Getting product links from: {category_url}")
-    product_links = set()
-    driver.get(category_url)
-    time.sleep(3)
-
+def load_category_page(browser: WebDriver):
     while True:
-        soup = BeautifulSoup(driver.page_source, "html.parser")
-        items = soup.select('a.product-tile-inner')
-
-        for item in items:
-            href = item.get("href")
-            if href:
-                product_links.add(BASE_URL + href)
-
-        # Check for "next" page button
         try:
-            next_button = driver.find_element(By.CSS_SELECTOR, "a.next")
-            if "disabled" in next_button.get_attribute("class"):
-                break
-            next_button.click()
-            time.sleep(2)
+            load_more_link = browser.find_element(By.XPATH, "//a[text()='Više proizvoda']")
+            current_count = len(browser.find_elements(By.CSS_SELECTOR, 'article.sc-iyjcfA.kWVQpz.es-product'))
+            load_more_link.click()
+
+            WebDriverWait(browser, 10).until(
+                lambda browser: len(browser.find_elements(By.CSS_SELECTOR, 'article.sc-iyjcfA.kWVQpz.es-product')) > current_count
+            )
+            time.sleep(random.uniform(0.5, 1.5)) # da ne bude mnogo ocigledno
         except:
             break
 
-    return list(product_links)
+def extract_category_product_links(browser: WebDriver):
+    load_category_page(browser)
 
-
-def parse_product(url, category):
-    driver.get(url)
-    time.sleep(2)
-    soup = BeautifulSoup(driver.page_source, "html.parser")
-
-    def safe_select(selector):
-        el = soup.select_one(selector)
-        return el.text.strip() if el else ""
-
-    name = safe_select("h1.product-name")
-    price = safe_select(".product-price-now")
-
-    try:
-        color = soup.find("span", string=lambda x: x and "Boja" in x).find_next("span").text.strip()
-    except:
-        color = ""
-
-    try:
-        material = soup.find("span", string=lambda x: x and "Sastav" in x).find_next("span").text.strip()
-    except:
-        material = ""
-
-    return {
-        "name": name,
-        "category": category,
-        "price": price,
-        "color": color,
-        "material": material,
-        "url": url
-    }
-
-
-def save_to_db(item):
-    cursor.execute("""
-    INSERT OR IGNORE INTO clothes (name, category, price, color, material, url)
-    VALUES (?, ?, ?, ?, ?, ?)
-    """, (
-        item["name"],
-        item["category"],
-        item["price"],
-        item["color"],
-        item["material"],
-        item["url"]
-    ))
-    conn.commit()
-
-
-def main():
-    categories = get_categories()
-
-    for category_name, category_url in categories.items():
-        print(f"\nScraping category: {category_name}")
-        product_links = get_product_links(category_url)
-
-        for url in product_links:
-            print(f"  Parsing: {url}")
-            try:
-                data = parse_product(url, category_name)
-                save_to_db(data)
-            except Exception as e:
-                print(f"  Failed to parse {url}: {e}")
-
+    soup = BeautifulSoup(browser.page_source, "lxml")
+    links = []
+    for product in soup.select('article[class="sc-iyjcfA kWVQpz es-product"]'):
+        link = product.select_one('a')
+        if link != None:
+            links.append((link['href']))
+    return links
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        driver.quit()
-        conn.close()
+    browser = webdriver.Firefox()
+    browser.get("https://www.sinsay.com/rs/sr/zene/odeca/majice/majice")
+    time.sleep(5)
+
+    product_links = extract_category_product_links(browser)
+    for product_link in product_links:
+        print(product_link)
+
+    browser.close()

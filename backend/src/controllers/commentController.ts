@@ -19,7 +19,7 @@ export async function getComment(req: Request, res: Response): Promise <void>
         return;
     }
     catch (error) {
-        res.status(500).json({error, "Server error."});
+        res.status(500).json({error: "Server error."});
         return;
     }
 } 

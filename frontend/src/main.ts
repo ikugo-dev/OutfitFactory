@@ -1,11 +1,13 @@
-import './assets/main.css'
+import "./assets/main.css";
 
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router'
+import { createApp } from "vue";
+import App from "./App.vue";
+import router from "./router/index.ts";
 
-const app = createApp(App)
+import InfiniteLoading from "v3-infinite-loading";
+import "v3-infinite-loading/lib/style.css";
 
-app.use(router)
-
-app.mount('#app')
+const app = createApp(App);
+app.component("infinite-loading", InfiniteLoading);
+app.use(router);
+app.mount("#app");

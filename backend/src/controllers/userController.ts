@@ -1,166 +1,228 @@
 import {Request, Response} from 'express'; 
-import user from './models/user.ts';
+import User from './models/user.ts';
+import Post from './models/post.ts';
 
 
 
-
-export async function getUser(req: Request, res: Response): Promise <any>  //TODO nejasno mi ovde sta treba da stavim i da li je any
+export async function getUser(req: Request, res: Response): Promise <void> 
 {
     try 
     {
         const { Username } = req.body;
-        const User = await user.find({username: Username}).exec();
+        const user = await User.find({username: Username}).exec();
 
-        if (!User) 
-        {
-            return res.status(404).json({error: "No such user."});
+        if (!User) {
+            res.status(404).json({error: "No such user."});
+            return;
         }
         
-        return res.status(200).json(User);
+        res.status(200).json(user);
+        return;
     }
-    catch (error) 
-    {
-        return res.status(500).json({error, "Server error."});
+    catch (error) {
+        res.status(500).json({error, "Server error."});
+        return;
     }
 } 
 
-export async function createUser(req: Request, res: Response): Promise<any>
+export async function createUser(req: Request, res: Response): Promise<void>
 {
     try
     {
         const { Username, Email, Password } = req.body;
         
-        let foundUsername = await user.exists({username: Username}).exec();  
-        if ( foundUsername != null ) return res.status(400).json({error: "Username already taken."});  
-        
-        let foundEmail = await user.exists({email: Email}).exec();  
-        if ( foundEmail != null ) return res.status(400).json({error: "Account with this email address already exists."});  
+        let foundUsername = await User.exists({username: Username}).exec();  
+        if ( foundUsername != null ){ 
+            res.status(400).json({error: "Username already taken."});  
+            return;
+        }   
 
-        const newUser = new user(Username, Email, Password);
-
-        if (newUser == null)
-        {
-            return res.status(400).json({error: "User creation error."});
+        let foundEmail = await User.exists({email: Email}).exec();  
+        if ( foundEmail != null ) {
+            res.status(400).json({error: "Account with this email address already exists."});  
+            return;
         }
 
-        return res.status(200).json(newUser);
+        const newUser = new User(Username, Email, Password,  "https://cdn-icons-png.flaticon.com/512/53/53101.png",
+                                    [], [], [], [] );
+
+        if (newUser == null){
+            res.status(400).json({error: "User creation error."});
+            return;
+        }
+
+        res.status(200).json(newUser);
+        return;
 
     }
-    catch(error)
-    {
-        return(res.status(500).json({error: "Server error."})); 
+    catch(error){
+        res.status(500).json({error: "Server error."});
+        return; 
     }
 
 }
 
-export async function removeUser(req: Request, res: Response) : Promise<any> 
+export async function removeUser(req: Request, res: Response) : Promise<void> 
 {
     try
     {
         const { Username } = req.body;
 
-        const User = await user.find({username: Username}).exec();
+        const user = await User.find({username: Username}).exec();
 
-        if (!User)  return res.status(404).json({error: "No such user."});
+        if (!User){
+            res.status(404).json({error: "No such user."});
+            return;
+        }
         
         const deleteRes = await User.deleteOne({ username: Username });
-        if (deleteRes.deletedCount == 0 )  return(res.status(500).json({error: "Server error."})); //TODO da li treba 500
-    
+        if (deleteRes.deletedCount == 0 ){
+            res.status(500).json({error: "Server error."}); 
+            return;
+        }
     }
     catch(error)
     {
-        return(res.status(500).json({error: "Server error."})); 
+        res.status(500).json({error: "Server error."}); 
+        return;
     }
 
 }
 
 
-export async function updateUsername(req: Request, res: Response) : Promise<any> 
+export async function updateUsername(req: Request, res: Response) : Promise<void> 
 {
     try
     {
         const { Username, newUsername } = req.body;
 
-        const User = await user.find({username: Username}).exec();
+        const user = await User.find({username: Username}).exec();
 
-        if (!User)  return res.status(404).json({error: "No such user."});
-        
+        if (!User) {
+            res.status(404).json({error: "No such user."});
+            return;
+        }
 
         let foundUsername = await user.exists({username: newUsername}).exec();  
-        if ( foundUsername != null )    return res.status(400).json({error: "Username already taken."}); 
-        
+        if ( foundUsername != null ) {
+            res.status(400).json({error: "Username already taken."}); 
+            return;
+        }  
         const updateRes = await User.updateOne({ username: Username });
-        if (updateRes.upsertedCount == 0 )  return(res.status(500).json({error: "Server error."})); //TODO da li treba 500
-    
+        if (updateRes.upsertedCount == 0 )  {
+            res.status(500).json({error: "Server error."}); 
+        }
     }
-    catch(error)
-    {
-        return(res.status(500).json({error: "Server error."})); 
+    catch(error){
+        res.status(500).json({error: "Server error."}); 
+        return;
     }
 
 }
 
 
-export async function updatePassword(req: Request, res: Response) : Promise<any> 
+export async function updatePassword(req: Request, res: Response) : Promise<void> 
 {
     try
     {
         const {Username, newPassword } = req.body;
 
-        const User = await user.find({username: Username}).exec();
+        const user = await User.find({username: Username}).exec();
 
-        if (!User)  return res.status(404).json({error: "No such user."});
+        if (!User) { 
+            res.status(404).json({error: "No such user."});
+            return;
+        }
         
         const updateRes = await User.updateOne({ password: newPassword });
-        if (updateRes.upsertedCount == 0 )  return(res.status(500).json({error: "Server error."})); //TODO da li treba 500
-    
+        if (updateRes.upsertedCount == 0 ) { 
+            res.status(500).json({error: "Server error."});
+            return;
+        }
     }
     catch(error)
     {
-        return(res.status(500).json({error: "Server error."})); 
+       res.status(500).json({error: "Server error."});
+       return; 
     }
 }
 
-export async function updateAvatar(req: Request, res: Response) : Promise<any> 
+export async function updateAvatar(req: Request, res: Response) : Promise<void> 
 {
     try
     {
         const {Username, newAvatar } = req.body;
 
-        const User = await user.find({username: Username}).exec();
+        const user = await User.find({username: Username}).exec();
 
-        if (!User)  return res.status(404).json({error: "No such user."});
-        
+        if (!User) {
+            res.status(404).json({error: "No such user."});
+            return;
+        }
         const updateRes = await User.updateOne({ avatar: newAvatar });
-        if (updateRes.upsertedCount == 0 )  return(res.status(500).json({error: "Server error."})); //TODO da li treba 500
-    
+        if (updateRes.upsertedCount == 0 )  {
+            res.status(500).json({error: "Server error."});
+            return;
+        }
     }
     catch(error)
     {
-        return(res.status(500).json({error: "Server error."})); 
+        res.status(500).json({error: "Server error."}); 
+        return;
     }
 }
 
-export async function removeAvatar(req: Request, res: Response) : Promise<any> 
+export async function removeAvatar(req: Request, res: Response) : Promise<void> 
 {
         try
     {
         const {Username} = req.body;
 
-        const User = await user.find({username: Username}).exec();
+        const user = await User.find({username: Username}).exec();
 
-        if (!User)  return res.status(404).json({error: "No such user."});
-        
-        const updateRes = await User.updateOne({ avatar: "https://cdn-icons-png.flaticon.com/512/53/53101.png" });
-        if (updateRes.upsertedCount == 0 )  return(res.status(500).json({error: "Server error."})); //TODO da li treba 500
-    
+        if (!user)  {
+            res.status(404).json({error: "No such user."});
+            return;
+        }
+        const updateRes = await user.updateOne({ avatar: "https://cdn-icons-png.flaticon.com/512/53/53101.png" });
+        if (updateRes.upsertedCount == 0 ) {
+            res.status(500).json({error: "Server error."});
+            return;
+        }   
     }
     catch(error)
     {
-        return(res.status(500).json({error: "Server error."})); 
+        res.status(500).json({error: "Server error."}); 
     }
 }
 
+
+export async function addPost(req: Request, res: Response) : Promise<void> 
+{
+    try
+    {
+        const {Username, PostID} = req.body;
+
+        const user = await User.find({username: Username}).exec();
+
+        if (!user)  {
+            res.status(404).json({error: "No such user."});
+            return;
+        }
+
+        const post = await Post.find({_id: PostID}).exec();
+
+        const updateRes = await User.updateOne({ $push: {posts : PostID}});
+        if (updateRes.upsertedCount == 0 ) {
+            res.status(500).json({error: "Server error."});
+            return;
+        }   
+    }
+    catch(error)
+    {
+        res.status(500).json({error: "Server error."}); 
+    }
+}
 
 export async function follow(req: Request, res: Response) : Promise<any> 
 {
@@ -168,16 +230,19 @@ export async function follow(req: Request, res: Response) : Promise<any>
     {
         const {Username, UsernameToFollow } = req.body;
 
-        const User = await user.find({username: Username}).exec();
-        if (!User)  return res.status(404).json({error: "No such user."});
+        const user = await User.find({username: Username, following : {$nin : [UsernameToFollow]}}).exec();
+        if (!user)  return res.status(404).json({error: "No such user."}); 
         
-        const UserToFollow = await user.find({username: UsernameToFollow}).exec();
-        if (!UserToFollow)  return res.status(404).json({error: "No such user."});
-/*
-        const User = await user.find({username: Username, followinf}).exec();
-        if (!User)  return res.status(404).json({error: "No such user."});
+        const userToFollow = await User.find({username: UsernameToFollow}).exec();
+        if (!userToFollow)  return res.status(404).json({error: "No such user."});
+
+        const newUser = await user.Update( {$push: { following: userToFollow } }, { new: true })
+        const newUserToFollow = await user.Update( {$push: { followers: user } }, { new: true })
         
-            */
+        if(newUser == null || newUserToFollow == null) {
+            res.status(500).json({error: "Server error."});
+            return;
+        }
     }
     catch(error)
     {
@@ -188,7 +253,28 @@ export async function follow(req: Request, res: Response) : Promise<any>
 
 export async function unfollow(req: Request, res: Response) : Promise<any> 
 {
+    try
+    {
+        const {Username, UsernameToUnfollow } = req.body;
 
+        const user = await User.find({username: Username, following : {$in: [UsernameToUnfollow]}}).exec();
+        if (!user)  return res.status(404).json({error: "No such user."});        
+        
+        
+        const userToFollow = await User.find({username: UsernameToUnfollow}).exec();
+        if (!userToFollow)  return res.status(404).json({error: "No such user."});
+
+
+        const newUser = await user.Update( {$pull: {following: UsernameToUnfollow } }, { new: true });
+        const newUserToUnfollow = await user.Update( {$pull: {followers: UsernameToUnfollow } }, { new: true });
+
+        if(newUser == null) {
+            res.status(500).json({error: "Server error."});
+            return;
+        }
+    }
+    catch(error)
+    {
+        return(res.status(500).json({error: "Server error."})); 
+    }
 }
-
-//TODO treba li za posts

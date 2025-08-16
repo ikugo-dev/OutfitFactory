@@ -25,6 +25,18 @@ const postSchema = new Schema(
             default: 0,
         },
 
+        comments: [
+        {
+            type: mongoose.Types.ObjectId,  
+            ref: 'outfit'
+        }], 
+
+        grades:[
+        {
+            type: mongoose.Types.ObjectId,
+            ref: 'grade'
+        }],
+
         outfit:
         {
             type: mongoose.Types.ObjectId,  

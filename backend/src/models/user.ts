@@ -33,26 +33,31 @@ const userSchema = new Schema(
             default: "https://cdn-icons-png.flaticon.com/512/53/53101.png"
         },
 
-        posts:
+        posts:[
         {
             type: mongoose.Types.ObjectId,
-            ref : 'post',
-            default: []
-        },
+            ref : 'post'
+        }],
 
-        followers:
+        followers:[
         {
             type: mongoose.Types.ObjectId,
             ref : 'user',
-            default: [], 
-        },
+             
+        }],
 
-        following:
+        following:[
         {
             type: mongoose.Types.ObjectId,
             ref : 'user',
-            default: [] 
-        }
+            
+        }],
+
+        liked:[
+        {
+            type: mongoose.Types.ObjectId,
+            ref : 'post'
+        }]
 
     });
 

@@ -4,6 +4,12 @@ const { Schema } = mongoose;
 const garmentSchema = new Schema(
     {
         
+        images:[
+        {
+            type: String
+        }],
+
+
         category: 
         {
             type: String,
@@ -17,36 +23,23 @@ const garmentSchema = new Schema(
             
         }],
 
-        material:
+        material:[
         {
             type: String, //TODO isto treba da bude u enum 
             default: null
-        },
+        }],
 
-        gender:
+        gender:[
         {
             type: String,
             default: null
-        },
+        }],
 
         brand:
         {
             type: String,
             required: true
         },
-
-        grade:
-        {
-            type: mongoose.Types.ObjectId,
-            ref : 'ocena',
-            default: null 
-        },
-
-        comments:[
-        {
-            type: mongoose.Types.ObjectId,
-            ref : 'comment',
-        }]
 
     });
 

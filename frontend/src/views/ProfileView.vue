@@ -21,7 +21,7 @@ import { getFakeUser, getFakePosts } from '../fakeData.ts';
 const profile = ref<UserType>(getFakeUser());
 const posts = shallowRef<PostType[]>([])
 const isFollowing = ref(false)
-posts.value = getFakePosts(12);
+posts.value = getFakePosts(3);
 
 function toggleFollow() {
   isFollowing.value = !isFollowing.value

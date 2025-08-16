@@ -15,9 +15,13 @@ const color = "#" + ((1 << 24) * Math.random() | 0).toString(16).padStart(6, "0"
 
 <style scoped>
 .post-card {
-  height: 150px;
-  width: 200px;
+  width: 100%;
+  aspect-ratio: 3 / 4;
   background-color: teal;
-  display: block;
+  overflow: hidden;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

@@ -16,7 +16,10 @@ defineProps<{
 <style scoped>
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  justify-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 </style>

@@ -18,7 +18,7 @@ const route = useRoute();
   flex-grow: 1;
   justify-content: space-around;
   background: var(--background-focus);
-  border-bottom: 4px solid black;
+  border-bottom: 0.2rem solid black;
   padding: 1rem 0;
   margin-bottom: 5rem;
   top: 0;

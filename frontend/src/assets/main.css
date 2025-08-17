@@ -41,3 +41,21 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+button {
+  background-color: var(--primary);
+  border: 0.15rem solid black;
+  box-shadow: 0.2rem 0.2rem black;
+  padding: 0.2rem 0.4rem;
+  cursor: pointer;
+  transition: transform 0.1s linear, box-shadow 0.1s linear;
+}
+
+button:hover {
+  transform: translate(0.2rem, 0.2rem);
+  box-shadow: 0rem 0rem black;
+}
+
+button:active {
+  background-color: var(--accent);
+}

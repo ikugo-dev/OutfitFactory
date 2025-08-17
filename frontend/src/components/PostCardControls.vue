@@ -23,11 +23,4 @@ defineProps<{
   display: flex;
   gap: 0.4rem;
 }
-
-button {
-  background-color: var(--primary);
-  background-color: var(--primary);
-  border: 0.15rem solid black;
-  box-shadow: 0.2rem 0.2rem;
-}
 </style>

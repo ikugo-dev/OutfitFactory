@@ -1,6 +1,9 @@
 <template>
   <nav class="navbar">
-    <router-link to="/explore" :class="{ 'active-link': route.path === '/explore' }">Explore</router-link>
+    <router-link :to="{ path: '/explore/new' }"
+      :class="{ 'active-link': route.path === '/explore/new' }">New</router-link>
+    <router-link :to="{ path: '/explore/following' }"
+      :class="{ 'active-link': route.path === '/explore/following' }">Following</router-link>
     <router-link to="/profile" :class="{ 'active-link': route.path === '/profile' }">Profile</router-link>
     <!-- <a href="/create.html">Create</a> > -->
   </nav>
@@ -14,6 +17,7 @@ const route = useRoute();
 
 <style scoped>
 .navbar {
+  z-index: 100;
   display: flex;
   flex-grow: 1;
   justify-content: space-around;

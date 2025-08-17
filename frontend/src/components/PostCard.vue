@@ -33,6 +33,7 @@ onMounted(() => {
   width: 100%;
   aspect-ratio: 3 / 4;
   padding: 0.5rem;
+  padding-bottom: 1rem;
   border: 0.2rem solid black;
   justify-content: center;
 }

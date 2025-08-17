@@ -1,5 +1,5 @@
 import {Request, Response} from 'express'; 
-import Garment from './models/garment.ts'
+const Garment = require ("../models/garment.ts");
 
 
 export async function getGarment(req: Request, res: Response): Promise <void>

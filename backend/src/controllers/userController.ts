@@ -1,6 +1,6 @@
 import {Request, Response} from 'express'; 
-import User from './models/user.ts';
-import Post from './models/post.ts';
+const User = require("../models/user.ts");
+const Post = require("../models/post.ts");
 
 
 
@@ -20,7 +20,7 @@ export async function getUser(req: Request, res: Response): Promise <void>
         return;
     }
     catch (error) {
-        res.status(500).json({error, "Server error."});
+        res.status(500).json({error: "Server error."});
         return;
     }
 } 

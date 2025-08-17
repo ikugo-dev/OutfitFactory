@@ -1,6 +1,6 @@
 import {Request, Response} from 'express'; 
-import Comment from './models/comment.ts';
-import User from './models/user.ts';
+const Comment = require("../models/comment.ts");
+const User = require ("../models/user.ts");
 
 
 export async function getComment(req: Request, res: Response): Promise <void>  

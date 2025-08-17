@@ -1,6 +1,6 @@
 import {Request, Response} from 'express'; 
-import Post from './src/models/post.ts';
-import User from './src/models/user.ts';
+const Post = require ("../models/post.ts");
+const User = require ( "../models/user.ts");
 
 
 export async function getPost(req: Request, res: Response): Promise <void>

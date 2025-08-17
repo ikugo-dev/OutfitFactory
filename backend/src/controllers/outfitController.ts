@@ -1,6 +1,5 @@
 import {Request, Response} from 'express'; 
-import Outfit from './models/outfit.ts';
-
+const Outfit = require("../models/postModel");
 
 export async function getOutfit(req: Request, res: Response): Promise <void>  {
     try 
@@ -53,7 +52,7 @@ export async function createOutfit(req: Request, res: Response): Promise<void>
 }
 
 
-export async function addHeadAcc(req: Request, res: Response): Promise <void>  {
+export async function addGarment(req: Request, res: Response): Promise <void>  {
     try 
     {
         const { ID, Garment } = req.body;
@@ -64,115 +63,7 @@ export async function addHeadAcc(req: Request, res: Response): Promise <void>  {
             return;
         }
         
-        let newOutfit = await outfit.Update({ $push: { headAccessories : Garment } }, { new: true })
-        if(newOutfit == null) {
-            res.status(500).json({error: "Server error."});
-            return;
-        }
-
-        res.status(200).json(outfit);
-        return;
-    }
-    catch (error) 
-    {
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-} 
-
-export async function addNeckAcc(req: Request, res: Response): Promise <void>  {
-    try 
-    {
-        const { ID, Garment } = req.body;
-        const outfit = await Outfit.find({_id: ID}).exec();
-
-        if (!outfit) {
-            res.status(404).json({error: "Outfit not found."});
-            return;
-        }
-        
-        let newOutfit = await outfit.Update({ $push: { neckAccessories : Garment } }, { new: true })
-        if(newOutfit == null) {
-            res.status(500).json({error: "Server error."});
-            return;
-        }
-
-        res.status(200).json(outfit);
-        return;
-    }
-    catch (error) 
-    {
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-} 
-
-export async function addBodyAcc(req: Request, res: Response): Promise <void>  {
-    try 
-    {
-        const { ID, Garment } = req.body;
-        const outfit = await Outfit.find({_id: ID}).exec();
-
-        if (!outfit) {
-            res.status(404).json({error: "Outfit not found."});
-            return;
-        }
-        
-        let newOutfit = await outfit.Update({ $push: { bodyAccessories : Garment } }, { new: true })
-        if(newOutfit == null) {
-            res.status(500).json({error: "Server error."});
-            return;
-        }
-
-        res.status(200).json(outfit);
-        return;
-    }
-    catch (error) 
-    {
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-} 
-
-export async function addLegAcc(req: Request, res: Response): Promise <void>  {
-    try 
-    {
-        const { ID, Garment } = req.body;
-        const outfit = await Outfit.find({_id: ID}).exec();
-
-        if (!outfit) {
-            res.status(404).json({error: "Outfit not found."});
-            return;
-        }
-        
-        let newOutfit = await outfit.Update({ $push: { legAccessories : Garment } }, { new: true })
-        if(newOutfit == null) {
-            res.status(500).json({error: "Server error."});
-            return;
-        }
-
-        res.status(200).json(outfit);
-        return;
-    }
-    catch (error) 
-    {
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-} 
-
-export async function addArmAcc(req: Request, res: Response): Promise <void>  {
-    try 
-    {
-        const { ID, Garment } = req.body;
-        const outfit = await Outfit.find({_id: ID}).exec();
-
-        if (!outfit) {
-            res.status(404).json({error: "Outfit not found."});
-            return;
-        }
-        
-        let newOutfit = await outfit.Update({ $push: { Accessories : Garment } }, { new: true })
+        let newOutfit = await outfit.Update({ $push: { garments : Garment } }, { new: true })
         if(newOutfit == null) {
             res.status(500).json({error: "Server error."});
             return;

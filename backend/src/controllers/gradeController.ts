@@ -1,5 +1,5 @@
 import {Request, Response} from 'express'; 
-import Grade from './models/grade.ts'
+const Grade = require("../models/grade.ts")
 
 
 export async function getGrade(req: Request, res: Response): Promise <void>

@@ -185,7 +185,7 @@ export async function publish(req: Request, res: Response): Promise <void>
             return;
         }
 
-        if (Published == true) {
+        if (Published == true) {    
             res.status(500).json({error: "Post already published."});
         }
 

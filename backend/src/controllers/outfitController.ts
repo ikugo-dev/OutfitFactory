@@ -26,13 +26,7 @@ export async function createOutfit(req: Request, res: Response): Promise<void>
 {
     try
     {
-        const { Top, Bottom, Shoes } = req.body;
-        
-        if (Top == null || Bottom == null || Shoes == null){
-            res.status(400).json({error: "Not enough garments for outfit."});
-            return; 
-        }
-        const newOutfit = new Outfit(Top, Bottom, Shoes);
+        const newOutfit = new Outfit();
 
         if (newOutfit== null){
             res.status(500).json({error: "Outfit creation error."});

@@ -62,6 +62,29 @@ export async function createUser(req: Request, res: Response): Promise<void>
 
 }
 
+export async function getPosts(req: Request, res: Response): Promise <void> 
+{
+    try 
+    {
+        const { Username } = req.body;
+        const posts = await User.find({username: Username}).select('posts').exec();
+    
+
+        if (!posts) {
+            res.status(404).json({error: "No posts."});
+            return;
+        }
+
+        res.status(200).json(posts);
+        return;
+    }
+    catch (error) {
+        res.status(500).json({error: "Server error."});
+        return;
+    }
+} 
+
+
 export async function removeUser(req: Request, res: Response) : Promise<void> 
 {
     try
@@ -75,7 +98,7 @@ export async function removeUser(req: Request, res: Response) : Promise<void>
             return;
         }
         
-        const deleteRes = await User.deleteOne({ username: Username });
+        const deleteRes = await user.deleteOne({ username: Username });
         if (deleteRes.deletedCount == 0 ){
             res.status(500).json({error: "Server error."}); 
             return;

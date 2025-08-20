@@ -17,6 +17,9 @@ import { ref, shallowRef } from 'vue'
 import PostGrid from '../components/PostGrid.vue'
 import { type PostType, type UserType } from "../types"
 import { getFakeUser, getFakePosts } from '../fakeData.ts';
+const { username } = defineProps<{
+  username: string,
+}>()
 
 const profile = ref<UserType>(getFakeUser());
 const posts = shallowRef<PostType[]>([])
@@ -27,7 +30,9 @@ function toggleFollow() {
   isFollowing.value = !isFollowing.value
 }
 
-
+if (username) {
+  profile.value.username = username;
+}
 </script>
 
 <style scoped>
@@ -42,6 +47,7 @@ function toggleFollow() {
   border-radius: 50%;
   width: 80px;
   height: 80px;
+  border: 0.2rem solid black;
   background-color: teal;
 }
 </style>

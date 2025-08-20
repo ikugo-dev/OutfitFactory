@@ -10,17 +10,36 @@ const router = createRouter({
       path: "/",
       name: "home",
       component: HomeView,
-      // component: () => import('../views/HomeView.vue'),
     },
     {
-      path: "/explore",
-      name: "explore",
+      path: "/explore/new",
+      name: "explore new",
+      component: ExploreView,
+    },
+    {
+      path: "/explore/following",
+      name: "explore following",
       component: ExploreView,
     },
     {
       path: "/profile",
-      name: "profile",
+      name: "my profile",
+      // beforeEnter: (_to, _from, next) => {
+      //   const loggedIn = !!localStorage.getItem('user') // your auth check
+      //   if (!loggedIn) next({ name: 'Login'})
+      //   else next()
+      // },
       component: ProfileView,
+    },
+    {
+      path: "/profile/:username",
+      name: "user profile",
+      component: ProfileView,
+      props: true,
+    },
+    {
+      path: "/*",
+      redirect: "/explore?algo=new",
     },
   ],
 });

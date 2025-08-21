@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+  --text: #1c0b22;             /* black          */
+  --background: #fff0e0;       /* beige          */
+  --background-focus: #ffe4cc; /* darker beige   */
+  --primary: #8b81e6;          /* purple         */
+  --secondary: #ffcc33;        /* yellow         */
+  --accent: #f66dDF;           /* magenta        */
+  --color-text: var(--text);
+  color: var(--text);
+  --color-background: var(--background);
+  background: var(--background) url("./bg.png") no-repeat fixed;
+  background-size: cover;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: 700;
+}
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  margin-top: 4rem;
+
+  min-height: 100vh;
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.6;
+  font-family: "Epilogue";
+  font-style: normal;
+  font-optical-sizing: auto;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  background-color: var(--primary);
+  border: 0.15rem solid black;
+  box-shadow: 0.2rem 0.2rem black;
+  padding: 0.2rem 0.4rem;
+  cursor: pointer;
+  transition: transform 0.1s linear, box-shadow 0.1s linear;
+}
+
+button:hover {
+  transform: translate(0.2rem, 0.2rem);
+  box-shadow: 0rem 0rem black;
+}
+
+button:active {
+  background-color: var(--accent);
+}

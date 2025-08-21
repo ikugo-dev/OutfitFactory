@@ -1,13 +1,25 @@
-import express from 'express';
-import dotenv from 'dotenv';
+import express from "express";
+import { connectDB } from "./tools/db-connection.ts";
+import postRouter from "./routes/postRoute.ts";
 
-dotenv.config();
 const app = express();
 
-const { connectDB } =  require("./tools/db-connection.ts");  
-
 app.use(express.json());
-//app.use(/api) TODO idk if needed
+app.use("/api/router", postRouter);
+
+// express-async-handler
+// deno-lint-ignore no-explicit-any
+app.use((err: any, _req: any, res: any, _next: any) => {
+    const status = err.status || 500;
+    const message = err.message || "Server error";
+    res.status(status).json({ error: message });
+});
+
+// for testing
+app.use(express.static("public"));
+app.get("/api/ping", (_req, res) => {
+    res.send({ message: "pong" });
+});
 
 (async function () {
     await connectDB();
@@ -17,4 +29,3 @@ const PORT = 8080;
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
 });
-

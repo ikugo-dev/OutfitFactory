@@ -1,285 +1,127 @@
-import {Request, Response} from 'express'; 
-const Post = require ("../models/post.ts");
-const User = require ( "../models/user.ts");
+import { Request, Response } from "express";
+import asyncHandler from "express-async-handler";
+import { PostModel } from "../models/post.ts";
+import { UserModel } from "../models/user.ts";
+import { Types } from "mongoose";
 
-
-export async function getPost(req: Request, res: Response): Promise <void>
-{
-    try{
-        const {ID} = req.body;
-
-        const post = await Post.findById(ID).exec();
-        if (post == null) {
-            res.status(404).json({error: "No such post."});
-            return;
-        }   
-        res.status(200).json(post);
-        return;
-
+async function getPostOr404(id: string) {
+    if (!Types.ObjectId.isValid(id)) {
+        throw { status: 400, message: "Invalid post ID." };
     }
-    catch(error)    {
-        res.status(500).json({error: "Server error."});
-        return;
+    const post = await PostModel.findById(id).exec();
+    if (!post) {
+        throw { status: 404, message: "Post not found." };
     }
-
+    return post;
 }
 
-export async function createPost(req: Request, res: Response): Promise <void>
-{
-    try
-    {
-        const { Username, Text, Outfit, Published } = req.body;
+export const getPost = asyncHandler(async (req: Request, res: Response) => {
+    const { ID } = req.body;
+    const post = await getPostOr404(ID);
+    res.json(post);
+});
 
-        let foundUsername = await User.exists({username: Username}).exec();  
-        
-        if ( foundUsername == null ) {
-            res.status(404).json({error: "No such user."});  
-            return;
-        }
-        
-        if (Text.length() > 128) {
-            res.status(400).json({error: "Text too long."});
-            return;
-        }
-        
-        if (Outfit.top == null || Outfit.bottom == null || Outfit.shoes == null){
-            res.status(400).json({error: "Outfit requires at least a top, a bottom, and footwear."});
-            return;
-        }
-        
-        const post = new Post(Username, Text, 0, null, 0.0, Outfit, Published);
+export const createPost = asyncHandler(async (req: Request, res: Response) => {
+    const { Username, Text, Outfit } = req.body;
 
-        res.status(200).json(post);
-        return;
+    const user = await UserModel.findOne({ username: Username }).exec();
+    if (!user) {
+        throw { status: 404, message: "No such user." };
     }
-    catch(error)    {
-        res.status(500).json({error: "Server error."});
-        return;
+
+    if (Text && Text.length > 128) {
+        throw { status: 400, message: "Text too long." };
     }
-}
 
-
-export async function like(req: Request, res: Response): Promise <void>
-{
-    try
-    {
-        const {ID} = req.body;
-
-        let foundPost = await Post.find({_id: ID}).exec();  
-        if ( foundPost == null ) {
-            res.status(404).json({error: "No such user."});  
-            return;
-        }
-
-        var likeNumber = foundPost.likes;
-        likeNumber++;
-
-        const updateRes = await foundPost.updateOne({likes: likeNumber});
-        if (updateRes.upsertedCount == 0 ) {
-            (res.status(500).json({error: "Server error."})); 
-            return;
-        }
+    if (!Outfit?.top || !Outfit?.bottom || !Outfit?.shoes) {
+        throw {
+            status: 400,
+            message: "Outfit requires top, bottom, and shoes.",
+        };
     }
-    catch(error)
-    {
-        res.status(500).json({error: "Server error."});
-        return;
+
+    const post = await PostModel.create({
+        user: user._id,
+        text: Text,
+        outfit: Outfit,
+        published: false,
+    });
+
+    res.status(201).json(post);
+});
+
+export const like = asyncHandler(async (req: Request, res: Response) => {
+    const { ID } = req.body;
+    const post = await getPostOr404(ID);
+
+    post.likes++;
+    await post.save();
+
+    res.json({ likes: post.likes });
+});
+
+export const unlike = asyncHandler(async (req: Request, res: Response) => {
+    const { ID } = req.body;
+    const post = await getPostOr404(ID);
+
+    post.likes = Math.max(0, post.likes - 1);
+    await post.save();
+
+    res.json({ likes: post.likes });
+});
+
+export const addComment = asyncHandler(async (req: Request, res: Response) => {
+    const { ID, Comment } = req.body;
+    const post = await getPostOr404(ID);
+
+    post.comments.push(Comment);
+    await post.save();
+
+    res.json(post);
+});
+
+export const addGrade = asyncHandler(async (req: Request, res: Response) => {
+    const { ID, Grade } = req.body;
+    const post = await getPostOr404(ID);
+
+    post.grades.push(Grade);
+    await post.save();
+
+    res.json(post);
+});
+
+export const publish = asyncHandler(async (req: Request, res: Response) => {
+    const { ID } = req.body;
+    const post = await getPostOr404(ID);
+
+    if (post.published) {
+        throw { status: 400, message: "Post already published." };
     }
-}
 
-export async function unlike(req: Request, res: Response): Promise <void>
-{
-    try
-    {
-        const {ID} = req.body;
+    post.published = true;
+    await post.save();
 
-        let foundPost = await Post.find({_id: ID}).exec();  
-        if ( foundPost == null ) { 
-            res.status(404).json({error: "No such user."});
-            return;
-        }  
-        //  TODO cuvanje lajkovanih postova
+    res.json(post);
+});
 
-        let likeNumber = foundPost.likes;
-        likeNumber--;
+export const unpublish = asyncHandler(async (req: Request, res: Response) => {
+    const { ID } = req.body;
+    const post = await getPostOr404(ID);
 
-        const updateRes = await foundPost.updateOne({likes: likeNumber});
-        if (updateRes.upsertedCount == 0 ) { 
-            res.status(500).json({error: "Server error."}); 
-            return;
-        }
-
+    if (!post.published) {
+        throw { status: 400, message: "Post already private." };
     }
-    catch(error)
-    {
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-}
 
+    post.published = false;
+    await post.save();
 
-export async function addComment(req: Request, res: Response): Promise <void>
-{
-    try
-    {
-        const {ID, Comment} = req.body;
+    res.json(post);
+});
 
-        let post = await Post.find({_id: ID}).exec();  
-        if ( post == null ) { 
-            res.status(404).json({error: "No such user."});  
-            return;
-        }
+export const deletePost = asyncHandler(async (req: Request, res: Response) => {
+    const { ID } = req.body;
+    const post = await getPostOr404(ID);
 
-        const newPost = await post.Update( {$push: { comments: Comment } }, { new: true })
-        if(newPost == null) {
-            res.status(500).json({error: "Server error."});
-            return;
-        }
-
-        res.status(200).json(post);
-        return;
-    }
-    catch(error){
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-}
-
-export async function addGrade(req: Request, res: Response): Promise <void>
-{
-    try
-    {
-        const {ID, Grade} = req.body;
-
-        let post = await Post.findByID(ID).exec();  
-        if ( post == null ) {
-            res.status(404).json({error: "No such user."});  
-            return;
-        }
-
-        const newPost = await post.Update( {$push: { grade: Grade } }, { new: true })
-        if (newPost == null) {
-            res.status(500).json({error: "Server error."});
-            return;
-        }
-
-        res.status(200).json(post);
-        return;
-    }
-    catch(error){
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-}
-
-
-export async function publish(req: Request, res: Response): Promise <void> 
-{
-    try
-    {
-        const {ID, Username, Published} = req.body;
-
-        let foundPost = await Post.find({_id: ID, username: Username}).exec();  
-        if ( foundPost == null ) {
-            res.status(404).json({error: "No such post from this user."});  
-            return;
-        }
-
-        if (Published == true) {    
-            res.status(500).json({error: "Post already published."});
-        }
-
-        const updateRes = await foundPost.updateOne({publish: true});
-        if (updateRes.upsertedCount == 0 )  {
-            res.status(500).json({error: "Server error."});
-            return;
-        }
-    }
-    catch(error)
-    {
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-}
-
-export async function unpublish(req: Request, res: Response): Promise <void>  
-{
-    try
-    {
-        const {ID, Username, Published} = req.body;
-
-        let foundPost = await Post.find({_id: ID, username: Username}).exec();  
-        if ( foundPost == null ) {
-            res.status(404).json({error: "No such post from this user."});  
-            return;
-        }
-        
-        if (Published == false) {
-            res.status(500).json({error: "Post already private."});
-        }
-
-        const updateRes = await foundPost.updateOne({publish: false});
-        if (updateRes.upsertedCount == 0 )  {
-            res.status(500).json({error: "Server error."});
-            return;
-        }
-    }
-    catch(error)
-    {
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-}
-
-
-
-export async function removeComment(req: Request, res: Response): Promise <void>  
-{
-    try
-    {
-        const {PostID, Username, Comment} = req.body;
-        let foundPost = await Post.find({_id: PostID, username: Username, comment: Comment}).exec();  
-        if ( foundPost == null ) {
-            res.status(404).json({error: "No such comment from this user on this post."});  
-            return;
-        }  
-
-
-
-    }
-    catch(error)
-    {
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-}
-
-
-export async function deletePost(req: Request, res: Response): Promise <void>  
-{
-    try
-    {
-        const {ID, Username, Published} = req.body;
-
-        let foundPost = await Post.find({_id: ID, username: Username}).exec();  
-        if ( foundPost == null ) {
-            res.status(404).json({error: "No such post from this user."});  
-            return;
-        }
-        
-        if (Published == false) {
-            res.status(500).json({error: "Post already private."});
-        }
-
-        const updateRes = await foundPost.updateOne({publish: false});
-        if (updateRes.upsertedCount == 0 )  {
-            res.status(500).json({error: "Server error."});
-            return;
-        }
-    }
-    catch(error)
-    {
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-}
+    await post.deleteOne();
+    res.status(204).send();
+});

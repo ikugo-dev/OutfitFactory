@@ -1,56 +1,25 @@
-import mongoose from 'mongoose';
-const { Schema } = mongoose;
+import { Document, model, Schema, Types } from "mongoose";
 
-const postSchema = new Schema(
+export interface Post extends Document {
+    user: number;
+    outfit: number;
+    text: string;
+    likes: number;
+    comments: number[];
+    grades: number[];
+    published: boolean;
+}
+
+const PostSchema = new Schema(
     {
-        
-        user: 
-        {
-            type: mongoose.Types.ObjectId,
-            ref: 'user',
-            required: true
-        },
+        user: { type: Types.ObjectId, ref: "user", required: true },
+        outfit: { type: Types.ObjectId, ref: "outfit", required: true },
+        text: { type: String, maxlength: 128, default: null },
+        likes: { type: Number, min: 0, default: 0 },
+        comments: { type: [Types.ObjectId], ref: "outfit" },
+        grades: { type: [Types.ObjectId], ref: "grade" },
+        published: { type: Boolean, default: false },
+    },
+);
 
-        text: 
-        {
-            type: String,
-            maxlength: 128,
-            default: null
-        },
-
-        likes:
-        {
-            type: Number,
-            min: 0,
-            default: 0,
-        },
-
-        comments: [
-        {
-            type: mongoose.Types.ObjectId,  
-            ref: 'outfit'
-        }], 
-
-        grades:[
-        {
-            type: mongoose.Types.ObjectId,
-            ref: 'grade'
-        }],
-
-        outfit:
-        {
-            type: mongoose.Types.ObjectId,  
-            ref: 'outfit',
-            required: true
-        },
-
-        published:
-        {
-            type: Boolean,
-            default: false
-
-        }
-
-    });
-
-module.exports = mongoose.model('post', postSchema);
+export const PostModel = model<Post>("Post", PostSchema);

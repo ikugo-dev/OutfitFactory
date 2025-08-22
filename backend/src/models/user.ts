@@ -30,31 +30,38 @@ const userSchema = new Schema(
         posts: [
             {
                 type: Types.ObjectId,
-                ref: "post",
+                ref: "post"
             },
         ],
 
         followers: [
             {
                 type: Types.ObjectId,
-                ref: "user",
+                ref: "user"
             },
         ],
 
         following: [
             {
                 type: Types.ObjectId,
-                ref: "user",
+                ref: "user"
             },
         ],
 
         liked: [
             {
                 type: Types.ObjectId,
-                ref: "post",
+                ref: "post"
             },
         ],
-    },
+
+        closet: [
+            {
+                type: Types.ObjectId,
+                ref: 'garment'
+            }
+        ]
+    }
 );
 
 export const UserModel = model("user", userSchema);

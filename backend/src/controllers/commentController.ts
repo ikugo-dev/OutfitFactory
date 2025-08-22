@@ -1,69 +1,62 @@
 import { Request, Response } from "express";
-const Comment = require("../models/comment.ts");
-const User = require("../models/user.ts");
+import {CommentModel} from "../models/comment.ts";
+import {UserModel} from "../models/user.ts";
 
 export async function getComment(req: Request, res: Response): Promise<void> {
     try {
         const { ID } = req.body;
-        const comment = await Comment.findById(ID).exec();
+        const comment = await CommentModel.findById(ID).exec();
 
         if (!comment) {
             res.status(404).json({ error: "No such comment." });
             return;
         }
 
-        res.status(200).json(comment);
+        res.status(200).json(comment).send();
         return;
     } catch (error) {
-        res.status(500).json({ error: "Server error." });
+        res.status(500).json({ error: "Server error." }).send();
         return;
     }
 }
 
-export async function createComment(
-    req: Request,
-    res: Response,
-): Promise<void> {
+export async function createComment( req: Request, res: Response): Promise<void> {
     try {
         const { Username, Text } = req.body;
 
-        let foundUsername = await User.exists({ username: Username }).exec();
+        let foundUsername = await UserModel.exists({ username: Username }).exec();
         if (foundUsername != null) {
             res.status(400).json({ error: "Username already taken." });
             return;
         }
-        const newComment = new Comment(Username, Text, 0);
+        const newComment = new CommentModel({username: Username, text: Text, likes: 0});
 
         if (newComment == null) {
-            res.status(400).json({ error: "User creation error." });
-            return;
+            throw new Error();
         }
-
-        res.status(200).json(newComment);
+        res.status(200).json(newComment).send();
         return;
+
     } catch (error) {
-        res.status(500).json({ error: "Server error." });
+        res.status(500).json({ error: "Server error." }).send();
         return;
     }
 }
 
-export async function deleteComment(
-    req: Request,
-    res: Response,
-): Promise<void> {
+export async function deleteComment(req: Request, res: Response): Promise<void> {
     try {
         const { ID } = req.body;
 
-        const comment = await Comment.findById(ID).exec();
+        const comment = await CommentModel.findById(ID).exec();
 
         if (!comment) {
-            res.status(404).json({ error: "No such comment." });
+            res.status(404).json({ error: "No such comment."}).send();
             return;
         }
 
-        const deleteRes = await Comment.deleteOne({ _id: ID });
+        const deleteRes = await CommentModel.deleteOne({ _id: ID });
         if (deleteRes.deletedCount == 0) {
-            res.status(500).json({ error: "Server error." });
+            throw new Error();
             return;
         }
     } catch (error) {
@@ -76,28 +69,27 @@ export async function likeComment(req: Request, res: Response): Promise<void> {
     try {
         const { ID, Username } = req.body;
 
-        const comment = await Comment.findById(ID).exec();
+        const comment = await CommentModel.findById(ID).exec();
 
         if (!comment) {
-            res.status(404).json({ error: "No such comment." });
+            res.status(404).json({ error: "No such comment." }).send();
             return;
         }
 
-        const user = await User.find({ username: Username }).exec();
+        const user = await UserModel.find({ username: Username }).exec();
         if (!user) {
-            res.status(400).json({ error: "No such user." });
+            res.status(400).json({ error: "No such user." }).send();
             return;
         }
+        
+        comment.likes++;
 
-        var likeNumber = comment.likes;
-        likeNumber++;
-
-        const updateRes = await comment.updateOne({ likes: likeNumber });
+        const updateRes = await comment.updateOne({_id: ID}, { likes: comment.likes }).exec();
         if (updateRes.upsertedCount == 0) {
-            res.status(500).json({ error: "Server error." });
+            res.status(500).json({ error: "Server error." }).send();
         }
     } catch (error) {
-        res.status(500).json({ error: "Server error." });
+        res.status(500).json({ error: "Server error." }).send();
         return;
     }
 }

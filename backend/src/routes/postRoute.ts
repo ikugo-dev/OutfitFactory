@@ -7,7 +7,6 @@ router.route("/post/:id")
     .patch(postCtrl.like)
     .patch(postCtrl.unlike)
     .patch(postCtrl.addComment)
-    .patch(postCtrl.removeComment)
     .patch(postCtrl.addGrade)
     .get(postCtrl.getPost)
     .delete(postCtrl.deletePost);

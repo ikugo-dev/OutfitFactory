@@ -36,11 +36,11 @@ def load_category_page(browser: WebDriver):
     while True:
         try:
             load_more_link = browser.find_element(By.XPATH, "//a[text()='Više proizvoda']")
-            current_count = len(browser.find_elements(By.CSS_SELECTOR, 'article.sc-iyjcfA.kWVQpz.es-product'))
+            current_count = len(browser.find_elements(By.CSS_SELECTOR, 'article.es-product'))
             load_more_link.click()
 
             WebDriverWait(browser, 10).until(
-                lambda browser: len(browser.find_elements(By.CSS_SELECTOR, 'article.sc-iyjcfA.kWVQpz.es-product')) > current_count
+                lambda browser: len(browser.find_elements(By.CSS_SELECTOR, 'article.es-product')) > current_count
             )
             time.sleep(random.uniform(0.5, 1.5)) # da ne bude mnogo ocigledno
         except:
@@ -51,7 +51,7 @@ def extract_category_product_links(browser: WebDriver):
 
     soup = BeautifulSoup(browser.page_source, "lxml")
     links = []
-    for product in soup.select('article[class="sc-iyjcfA kWVQpz es-product"]'):
+    for product in soup.select('article.es-product'):
         link = product.select_one('a')
         if link != None:
             links.append((link['href']))
@@ -59,7 +59,8 @@ def extract_category_product_links(browser: WebDriver):
 
 if __name__ == "__main__":
     browser = webdriver.Firefox()
-    browser.get("https://www.sinsay.com/rs/sr/zene/odeca/majice/majice")
+    # browser.get("https://www.sinsay.com/rs/sr/zene/odeca/majice/majice")
+    browser.get("https://www.sinsay.com/rs/sr/muskarac/odeca/farmerke")
     time.sleep(5)
 
     product_links = extract_category_product_links(browser)

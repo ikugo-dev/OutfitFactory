@@ -25,11 +25,11 @@ def parse_product(browser: WebDriver, url: str, gender: str, category: str):
     price_value     = safe_select("div[data-selen='product-price']").replace('\xa0', ' ') # zbog whitespaces koji stavljaju
     color_value     = safe_select("span[data-testid='color-picker-color-name']")
 
-    image_tag = soup.select_one("link[href^='https://static.sinsay.com/media/catalog/product/cache/']")
-    image_url_value = image_tag.get("src") if image_tag else "N/A"
+    image_tag = soup.select_one("meta[content^='https://static.sinsay.com/media/catalog/product/cache/']")
+    image_url_value = image_tag.get("content") if image_tag else "N/A"
 
     material_value = "N/A"
-    script_tag = soup.find("script", string=re.compile("getProductData"))
+    script_tag = soup.find("script", string=re.compile("getProductData")) #type: ignore
     if script_tag:
         match = re.search('"composition_main_fabric":"([^"]+)"', script_tag.text)
         if match:

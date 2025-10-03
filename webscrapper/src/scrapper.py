@@ -1,7 +1,8 @@
+import cloudinary_uploader
+import links
 import random
 import time
 import re
-from collections import namedtuple
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.webdriver import WebDriver
@@ -26,7 +27,11 @@ def parse_product(browser: WebDriver, url: str, gender: str, category: str):
     color_value     = safe_select("span[data-testid='color-picker-color-name']")
 
     image_tag = soup.select_one("meta[content^='https://static.sinsay.com/media/catalog/product/cache/']")
-    image_url_value = image_tag.get("content") if image_tag else "N/A"
+    if image_tag:
+        image_url_value = image_tag.get("content")
+        if image_url_value:
+            cloudinary_url = cloudinary_uploader.upload(image_url_value)
+
 
     material_value = "N/A"
     script_tag = soup.find("script", string=re.compile("getProductData")) #type: ignore
@@ -74,16 +79,11 @@ def extract_category_product_links(browser: WebDriver, url: str):
             links.append((link['href']))
     return links
 
-Category = namedtuple('Category', 'link gender name')
-categories = [
-    Category("https://www.sinsay.com/rs/sr/muskarac/odeca/farmerke", "m", "farmerke")
-]
-
 if __name__ == "__main__":
     browser = webdriver.Firefox()
     print(parse_product(browser, "https://www.sinsay.com/rs/sr/jogger-farmerke-445fb-90j", "m", "farmerke"))
-    # for category in categories:
-    #     product_links = extract_category_product_links(browser, category.link)
-    #     for product_link in product_links:
-    #         print(parse_product(browser, product_link, category.gender, category.name));
+    for category in links.categories:
+        product_links = extract_category_product_links(browser, category.link)
+        for product_link in product_links:
+            print(parse_product(browser, product_link, category.gender, category.name));
     browser.close()

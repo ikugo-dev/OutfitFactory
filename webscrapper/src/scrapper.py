@@ -26,11 +26,12 @@ def parse_product(browser: WebDriver, url: str, gender: str, category: str):
     price_value     = safe_select("div[data-selen='product-price']").replace('\xa0', ' ') # zbog whitespaces koji stavljaju
     color_value     = safe_select("span[data-testid='color-picker-color-name']")
 
+    cloudinary_url = "N/A"
     image_tag = soup.select_one("meta[content^='https://static.sinsay.com/media/catalog/product/cache/']")
     if image_tag:
         image_url_value = image_tag.get("content")
         if image_url_value:
-            cloudinary_url = cloudinary_uploader.upload(image_url_value)
+            cloudinary_url = cloudinary_uploader.upload(str(image_url_value))
 
 
     material_value = "N/A"
@@ -42,7 +43,7 @@ def parse_product(browser: WebDriver, url: str, gender: str, category: str):
 
     return {
         "id": id_value,
-        "image_url": image_url_value,
+        "image_url": cloudinary_url,
         "gender": gender,
         "category": category,
         "name":  name_value,
@@ -81,7 +82,7 @@ def extract_category_product_links(browser: WebDriver, url: str):
 
 if __name__ == "__main__":
     browser = webdriver.Firefox()
-    print(parse_product(browser, "https://www.sinsay.com/rs/sr/jogger-farmerke-445fb-90j", "m", "farmerke"))
+    # print(parse_product(browser, "https://www.sinsay.com/rs/sr/jogger-farmerke-445fb-90j", "m", "farmerke"))
     for category in links.categories:
         product_links = extract_category_product_links(browser, category.link)
         for product_link in product_links:

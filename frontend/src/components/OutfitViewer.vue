@@ -24,7 +24,6 @@
 
 <script setup lang="ts">
 import type { OutfitType } from '../types';
-
 defineProps<{
   outfit: OutfitType | undefined;
 }>();

@@ -38,7 +38,6 @@ const outfit = ref<OutfitType>({
 
 const caption = ref("");
 
-// Mock submit function (in reality you’d send this to your backend)
 function submitPost() {
   if (!user.value) return alert("You must be logged in!");
 
@@ -54,7 +53,6 @@ function submitPost() {
   console.log("Posted new outfit:", newPost);
   alert("Outfit posted! (Check console for mock data.)");
 
-  // reset
   outfit.value = { clothes: [] };
   caption.value = "";
 }

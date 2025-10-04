@@ -9,8 +9,8 @@
       <div class="filter-row">
         <label>Gender</label>
         <div>
-          <label><input type="checkbox" value="male" v-model="localFilters.genders" /> Male</label>
-          <label><input type="checkbox" value="female" v-model="localFilters.genders" /> Female</label>
+          <label><input type="checkbox" value="Male" v-model="localFilters.genders" /> Male</label>
+          <label><input type="checkbox" value="Female" v-model="localFilters.genders" /> Female</label>
         </div>
       </div>
 
@@ -53,7 +53,8 @@
 
       <ul class="items">
         <li v-for="a in filteredArticles" :key="a.id" class="item" @click="select(a)">
-          <div class="image-placeholder">{{ a.category }}</div>
+          <!-- <div class="image-placeholder">{{ a.imageUrl }}</div> -->
+          <img :src="a.imageUrl">
           <div class="info">
             <div class="name">{{ a.name }}</div>
             <div class="meta">{{ a.brand }} • €{{ a.price }} • {{ a.material }}</div>
@@ -68,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, reactive, toRefs, onMounted } from 'vue';
+import { ref, watch, reactive, onMounted } from 'vue';
 import type { ArticleType } from '../types';
 import { fetchAllArticles } from '../fakeData.ts';
 
@@ -93,7 +94,7 @@ const emit = defineEmits<{
 const brand = props.brand ?? '';
 
 const localFilters = reactive({
-  genders: props.initialFilters?.genders ? [...props.initialFilters.genders] : ['male', 'female'],
+  genders: props.initialFilters?.genders ? [...props.initialFilters.genders] : ['Male', 'Female'],
   materialSubstr: props.initialFilters?.materialSubstr ?? '',
   priceFrom: props.initialFilters?.priceFrom ?? null,
   priceTo: props.initialFilters?.priceTo ?? null,
@@ -146,7 +147,7 @@ function applyFilters() {
 }
 
 function resetFilters() {
-  localFilters.genders = ['male','female'];
+  localFilters.genders = ['Male','Female'];
   localFilters.materialSubstr = '';
   localFilters.priceFrom = null;
   localFilters.priceTo = null;

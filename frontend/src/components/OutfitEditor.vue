@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <SelectionPanel
+    <OutfitSelectionPanel
       v-if="isPanelOpen"
       :category="activeCategory"
       :brand="brand"
@@ -25,17 +25,17 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue';
+import { reactive, ref } from 'vue';
 import type { ArticleType } from '../types';
 import OutfitSlot from './OutfitSlot.vue';
-import SelectionPanel from './SelectionPanel.vue';
+import OutfitSelectionPanel from './OutfitSelectionPanel.vue';
 
 const slots = [
   { key: 'top', label: 'Top', category: 'top' },
-  { key: 'bottom', label: 'Bottom', category: 'bottom' },
-  { key: 'shoes', label: 'Shoes', category: 'shoes' },
   { key: 'jacket', label: 'Jacket', category: 'jacket' },
+  { key: 'bottom', label: 'Bottom', category: 'bottom' },
   { key: 'accessory1', label: 'Accessory 1', category: 'accessory' },
+  { key: 'shoes', label: 'Shoes', category: 'shoes' },
   { key: 'accessory2', label: 'Accessory 2', category: 'accessory' },
 ] as const;
 
@@ -54,7 +54,6 @@ const isPanelOpen = ref(false);
 const activeSlot = ref<SlotKey | null>(null);
 const activeCategory = ref<string | null>(null);
 
-// simple shared filters initial values
 const filters = reactive({
   genders: ['male', 'female'], // both checked by default
   materialSubstr: '',
@@ -63,8 +62,7 @@ const filters = reactive({
   colors: [] as string[],
 });
 
-// brand is locked to BrandA (per your instruction)
-const brand = 'BrandA';
+const brand = 'Sinsay';
 
 // expected color list
 const availableColors = ['red','green','blue','black','white','brown','yellow'];
@@ -87,8 +85,6 @@ function handleSelectArticle(article: ArticleType) {
   closePanel();
 }
 
-// expose for debugging (dev)
-(window as any).__outfitSlots = outfitSlots;
 </script>
 
 <style scoped>
@@ -98,7 +94,6 @@ function handleSelectArticle(article: ArticleType) {
   align-items: flex-start;
 }
 
-/* grid area (left) */
 .outfit-grid {
   display: grid;
   grid-template-columns: repeat(2, 180px);
@@ -106,6 +101,4 @@ function handleSelectArticle(article: ArticleType) {
   gap: 12px;
   padding: 8px;
 }
-
-/* let SelectionPanel be to the right; it has its own styles */
 </style>

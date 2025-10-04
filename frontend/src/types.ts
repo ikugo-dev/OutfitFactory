@@ -37,6 +37,7 @@ export interface PostType {
   id: number;
   user: UserType;
   outfit: OutfitType | undefined;
+  caption: string;
   likes: number;
   comments: CommentType[] | undefined;
   visible: boolean;

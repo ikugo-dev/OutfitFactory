@@ -1,16 +1,18 @@
 <template>
   <div class="post-card" :style="{ backgroundColor: color }">
     <div class="outfit-container">
-      <OutfitEditor />
+      <!-- <OutfitEditor /> -->
+      <OutfitViewer :outfit="post.outfit"/>
     </div>
 
-    <h3>{{ post.user.username }} : {{ post.text || '...' }}</h3>
+    <h3>{{ post.user.username }} : {{ post.caption || '...' }}</h3>
     <PostCardControls :post="post" />
   </div>
 </template>
 
+<!-- import OutfitEditor from './OutfitEditor.vue'; -->
 <script setup lang="ts">
-import OutfitEditor from './OutfitEditor.vue';
+import OutfitViewer from './OutfitViewer.vue';
 import PostCardControls from './PostCardControls.vue';
 import { ref } from 'vue';
 import type { PostType } from '../types';
@@ -38,3 +40,5 @@ const color = "#" + ((1 << 24) * Math.random() | 0).toString(16).padStart(6, "0"
   margin-bottom: 8px;
 }
 </style>
+
+

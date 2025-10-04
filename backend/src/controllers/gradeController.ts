@@ -1,13 +1,14 @@
 import {Request, Response} from 'express'; 
-import { GradeModel } from "../models/grade.ts";
+const GradeModel = require("../models/grade");
 
 
-export async function getGrade(req: Request, res: Response): Promise <void>
-{
+const gradeCtrl = {
+
+    async getGrade(req: Request, res: Response): Promise <void>{
     try{
-        const {ID} = req.body;
+        const id = req.params.id;
 
-        const grade = await GradeModel.findById(ID).exec();
+        const grade = await GradeModel.findById(id).exec();
         if (grade == null) {
             res.status(404).json({error: "No such post."});
             return; 
@@ -20,42 +21,40 @@ export async function getGrade(req: Request, res: Response): Promise <void>
         res.status(500).json({error: "Server error."});
     }
 
-}
+},
 
-
-export async function createGrade(req: Request, res: Response): Promise <void>
-{
-    try{
+async createGrade(req: Request, res: Response): Promise <void>{
+    
+    try {
         const newGrade = await GradeModel.create({ fit_quality: 0, material_quality: 0, design: 0, comfort : 0});
 
         if (newGrade == null) {
             throw new Error();
         }
-
         res.status(200).json(newGrade).send();
     }
-    catch(error)    
-    {
+    catch(error){
         res.status(500).json({error: "Server error."}).send();
     }
 
-}
+},
 
 
-export async function addFit(req: Request, res: Response): Promise <void>
-{
+async addFit(req: Request, res: Response): Promise <void>{
     try{
-        const {ID, Fit} = req.body;
+        const {id, fit} = req.body;
+        const fitNum = new Number(fit);
         
-        const grade = await GradeModel.findById(ID).exec();
+        const grade = await GradeModel.findById(id).exec();
         if (grade == null) {
             res.status(404).json({error: "No such post."}).send();
             return; 
         }
         
-        const newGrade = await grade.updateOne({fit_quality: Fit}).exec();
-        if( newGrade.upsertedCount == 0) {
-            throw new Error();
+        const newGrade = await GradeModel.updateOne({_id: id}, {$set: {fit_quality: fitNum}}).exec();
+        console.log(newGrade);
+        if( newGrade.modifiedCount == 0) {
+            throw new Error("500");
         }
 
         res.status(200).json(grade).send();
@@ -63,24 +62,73 @@ export async function addFit(req: Request, res: Response): Promise <void>
     }
     catch(error)    
     {
+        console.log(error);
         res.status(500).json({error: "Server error."}).send();
     }
 
-}
+},
 
-export async function addMaterial(req: Request, res: Response): Promise <void>
-{
+async addMaterial(req: Request, res: Response): Promise <void> {
+    
     try{
-        const {ID, Material} = req.body;
+        const {id, material} = req.body;
         
-        const grade = await GradeModel.findById(ID).exec();
+        const grade = await GradeModel.findById(id).exec();
         if (grade == null) {
             res.status(404).json({error: "No such post."});
             return; 
         }
         
-        const newGrade = await grade.updateOne({material_quality: Material}).exec();
-        if( newGrade.upsertedCount == 0) {
+        const newGrade = await GradeModel.updateOne({_id: id}, {$set: {material_quality: new Number(material)}}).exec();
+        if( newGrade.modifiedCount == 0) {
+            throw new Error("500");
+        }
+
+        res.status(200).json(grade).send();
+        return;
+    }
+    catch(error) {
+        res.status(500).json({error: "Server error."});
+    }
+
+},
+
+async addDesign(req: Request, res: Response): Promise <void> {
+    try{
+        const {id, design} = req.body;
+        
+        const grade = await GradeModel.findById(id).exec();
+        if (grade == null) {
+            res.status(404).json({error: "No such post."});
+            return; 
+        }
+        
+        const newGrade = await GradeModel.updateOne({_id: id}, {$set: {design: new Number(design)}}).exec();
+        if( newGrade.modifiedCount == 0) {
+            throw new Error();
+        }
+
+        res.status(200).json(grade).send();
+        return;
+    }
+    catch(error) {
+        res.status(500).json({error: "Server error."});
+    }
+
+},
+
+async addComfort(req: Request, res: Response): Promise <void> {
+    try{
+        const {id, comfort} = req.body;
+        
+        const grade = await GradeModel.findById(id).exec();
+        if (grade == null) {
+            res.status(404).json({error: "No such post."});
+            return; 
+        }
+        
+        const newGrade = await GradeModel.updateOne({_id: id},  {$set: {comfort: comfort}}).exec();
+        if( newGrade.modifiedCount == 0) {
             throw new Error();
         }
 
@@ -92,73 +140,20 @@ export async function addMaterial(req: Request, res: Response): Promise <void>
         res.status(500).json({error: "Server error."});
     }
 
-}
+},
 
-export async function addDesign(req: Request, res: Response): Promise <void>
-{
+
+async deleteGrade(req: Request, res: Response): Promise <void> {
     try{
-        const {ID, Design} = req.body;
-        
-        const grade = await GradeModel.findById(ID).exec();
-        if (grade == null) {
-            res.status(404).json({error: "No such post."});
-            return; 
-        }
-        
-        const newGrade = await grade.updateOne({design: Design}).exec();
-        if( newGrade.upsertedCount == 0) {
-            throw new Error();
-        }
+        const id = req.params.id;
 
-        res.status(200).json(grade).send();
-        return;
-    }
-    catch(error)    
-    {
-        res.status(500).json({error: "Server error."});
-    }
-
-}
-
-export async function addComfort(req: Request, res: Response): Promise <void>
-{
-    try{
-        const {ID, Comfort} = req.body;
-        
-        const grade = await GradeModel.findById(ID).exec();
-        if (grade == null) {
-            res.status(404).json({error: "No such post."});
-            return; 
-        }
-        
-        const newGrade = await grade.updateOne({comfort: Comfort}).exec();
-        if( newGrade == null) {
-            throw new Error();
-        }
-
-        res.status(200).json(grade).send();
-        return;
-    }
-    catch(error)    
-    {
-        res.status(500).json({error: "Server error."});
-    }
-
-}
-
-
-export async function deleteGrade(req: Request, res: Response): Promise <void>
-{
-    try{
-        const {ID} = req.body;
-
-        const post = await GradeModel.findById(ID).exec();
+        const post = await GradeModel.findById(id).exec();
         if (post == null) {
             res.status(404).json({error: "No such garment."});
             return;
         }
 
-        const deleteRes = await GradeModel.deleteOne({ _id: ID });
+        const deleteRes = await GradeModel.deleteOne({ _id: id });
         if (deleteRes.deletedCount == 0 ) { 
             throw new Error();
         }
@@ -172,3 +167,6 @@ export async function deleteGrade(req: Request, res: Response): Promise <void>
         return;
     }
 }
+}
+
+module.exports = gradeCtrl;

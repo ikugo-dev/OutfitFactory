@@ -1,8 +1,11 @@
-import { Request, Response } from "express";
-import asyncHandler from "express-async-handler";
-import { PostModel } from "../models/post.ts";
-import { UserModel } from "../models/user.ts";
+import { Request, Response } from 'express';
 import { Types } from "mongoose";
+
+const PostModel = require("../models/post");
+const UserModel = require("../models/user");
+const OutfitModel = require("../models/outfit");
+const CommentModel = require("../models/comment");
+const GradeModel = require("../models/grade");
 
 async function getPostOr404(id: string) {
     if (!Types.ObjectId.isValid(id)) {
@@ -22,10 +25,14 @@ export const getPost = asyncHandler(async (req: Request, res: Response) => {
     res.json(post);
 }); 
 */
-export async function getPost (req: Request, res: Response) {
+
+const postCtrl = {
+
+async getPost (req: Request, res: Response) : Promise <void> {
     try{
-        const { ID } = req.body;
-        const post = await getPostOr404(ID);
+        const id = req.params.id;
+        if (!id) throw Error("400");
+        const post = await getPostOr404(id);
         
         res.status(200).json(post).send();
         return;
@@ -41,37 +48,43 @@ export async function getPost (req: Request, res: Response) {
         
         res.status(500).json({message: "Server error."}).send(); return;
     }
-}; 
+},
 
-export async function createPost(req: Request, res: Response) {
+async createPost(req: Request, res: Response) : Promise <void> {
     try {
-        const { Username, Text, Outfit } = req.body;
-
-        const user = await UserModel.findOne({ username: Username }).exec();
+        const { id, text, outfitId } = req.body;
+         
+        const user = await UserModel.findById(id).exec();
         if (!user) {
             throw { status: 404, message: "No such user." };
         }
 
-        if (Text && Text.length > 128) {
+        if (text.length > 128) {
             throw { status: 400, message: "Text too long." };
         }
-
-        if (Outfit.garments.length == 0)
+        let textStr = text.toString();
+        const outfit = await OutfitModel.findById(outfitId);  
+        if (!outfit) {
+            throw { status: 404, message: "No such outfit." };
+        }
+        if (outfit.garments.length == 0)
             throw {status: 400, message: "No garments in outfit."}
         
+        console.log("aaa");
 
-        const post = await PostModel.create({   //TODO fix creates
-            user: user._id,
-            text: Text,
-            outfit: Outfit,
+        const post = await PostModel.create({   
+            user: id,
+            text: textStr,
+            outfit: outfitId,
             published: false,
         });
-
-        res.status(201).json(post);
+        
+        
+        res.status(201).json(post).send();
         return;
     }   
     catch(error) {
-
+        console.log(error);
         if (error instanceof Error && error.message == "400"){
             res.status(400).json({message: "Invalid ID."}).send(); return;
         }
@@ -81,12 +94,12 @@ export async function createPost(req: Request, res: Response) {
         
         res.status(500).json({message: "Server error."}).send(); return;
     }
-};
+},
 
-export async function like(req: Request, res: Response) {
+async like(req: Request, res: Response): Promise <void> {
     try{
-        const { ID } = req.body;
-        const post = await getPostOr404(ID);
+        const { id } = req.body;
+        const post = await getPostOr404(id);
 
         post.likes++;
         await post.save();
@@ -104,12 +117,12 @@ export async function like(req: Request, res: Response) {
         
         res.status(500).json({message: "Server error."}).send(); return;
     }
-};
+},
 
-export async function unlike(req: Request, res: Response){
+async unlike(req: Request, res: Response) : Promise <void>{
     try{
-        const { ID } = req.body;
-        const post = await getPostOr404(ID);
+        const { id } = req.body;
+        const post = await getPostOr404(id);
 
         post.likes = Math.max(0, post.likes - 1);
         await post.save();
@@ -129,21 +142,23 @@ export async function unlike(req: Request, res: Response){
         res.status(500).json({message: "Server error."}).send(); return;   
     
     }
-};
+},
 
-export async function addComment(req: Request, res: Response){
+async addComment(req: Request, res: Response) : Promise <void>{
     try{
-        const { ID, Comment } = req.body;
-        const post = await getPostOr404(ID);
+        const { id, commentId } = req.body;
+        const post = await getPostOr404(id);
+        const comment = await CommentModel.findById(commentId);
+        if (!comment) throw Error("404");
 
-        post.comments.push(Comment);
-        await post.save();
-
-        res.status(203).json({comment: Comment}).send();
+        const updateRes = PostModel.updateOne({_id: id}, {$push: {comments: commentId}});
+        if (updateRes.modifiedCount ==0) throw Error("500");
+        res.status(200).send();
         return;
 
     } 
     catch(error) {
+        console.log(error);
 
         if (error instanceof Error && error.message == "400"){
             res.status(400).json({message: "Invalid ID."}).send(); return;
@@ -155,17 +170,19 @@ export async function addComment(req: Request, res: Response){
         res.status(500).json({message: "Server error."}).send(); return;    
     }
 
-};
+},
 
-export async function addGrade(req: Request, res: Response) {
+async addGrade(req: Request, res: Response) : Promise <void> {
     try {
-        const { ID, Grade } = req.body;
-        const post = await getPostOr404(ID);
+        const { id, gradeId } = req.body;
+        const post = await getPostOr404(id);
+        
+        const grade = await GradeModel.findById(gradeId);
+        if (!grade) throw Error("404");
 
-        post.grades.push(Grade);
-        await post.save();
-
-        res.status(204).json({grade: Grade}).send();
+        const updateRes = PostModel.updateOne({_id: id}, {$push: {grades: gradeId}});
+        if (updateRes.modifiedCount ==0) throw Error("500");
+        res.status(200) .send();
         return;
 
     }
@@ -180,13 +197,13 @@ export async function addGrade(req: Request, res: Response) {
         
         res.status(500).json({message: "Server error."}).send(); return;  
     }
-};
+},
 
-export async function publish (req: Request, res: Response) {
+async publish (req: Request, res: Response) : Promise <void> {
     
     try {
-        const { ID } = req.body;
-        const post = await getPostOr404(ID);
+        const { id } = req.body;
+        const post = await getPostOr404(id);
 
         if (post.published) {
             throw { status: 400, message: "Post already published." };
@@ -209,12 +226,12 @@ export async function publish (req: Request, res: Response) {
         
         res.status(500).json({message: "Server error."}).send(); return;   
     }
-};
+},
 
-export async function unpublish (req: Request, res: Response) {
+async unpublish (req: Request, res: Response) : Promise <void> {
     try{
-        const { ID } = req.body;
-        const post = await getPostOr404(ID);
+        const { id } = req.body;
+        const post = await getPostOr404(id);
 
         if (!post.published) {
             throw { status: 400, message: "Post already private." };
@@ -238,12 +255,13 @@ export async function unpublish (req: Request, res: Response) {
         
         res.status(500).json({message: "Server error."}).send(); return;
     }
-};
+},
 
-export async function deletePost (req: Request, res: Response) {
+async deletePost (req: Request, res: Response) : Promise <void> {
     try{
-        const { ID } = req.body;
-        const post = await getPostOr404(ID);
+        const id  = req.params.id;
+        if (!id) throw Error("400");
+        const post = await getPostOr404(id);
 
         await post.deleteOne();
         res.status(206).send();  //TODO
@@ -262,4 +280,8 @@ export async function deletePost (req: Request, res: Response) {
         res.status(500).json({message: "Server error."}).send(); return;
     
     }
-};
+}
+
+}
+
+module.exports = postCtrl;

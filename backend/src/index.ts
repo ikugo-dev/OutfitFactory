@@ -1,11 +1,13 @@
 import express from "express";
-import { connectDB } from "./tools/db-connection.ts";
-import postRouter from "./routes/postRoute.ts";
-import userRouter from "./routes/userRoute.ts"
+const listEndpoints = require('express-list-endpoints');
+const dbCon = require ("./tools/db-connection");
+const postRouter = require ("./routes/postRoute.js");
+const userRouter = require ("./routes/userRoute.js");
 
 const app = express();
 
 app.use(express.json());
+
 app.use("/api/post_router", postRouter);
 app.use("/api/user_router", userRouter);
 
@@ -15,20 +17,22 @@ app.use((err: any, _req: any, res: any, _next: any) => {
     const status = err.status || 500;
     const message = err.message || "Server error";
     res.status(status).json({ error: message });
+
 });
 
-// for testing
+
+/*// for testing
 app.use(express.static("public"));
 app.get("", (_req, res) => {
     res.send({ message: "pong" });
 });
-
+*/
 
 (async function () {
-    await connectDB();
+    await dbCon.connectDB();
 })();
 
-const PORT = process.env.port;
+const PORT = process.env.port || 3000;
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
 });

@@ -1,11 +1,14 @@
 import {Request, Response} from 'express'; 
-import { OutfitModel } from "../models/outfit.ts";
+const OutfitModel = require("../models/outfit");
+const GarmentModel = require("../models/garment");
 
-export async function getOutfit(req: Request, res: Response): Promise <void>  {
+const outfitCtrl = {
+
+async getOutfit(req: Request, res: Response): Promise <void>  {
     try 
     {
-        const { ID } = req.body;
-        const outfit = await OutfitModel.findById(ID).exec();
+        const  id  = req.params.id;
+        const outfit = await OutfitModel.findById(id).exec();
 
         if (!outfit) {
             res.status(404).json({error: "Outfit not found."}).send();
@@ -20,12 +23,11 @@ export async function getOutfit(req: Request, res: Response): Promise <void>  {
         res.status(500).json({error: "Server error."}).send();
         return;
     }
-} 
+},
 
-export async function createOutfit(req: Request, res: Response): Promise<void>
+async createOutfit(req: Request, res: Response): Promise<void>
 {
-    try
-    {
+    try{
         const newOutfit = await OutfitModel.create({ garments: [] });
 
         if (newOutfit == null){
@@ -37,54 +39,52 @@ export async function createOutfit(req: Request, res: Response): Promise<void>
         return;
 
     }
-    catch(error)
-    {
+    catch(error){
         res.status(500).json({error: "Server error."}).send();
         return; 
     }
+},
 
-}
 
+async addGarment(req: Request, res: Response): Promise <void>  {
+    try {
+        const { id, garmentId } = req.body;
+        const outfit = await OutfitModel.findById(id).exec();
+        const garment = await GarmentModel.findById(garmentId).exec();
 
-export async function addGarment(req: Request, res: Response): Promise <void>  {
-    try 
-    {
-        const { ID, Garment } = req.body;
-        const outfit = await OutfitModel.find({_id: ID}).exec();
-
-        if (!outfit) {
-            res.status(404).json({error: "Outfit not found."}).send();
+        console.log("")
+        if (!outfit || !garment) {
+            res.status(404).json({error: "Not found."}).send();
             return;
         }
         
-        let newOutfit = await OutfitModel.updateOne({_id: ID}, { $push: { garments : Garment }}).exec();
-        if(newOutfit.upsertedCount == 0) {
-            throw new Error();
+        let newOutfit = await OutfitModel.updateOne({_id: id}, { $push: { garments : garmentId }}).exec();
+        if(newOutfit.modifiedCount == 0) {
+            throw new Error("500");
         }
 
-        res.status(200).json({garment: Garment}).send();
+        res.status(200).json().send();
         return;
     }
-    catch (error) 
-    {
+    catch (error) {
+        console.log(error);
         res.status(500).json({error: "Server error."}).send();
         return;
     }
-} 
+},
 
 
-export async function deleteOutfit(req: Request, res: Response): Promise <void>  {
-    try 
-    {
-        const { ID } = req.body;
-        const outfit = await OutfitModel.findById(ID).exec();
+async deleteOutfit(req: Request, res: Response): Promise <void>  {
+    try {
+        const id  = req.params.id;
+        const outfit = await OutfitModel.findById(id).exec();
 
         if (!outfit) {
             res.status(404).json({error: "Outfit not found."}).send();
             return;
         }
 
-        const deleteRes = await OutfitModel.deleteOne({ _id: ID }).exec();
+        const deleteRes = await OutfitModel.deleteOne({ _id: id }).exec();
         if (deleteRes.deletedCount == 0 ) { 
             throw new Error();
         }
@@ -92,10 +92,12 @@ export async function deleteOutfit(req: Request, res: Response): Promise <void> 
         res.status(200).json("Successfully deleted outfit").send();
         return;
     }
-    catch (error) 
-    {
+    catch (error) {
         res.status(500).json({error: "Server error."}).send();
         return;
     }
 } 
+}
 
+
+module.exports = outfitCtrl;

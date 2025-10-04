@@ -1,7 +1,8 @@
 import {Request, Response} from 'express'; 
-import { PostModel } from "../models/post.ts";
-import { UserModel } from "../models/user.ts";
 import { Types } from "mongoose";
+
+const UserModel = require("../models/user");
+const PostModel = require("../models/post");
 
 
 async function getUserOr404(id: string) {
@@ -9,19 +10,24 @@ async function getUserOr404(id: string) {
         throw new Error("400");
     }
     const user = await UserModel.findById(id).exec();
-    if (!user) { //TODO FIX THIS
+
+    if (!user) { 
         throw Error("404");
     }
     return user;
 }
 
-export async function getUser(req: Request, res: Response): Promise <void> 
+const userCtrl = {
+
+async getUser(req: Request, res: Response): Promise <void> 
 {
     try {
-        const { ID } = req.body;
-        const user = await getUserOr404(ID);
+        const id = req.params.id;
+        console.log(id);    
+        if(!id) throw Error("404");
+        const user = await getUserOr404(id);
         
-        res.status(200).json(user).send(); //TODO json returns
+        res.status(200).json(user).send(); //todo json returns
         return;
     }
     catch (error) {
@@ -36,38 +42,41 @@ export async function getUser(req: Request, res: Response): Promise <void>
         res.status(500).json({message: "Server error."}).send(); return;
     
     }
-} 
+},
 
-export async function createUser(req: Request, res: Response): Promise<void>
+async createUser(req: Request, res: Response): Promise<void>
 {
     try {
-        const { Username, Email, Password } = req.body;
-        
-        const foundUsername = await UserModel.exists({username: Username}).exec();  
+        const { username, email, password } = req.body;
+        if (!username || !email  || !password){
+            res.status(400).json({error: "JSON body is empty."}).send();
+        }
+
+        const foundUsername = await UserModel.exists({username: username}).exec();  
         if ( foundUsername != null ){ 
             res.status(400).json({error: "Username already taken."}).send();  
             return;
         }   
 
-        let foundEmail = await UserModel.exists({email: Email}).exec();  
+        let foundEmail = await UserModel.exists({email: email}).exec();  
         if ( foundEmail != null ) {
             res.status(400).json({error: "Account with this email address already exists."}).send();  
             return;
         }
 
-        const newUser = new UserModel(Username, Email, Password);
-
+        const newUser = new UserModel({username, email, password});
+        
         if (newUser == null){
             res.status(400).json({error: "User creation error."}).send();
             return;
         }
+        await newUser.save();
 
         res.status(200).json(newUser).send();
         return;
 
     }
     catch(error) {
-        
         if (error instanceof Error && error.message == "400"){
             res.status(400).json({message: "Invalid ID."}).send(); return;
         }
@@ -79,13 +88,14 @@ export async function createUser(req: Request, res: Response): Promise<void>
     ; 
     }
 
-}
+},
 
-export async function getPosts(req: Request, res: Response): Promise <void> 
+async getPosts(req: Request, res: Response): Promise <void> 
 {
     try {
-        const { ID } = req.body;
-        const user = await getUserOr404(ID);
+        const id  = req.params.id;
+        if(!id) throw Error("404");
+        const user = await getUserOr404(id);
         
         if (user.posts.length == 0) {
             res.status(404).json({error: "No posts."}).send();
@@ -107,21 +117,23 @@ export async function getPosts(req: Request, res: Response): Promise <void>
         res.status(500).json({message: "Server error."}).send(); return;
     
     }
-} 
+},
 
 
-export async function removeUser(req: Request, res: Response) : Promise<void> 
+async removeUser(req: Request, res: Response) : Promise<void> 
 {
     try {
-        const { ID } = req.body;
-
-        const user = await getUserOr404(ID) ;
+        const id  = req.params.id;
+        if (!id) throw Error("404");
+        const user = await getUserOr404(id) ;
         
         const deleteRes = await user.deleteOne();
         if (deleteRes.deletedCount == 0 ){
             res.status(501).json({error: "Server error."}).send(); 
             return;
         }
+        res.status(200).send();
+        return;
     }
     catch(error) {
         
@@ -136,27 +148,29 @@ export async function removeUser(req: Request, res: Response) : Promise<void>
     
     }
 
-}
+},
 
 
-export async function updateUsername(req: Request, res: Response) : Promise<void> 
+async updateUsername(req: Request, res: Response) : Promise<void> 
 {
     try
     {
-        const { ID, newUsername } = req.body;
-
-        const user = await getUserOr404(ID);
+        const { id, newUsername } = req.body;
+        console.log(id, newUsername);
+        const user = await getUserOr404(id);
 
         const foundUsername = await UserModel.exists({username: newUsername}).exec();  
         if ( foundUsername != null ) {
-            res.status(400).json({error: "Username already taken."}).send();    //fix throws
+            res.status(400).json({error: "Username already taken."}).send();   
 
             return;
         }  
-        const updateRes = await UserModel.updateOne({ _id: ID },  {$set: { username: newUsername}} );
-        if (updateRes.upsertedCount == 0 )  {
-            res.status(501).json({error: "Server error."}). send(); 
+        const updateRes = await UserModel.updateOne({ _id: id },  {$set: { username: newUsername}}).exec();
+        if (updateRes.modifiedCount == 0 )  {
+            res.status(501).json({error: "Server error."}).send(); return;
         }
+        res.status(200).send();
+        return;
     }
     catch(error){
             
@@ -171,25 +185,27 @@ export async function updateUsername(req: Request, res: Response) : Promise<void
     
     }
 
-}
+},
 
 
-export async function updatePassword(req: Request, res: Response) : Promise<void> 
+async updatePassword(req: Request, res: Response) : Promise<void> 
 {
     try {
-        const {ID, oldPassword, newPassword } = req.body;
-
-        const user = await getUserOr404(ID);
+        const {id, oldPassword, newPassword } = req.body;
+        //console.log(oldPassword, newPassword);
+        const user = await getUserOr404(id);
 
         if (oldPassword != user.password) {
-            res.status(400).json({error: "Wrong password."}).send();
+            res.status(400).json({error: "Wrong password."}).send(); return;
         }
             
-        const updateRes = await UserModel.updateOne({ _id: ID },  {$set: { password: newPassword}}); //TODO set
-        if (updateRes.upsertedCount == 0 ) { 
+        const updateRes = await UserModel.updateOne({ _id: id }, {$set: { password: newPassword}}).exec();
+        if (updateRes.modifiedCount == 0 ) { 
             res.status(500).json({error: "Server error."}).send();
             return;
         }
+        res.status(200).send();
+        return;
     }
     catch(error){
         
@@ -203,20 +219,22 @@ export async function updatePassword(req: Request, res: Response) : Promise<void
         res.status(500).json({message: "Server error."}).send(); return;
      
     }
-}
+},
 
-export async function updateAvatar(req: Request, res: Response) : Promise<void> 
+async updateAvatar(req: Request, res: Response) : Promise<void> 
 {
     try{
-        const {ID, newAvatar } = req.body;
+        const {id, newAvatar } = req.body;  //todo sredi da lice na json 
 
-        const user = await getUserOr404(ID);
+        const user = await getUserOr404(id);
 
-        const updateRes = await UserModel.updateOne({ _id: ID },  {$set: { avatar: newAvatar}}).exec();
-        if (updateRes.upsertedCount == 0 )  {
+        const updateRes = await UserModel.updateOne({ _id: id },  {$set: { avatar: newAvatar}}).exec();
+        if (updateRes.modifiedCount == 0 )  {
             res.status(500).json({error: "Server error."}).send();
             return;
         }
+        res.status(200).send();
+        return;
    
     } catch(error)
     {
@@ -230,20 +248,22 @@ export async function updateAvatar(req: Request, res: Response) : Promise<void>
         res.status(500).json({message: "Server error."}).send(); return;
     
     }
-}
+},
 
-export async function removeAvatar(req: Request, res: Response) : Promise<void> 
+async removeAvatar(req: Request, res: Response) : Promise<void> 
 {
     try {
-        const {ID} = req.body;
+        const {id} = req.body;
 
-        const user = await getUserOr404(ID);
+        const user = await getUserOr404(id);
 
-        const updateRes = await user.updateOne({_id: ID}, {$set: { avatar: "https://cdn-icons-png.flaticon.com/512/53/53101.png" }}).exec();
-        if (updateRes.upsertedCount == 0 ) {
-            res.status(500).json({error: "Server error."}).send();
+        const updateRes = await UserModel.updateOne({_id: id}, {$set: { avatar: "https://cdn-icons-png.flaticon.com/512/53/53101.png" }}).exec();
+        if (updateRes.modifiedCount == 0 ) {
+            res.status(500).json({error: "Server error. (Modified is zero)"}).send();
             return;
         }   
+        res.status(200).send();
+        return;
     }
     catch(error)
     {
@@ -258,24 +278,26 @@ export async function removeAvatar(req: Request, res: Response) : Promise<void>
         res.status(500).json({message: "Server error."}).send(); return;
      
     }
-}
+},
 
 
-export async function addPost(req: Request, res: Response) : Promise<void> 
+async addPost(req: Request, res: Response) : Promise<void> //todo msm da ne treba ovo
 {
     try
     {
-        const {ID, PostID} = req.body;
+        const {id, postId} = req.body;
 
-        const user = await getUserOr404(ID);
+        const user = await getUserOr404(id);
 
-        const post = await PostModel.findById(PostID).exec();
+        const post = await PostModel.findById(postId).exec();
 
-        const updateRes = await UserModel.updateOne({_id: ID}, { $push: {posts : PostID}}).exec(); //TODO exec
-        if (updateRes.upsertedCount == 0 ) {
+        const updateRes = await UserModel.updateOne({_id: id}, { $push: {posts : postId}}).exec();
+        if (updateRes.modifiedCount == 0 ) {
             res.status(500).json({error: "Server error."}).send();
             return;
         }   
+        res.status(200).send();
+        return;
     }
     catch(error)
     {
@@ -289,68 +311,107 @@ export async function addPost(req: Request, res: Response) : Promise<void>
         res.status(500).json({message: "Server error."}).send(); return;
     
     }
-}
+},
 
-export async function follow(req: Request, res: Response) : Promise<any> 
+async follow(req: Request, res: Response) : Promise<any> 
 {
     try
     {
-        const {Username, UsernameToFollow } = req.body;
+        const {id, idToFollow } = req.body;
 
-        const user = await UserModel.find({username: Username, following : {$nin : [UsernameToFollow]}}).exec();
-        const userToFollow = await UserModel.find({username: UsernameToFollow}).exec();
+        const user = await getUserOr404(id);
+        const userToFollow = await getUserOr404(idToFollow);
+
+        if (user.following.find((id: string) => id == idToFollow)) throw Error("401");
+        if (userToFollow.following.find((id: string)=> id == id)) throw Error("401");
         
-        if (!user || !userToFollow)  {
-            res.status(404).json({error: "No such user."}).send(); 
+        console.log("proslo")
+
+        const updateRes = await UserModel.updateOne({_id: id}, {$push: { following: userToFollow._id } }).exec();
+        const updateRes2= await UserModel.updateOne({_id: idToFollow}, {$push: { followers: user._id } }).exec();
+        
+        if(updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0) {
+            res.status(500).json({error: "Server error. (Modified is zero)"}).send();
             return;
         }
-
-        const updateRes = await UserModel.updateOne({username: Username}, {$push: { following: userToFollow } }).exec();
-        const updateRes2= await UserModel.updateOne({username: UsernameToFollow}, {$push: { followers: user } }).exec();
-        
-        if(updateRes.upsertedCount == 0 || updateRes2.upsertedCount == 0) {
-            res.status(500).json({error: "Server error."}).send();
-            return;
-        }
+        res.status(200).send();
+        return;
     }
     catch(error)
     {  
+        console.log(error);
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "User error."}).send(); return;
         }
+        if (error instanceof Error && error.message == "401"){
+            res.status(400).json({message: "Already following each other."}).send(); return;
+        }
+        
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User(s) not found."}).send(); return;
         }
         
         res.status(500).json({message: "Server error."}).send(); return;
     
     }
-}
+},
 
 
-export async function unfollow(req: Request, res: Response) : Promise<any> 
+async unfollow(req: Request, res: Response) : Promise<any> 
 {
     try
     {
-        const {UserID, IDToUnfollow } = req.body;
+        const {id, idToUnfollow } = req.body;
 
-        const user = await UserModel.find({_id : UserID , following : {$nin : [IDToUnfollow]}}).exec();
-        if (!user)  {
-            res.status(404).json({error: "No such user."}).send(); 
-            return;
-        }
-        const userToUnfollow = await getUserOr404(IDToUnfollow);
+        const user = await getUserOr404(id);
+        const userToUnfollow = await getUserOr404(idToUnfollow);
+
+        if (user.following.find((id: string) => id == idToUnfollow) == undefined) throw Error("401");
+        if (userToUnfollow.followers.find((id: string)=> id == id) == undefined) throw Error("401");
         
+        const updateRes = await UserModel.updateOne( {_id : id}, {$pull: { following: idToUnfollow } }).exec();  
+        const updateRes2 = await UserModel.updateOne( {_id: idToUnfollow}, {$pull: {followers: id } }).exec();
 
-        const newUser = await UserModel.updateOne( {_id : UserID}, {$pull: { following: IDToUnfollow } }).exec();  //TODO SREDI ovo i gornju
-        const newUserToUnfollow = await UserModel.updateOne( {_id: IDToUnfollow}, {$pull: {followers: UserID } }).exec();
-
-        if (newUser.upsertedCount == 0 || newUserToUnfollow)
-             throw Error;
+        if (updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0)
+             throw Error("500");
             
     }
     catch(error)
     {
+        console.log(error);
+        if (error instanceof Error && error.message == "400"){
+            res.status(400).json({message: "User error."}).send(); return;
+        }
+        if (error instanceof Error && error.message == "401"){
+            res.status(400).json({message: "Not following each other."}).send(); return;
+        }
+        
+        if (error instanceof Error && error.message == "404") {
+            res.status(404).json({message: "User not found."}).send(); return;
+        }
+        
+        res.status(500).json({message: "Server error."}).send(); return;
+     
+    }
+},
+
+async getFollowers(req: Request, res: Response): Promise <void> 
+{
+    try {
+        const id = req.params.id;
+        if (!id) throw Error("404");
+        const user = await getUserOr404(id);
+        
+        if (user.followers.length == 0) {
+            res.status(404).json({error: "No followers."}).send();
+            return;
+        }
+
+        res.status(200).json(user.followers).send();
+        return;
+    }
+    catch (error) { 
+        
         if (error instanceof Error && error.message == "400"){
             res.status(400).json({message: "Invalid ID."}).send(); return;
         }
@@ -359,7 +420,69 @@ export async function unfollow(req: Request, res: Response) : Promise<any>
         }
         
         res.status(500).json({message: "Server error."}).send(); return;
-     
+    
+    }
+},
+
+
+async getFollowing(req: Request, res: Response): Promise <void> 
+{
+    try {
+        const id = req.params.id;
+        if (!id) throw Error("404");
+        const user = await getUserOr404(id);
+        
+        if (user.following.length == 0) {
+            res.status(404).json({error: "No following."}).send();
+            return;
+        }
+
+        res.status(200).json(user.following).send();
+        return;
+    }
+    catch (error) { 
+        
+        if (error instanceof Error && error.message == "400"){
+            res.status(400).json({message: "Invalid ID."}).send(); return;
+        }
+        if (error instanceof Error && error.message == "404") {
+            res.status(404).json({message: "User not found."}).send(); return;
+        }
+        
+        res.status(500).json({message: "Server error."}).send(); return;
+    
+    }
+},
+
+
+async getOne(req: Request, res: Response): Promise <void> 
+{
+    try {
+        const user = await UserModel.findOne();
+        /*
+        if (user.followers.length == 0) {
+            res.status(404).json({error: "No posts."}).send();
+            return;
+        }
+*/
+        res.status(200).json(user).send();
+        return;
+    }
+    catch (error) {
+        
+        if (error instanceof Error && error.message == "400"){
+            res.status(400).json({message: "Invalid ID."}).send(); return;
+        }
+        if (error instanceof Error && error.message == "404") {
+            res.status(404).json({message: "User not found."}).send(); return;
+        }
+        
+        res.status(500).json({message: "Server error."}).send(); return;
+    
     }
 }
+
+}
+
+module.exports = userCtrl;
 

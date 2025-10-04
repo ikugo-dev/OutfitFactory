@@ -1,4 +1,5 @@
-import { model, Schema, Types } from "mongoose";
+import mongoose, {Schema, Types} from "mongoose";
+
 
 const userSchema = new Schema(
     {
@@ -55,6 +56,13 @@ const userSchema = new Schema(
             },
         ],
 
+        likedComments: [
+            {
+                type: Types.ObjectId,
+                ref: "comment"
+            }
+        ],
+
         closet: [
             {
                 type: Types.ObjectId,
@@ -64,4 +72,4 @@ const userSchema = new Schema(
     }
 );
 
-export const UserModel = model("user", userSchema);
+module.exports = mongoose.model('UserModel', userSchema);

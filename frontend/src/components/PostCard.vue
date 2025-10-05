@@ -34,7 +34,7 @@ const color = "#" + ((1 << 24) * Math.random() | 0).toString(16).padStart(6, "0"
 .outfit-container {
   width: 100%;
   height: auto;
-  aspect-ratio: 3/4;
+  aspect-ratio: 3 / 4;
   background-color: var(--background);
   border: 0.2rem solid black;
   display:flex;

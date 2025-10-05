@@ -1,56 +1,104 @@
 <template>
-  <div class="slot" @click="$emit('clickSlot')">
-    <div class="slot-label">{{ label }}</div>
-    <div v-if="article" class="article">
-      <div class="thumb" :title="article.name">{{ article.name }}</div>
-      <div class="meta">{{ article.brand }} • €{{ article.price }}</div>
+  <div
+    class="outfit-slot"
+    :class="{ clickable: editable }"
+    @click="handleClick"
+  >
+    <img v-if="item?.imageUrl" :src="item.imageUrl" alt="clothing"/>
+    <div v-else class="empty-slot">
+      <span v-if="editable">+</span>
     </div>
-    <div v-else class="empty">Click to choose</div>
+
+    <!-- Hover info panel -->
+    <div v-if="item" class="hover-panel">
+      <div class="info-row"><strong>{{ item.name }}</strong></div>
+      <div class="info-row">Brand: {{ item.brand }}</div>
+      <div class="info-row">Price: €{{ item.price }}</div>
+      <div class="info-row">Material: {{ item.material }}</div>
+      <div class="info-row">
+        Colors:
+        <span v-for="c in item.color" :key="c" class="chip">{{ c }}</span>
+      </div>
+      <div class="info-row">Gender: {{ item.gender }}</div>
+      <div class="info-row">Category: {{ item.category }}</div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { PropType } from 'vue';
-import type { ArticleType } from '../types';
-defineProps({
-  label: { type: String as PropType<string>, required: true },
-  article: { type: Object as PropType<ArticleType | null>, default: null },
-});
+import { defineProps, defineEmits } from "vue";
+import type { ArticleType } from "@/types";
+
+const props = defineProps<{
+  item?: ArticleType | null;
+  editable?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "select"): void;
+}>();
+
+function handleClick() {
+  if (props.editable) emit("select");
+}
 </script>
 
 <style scoped>
-.slot {
-  border: 2px dashed #ccc;
-  border-radius: 10px;
-  padding: 8px;
-  display:flex;
-  flex-direction:column;
+.outfit-slot {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 2px solid blue;
+  aspect-ratio: 1 / 1;
+  display: flex;
   justify-content: center;
   align-items: center;
+}
+
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.outfit-slot.clickable:hover {
+  transform: scale(1.03);
   cursor: pointer;
-  background: #fafafa;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  background: #f0f0f0;
 }
-.slot-label {
+
+/* Hover info panel */
+.hover-panel {
   position: absolute;
-  margin-top: -20px;
-  font-size: 12px;
-  color: #666;
-}
-.empty {
-  color: #777;
-}
-.article .thumb {
-  font-size: 14px;
+  top: 0;
+  left: 110%;
+  border: 0.2rem solid black;
+  width: 200px;
+  background: #fff;
+  border: 1px solid #ddd;
   padding: 8px;
-  border-radius: 6px;
-  background: linear-gradient(135deg, #fff, #eee);
-  min-width: 120px;
-  text-align:center;
-}
-.meta {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
   font-size: 12px;
-  color: #444;
-  margin-top: 6px;
+  z-index: 50;
+  display: none;
+}
+
+.outfit-slot:hover .hover-panel {
+  display: block;
+}
+
+.info-row {
+  margin-bottom: 4px;
+}
+
+.chip {
+  display: inline-block;
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 999px;
+  margin-right: 4px;
+  font-size: 10px;
 }
 </style>

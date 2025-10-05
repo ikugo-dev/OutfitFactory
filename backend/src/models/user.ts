@@ -56,17 +56,17 @@ const userSchema = new Schema(
             },
         ],
 
-        likedComments: [
-            {
-                type: Types.ObjectId,
-                ref: "comment"
-            }
-        ],
-
         closet: [
             {
                 type: Types.ObjectId,
                 ref: 'garment'
+            }
+        ],
+
+        outfits: [
+            {
+                type: Types.ObjectId,
+                ref: 'outfit'
             }
         ]
     }

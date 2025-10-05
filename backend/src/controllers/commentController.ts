@@ -82,27 +82,30 @@ async deleteComment(req: Request, res: Response): Promise<void> {
     }
 },
 
-async likeComment(req: Request, res: Response): Promise<void> {
+async likeComment(req: Request, res: Response): Promise<void> { //--
     try {
-        const { id, idUser } = req.body;
+        const { id, userId } = req.body;
 
         const comment = await CommentModel.findById(id).exec();
-        
-
         if (!comment) {
             res.status(404).json({ error: "No such comment." }).send();
             return;
         }
+        const user = await getUserOr404(userId); 
+        
+        const findRes = await CommentModel.find({likers: userId}).exec();
+        if(findRes.length != 0){
+            res.status(400).json({message: "Already liked."}).send(); return;
+        }
 
-        const user = await getUserOr404(idUser);   
-        //const alreadyLiked = await user.likedComments.find() //todo sredi ovo  
-        let likeNum = comment.likes;
-        likeNum += 1;
+        let likeNum = new Number(comment.likes+1);
         console.log(likeNum);
 
         const updateRes = await CommentModel.updateOne({_id: id}, {$set: { likes: likeNum }}).exec();
+        const updateRes2 = await CommentModel.updateOne({_id: id}, {$push: {likers: userId}}).exec();
+
         console.log(updateRes);
-        if (updateRes.modifiedCount == 0) {
+        if (updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0) {
             res.status(500).json({ error: "Server error. (Modified is zero)" }).send();
             return;
         }
@@ -118,31 +121,45 @@ async likeComment(req: Request, res: Response): Promise<void> {
 
 
 
-async unlikeComment(req: Request, res: Response): Promise<void> {
+async unlikeComment(req: Request, res: Response): Promise<void> { //--
     try {
-        const { id, idUser } = req.body;
+        const { id, userId } = req.body;
 
         const comment = await CommentModel.findById(id).exec();
-
         if (!comment) {
             res.status(404).json({ error: "No such comment." }).send();
             return;
         }
-
-        const user = await getUserOr404(idUser);      
-       
-        let likeNum = comment.likes;
-        likeNum -= 1;
-        if (likeNum < 0) likeNum = 0;
-        const updateRes = await CommentModel.updateOne({_id: id}, { likes: likeNum }).exec();
-        if (updateRes.modifiedCount == 0) {
-            res.status(500).json({ error: "Modified error." }).send();
+        const user = await getUserOr404(userId); 
+        
+        const findRes = await CommentModel.find({likers: userId}).exec();
+        if(findRes.length == 0){
+            res.status(400).json({message: "Not liked."}).send(); return;
         }
+
+        let likeNum;
+        if(comment.likes-1 < 0) likeNum = new Number(0);
+        else likeNum = new Number(comment.likes-1);
+        console.log(likeNum);
+
+        const updateRes = await CommentModel.updateOne({_id: id}, {$set: { likes: likeNum }}).exec();
+        const updateRes2 = await CommentModel.updateOne({_id: id}, {$pull: {likers: userId}}).exec();
+
+        console.log(updateRes || updateRes2);
+        if (updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0) {
+            res.status(500).json({ error: "Server error. (Modified is zero)" }).send();
+            return;
+        }
+        res.status(200).send();
+        return;
+
     } catch (error) {
+        console.log(error);
         res.status(500).json({ error: "Server error." }).send();
         return;
     }
-}
+},
+
 
 }
 

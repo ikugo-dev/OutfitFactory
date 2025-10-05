@@ -4,7 +4,9 @@ const GradeModel = require("../models/grade");
 
 const gradeCtrl = {
 
-    async getGrade(req: Request, res: Response): Promise <void>{
+    //treba da se cuva grade
+
+async getGrade(req: Request, res: Response): Promise <void>{
     try{
         const id = req.params.id;
 
@@ -26,7 +28,8 @@ const gradeCtrl = {
 async createGrade(req: Request, res: Response): Promise <void>{
     
     try {
-        const newGrade = await GradeModel.create({ fit_quality: 0, material_quality: 0, design: 0, comfort : 0});
+        const {id} = req.body;
+        const newGrade = await GradeModel.create({user: id, fit_quality: 0, material_quality: 0, design: 0, comfort : 0});
 
         if (newGrade == null) {
             throw new Error();

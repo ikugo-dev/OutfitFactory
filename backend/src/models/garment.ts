@@ -43,3 +43,6 @@ const garmentSchema = new Schema(
     });
 
 module.exports =  mongoose.model('GarmentModel', garmentSchema);
+
+
+//vrv treba neki dodatan description

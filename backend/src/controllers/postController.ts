@@ -13,18 +13,24 @@ async function getPostOr404(id: string) {
     }
     const post = await PostModel.findById(id).exec();
     if (!post) {
+        console.log(id);
         throw { status: 404, message: "Post not found." };
     }
     return post;
 }
 
-/*
-export const getPost = asyncHandler(async (req: Request, res: Response) => {
-    const { ID } = req.body;
-    const post = await getPostOr404(ID);
-    res.json(post);
-}); 
-*/
+async function getUserOr404(id: string) {
+    if (!Types.ObjectId.isValid(id)) {
+        throw new Error("400");
+    }
+    const user = await UserModel.findById(id).exec();
+
+    if (!user) { 
+        throw Error("404");
+    }
+    return user;
+}
+
 
 const postCtrl = {
 
@@ -52,14 +58,11 @@ async getPost (req: Request, res: Response) : Promise <void> {
 
 async createPost(req: Request, res: Response) : Promise <void> {
     try {
-        const { id, text, outfitId } = req.body;
-         
-        const user = await UserModel.findById(id).exec();
-        if (!user) {
-            throw { status: 404, message: "No such user." };
-        }
+        const { id, text, outfitId} = req.body;
+        
+        const user = await getUserOr404(id);
 
-        if (text.length > 128) {
+        if (text.length > 128) { //potencijalno nebitno
             throw { status: 400, message: "Text too long." };
         }
         let textStr = text.toString();
@@ -67,19 +70,18 @@ async createPost(req: Request, res: Response) : Promise <void> {
         if (!outfit) {
             throw { status: 404, message: "No such outfit." };
         }
-        if (outfit.garments.length == 0)
-            throw {status: 400, message: "No garments in outfit."}
         
-        console.log("aaa");
-
         const post = await PostModel.create({   
             user: id,
             text: textStr,
             outfit: outfitId,
-            published: false,
         });
         
-        
+        const updateRes = await UserModel.updateOne({_id: id}, { $push: {posts : post._id}}).exec();
+        if (updateRes.modifiedCount == 0 ) {
+            res.status(500).json({error: "Server error."}).send();
+            return;
+        }   
         res.status(201).json(post).send();
         return;
     }   
@@ -96,18 +98,33 @@ async createPost(req: Request, res: Response) : Promise <void> {
     }
 },
 
-async like(req: Request, res: Response): Promise <void> {
+async like(req: Request, res: Response): Promise <void> { 
     try{
-        const { id } = req.body;
+        const { id, userId } = req.body;
+        console.log(id, userId);
         const post = await getPostOr404(id);
+        const user = await getUserOr404(userId);
 
-        post.likes++;
-        await post.save();
+        const findRes = await PostModel.find({likers: userId}).exec();
+        if(findRes.length != 0){
+            res.status(400).json({message: "Already liked."}).send(); return;
+        }
 
-        res.status(202).json({ likes: post.likes }).send();
+
+        let newLikes = new Number(post.likes +1);
+        const updateRes = await PostModel.updateOne({_id: id}, {$set: {likes: newLikes}});
+        const updateRes2 = await PostModel.updateOne({_id: id}, {$push: {likers: userId}});
+
+        if (updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0){
+            res.status(500).json({message: "Server error. (Update error)"}).send(); return;
+        }
+
+        res.status(200).json(newLikes).send();
+        return;
     }
     catch(error) {
 
+        console.log(error);
         if (error instanceof Error && error.message == "400"){
             res.status(400).json({message: "Invalid ID."}).send(); return;
         }
@@ -121,17 +138,33 @@ async like(req: Request, res: Response): Promise <void> {
 
 async unlike(req: Request, res: Response) : Promise <void>{
     try{
-        const { id } = req.body;
+        const { id, userId } = req.body;
+        console.log(id, userId);
         const post = await getPostOr404(id);
+        const user = await getUserOr404(userId);
 
-        post.likes = Math.max(0, post.likes - 1);
-        await post.save();
+        const findRes = await PostModel.find({likers: userId}).exec();
+        if(findRes.length == 0){
+            res.status(400).json({message: "Not liked."}).send(); return;
+        }
 
-        res.status(202).json({ likes: post.likes }).send();
+        let newLikes;
+        if (post.likes-1 < 0) newLikes = new Number(0);
+        else newLikes = new Number(post.likes-1);
 
+        const updateRes = await PostModel.updateOne({_id: id}, {$set: {likes: newLikes}});
+        const updateRes2 = await PostModel.updateOne({_id: id}, {$pull: {likers: userId}});
+
+        if (updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0){
+            res.status(500).json({message: "Server error. (Update error)"}).send(); return;
+        }
+
+        res.status(200).json(newLikes).send();
+        return;
     }
     catch(error) {
 
+        console.log(error);
         if (error instanceof Error && error.message == "400"){
             res.status(400).json({message: "Invalid ID."}).send(); return;
         }
@@ -139,8 +172,7 @@ async unlike(req: Request, res: Response) : Promise <void>{
             res.status(404).json({message: "Post not found."}).send(); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;   
-    
+        res.status(500).json({message: "Server error."}).send(); return;
     }
 },
 
@@ -151,8 +183,9 @@ async addComment(req: Request, res: Response) : Promise <void>{
         const comment = await CommentModel.findById(commentId);
         if (!comment) throw Error("404");
 
-        const updateRes = PostModel.updateOne({_id: id}, {$push: {comments: commentId}});
-        if (updateRes.modifiedCount ==0) throw Error("500");
+        const updateRes = await PostModel.updateOne({_id: id}, {$push: {comments: commentId}}).exec();
+        console.log(updateRes);
+        if (updateRes.modifiedCount == 0) throw Error("500");
         res.status(200).send();
         return;
 
@@ -163,7 +196,7 @@ async addComment(req: Request, res: Response) : Promise <void>{
         if (error instanceof Error && error.message == "400"){
             res.status(400).json({message: "Invalid ID."}).send(); return;
         }
-        if (error instanceof Error && error.message == "404") {
+        if (error instanceof Error && error.message == "404"){
             res.status(404).json({message: "Post not found."}).send(); return;
         }
         
@@ -180,7 +213,7 @@ async addGrade(req: Request, res: Response) : Promise <void> {
         const grade = await GradeModel.findById(gradeId);
         if (!grade) throw Error("404");
 
-        const updateRes = PostModel.updateOne({_id: id}, {$push: {grades: gradeId}});
+        const updateRes = await PostModel.updateOne({_id: id}, {$push: {grades: gradeId}}).exec();
         if (updateRes.modifiedCount ==0) throw Error("500");
         res.status(200) .send();
         return;
@@ -199,26 +232,26 @@ async addGrade(req: Request, res: Response) : Promise <void> {
     }
 },
 
+/*
 async publish (req: Request, res: Response) : Promise <void> {
     
     try {
         const { id } = req.body;
         const post = await getPostOr404(id);
 
-        if (post.published) {
-            throw { status: 400, message: "Post already published." };
-        }
+        if (post.published) throw Error("400");
 
-        post.published = true;
-        await post.save();
 
-        res.status(205).json({Comment}).send();
+        const updateRes = await PostModel.updateOne({_id: id}, {$set: {published: true}}).exec();
+        if (updateRes.modifiedCount == 0) throw Error("500");
+
+        res.status(200).send();
         return;
     }
     catch(error){
 
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Post already public."}).send(); return;
         }
         if (error instanceof Error && error.message == "404") {
             res.status(404).json({message: "Post not found."}).send(); return;
@@ -233,21 +266,18 @@ async unpublish (req: Request, res: Response) : Promise <void> {
         const { id } = req.body;
         const post = await getPostOr404(id);
 
-        if (!post.published) {
-            throw { status: 400, message: "Post already private." };
-        }
+        if (!post.published) throw Error("400");
 
-        post.published = false;
-        await post.save();
-
-        res.status(205).send();
+        const updateRes = await PostModel.updateOne({_id: id}, {$set: {published: false}}).exec();
+        if (updateRes.modifiedCount == 0) throw Error("500");
+        res.status(200).send();
         
         return;
     }
     catch (error) {
 
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Post already private."}).send(); return;
         }
         if (error instanceof Error && error.message == "404") {
             res.status(404).json({message: "Post not found."}).send(); return;
@@ -256,15 +286,17 @@ async unpublish (req: Request, res: Response) : Promise <void> {
         res.status(500).json({message: "Server error."}).send(); return;
     }
 },
-
+*/
 async deletePost (req: Request, res: Response) : Promise <void> {
     try{
         const id  = req.params.id;
         if (!id) throw Error("400");
         const post = await getPostOr404(id);
 
-        await post.deleteOne();
-        res.status(206).send();  //TODO
+        const deleteRes = await PostModel.deleteOne({_id: id});
+        if (deleteRes.modifiedCount == 0) throw Error("500");
+
+        res.status(200).send();  
         
         return;
     }

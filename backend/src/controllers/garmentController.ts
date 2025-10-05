@@ -1,5 +1,6 @@
 import {Request, Response} from 'express'; 
 const GarmentModel = require("../models/garment");
+const UserModel = require("../models/user");
 
 
 const garmentCtrl = {
@@ -25,11 +26,9 @@ async getGarment(req: Request, res: Response): Promise <void>
 },
 
 
-async createGarment(req: Request, res: Response): Promise <void> {
+async createGarment(req: Request, res: Response): Promise <void> { //--
     try{
-        
         const newGarment = await GarmentModel.create({brand: "nobrand"});
-
         if (newGarment == null) {
             throw new Error("500");
         }
@@ -38,7 +37,8 @@ async createGarment(req: Request, res: Response): Promise <void> {
     catch(error)    
     {
         console.log(error);
-        res.status(500).json({error: "Server error."});
+        res.status(500).json({error: "Server error."}).send();
+        return;
     }
 
 },
@@ -150,8 +150,7 @@ async addGender(req: Request, res: Response): Promise <void> {
     }
 },
 
-
-async deleteGarment(req: Request, res: Response): Promise <void>
+async deleteGarment(req: Request, res: Response): Promise <void> //vrv ne treba 
 {
     try{
         const id = req.params.id;
@@ -177,5 +176,9 @@ async deleteGarment(req: Request, res: Response): Promise <void>
     }
 }
 }
+
+//get all garments
+
+
 
 module.exports = garmentCtrl;

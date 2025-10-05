@@ -24,7 +24,15 @@ const commentSchema = new Schema(
             type: Number,
             min: 0,
             default: 0
+        },
+
+        likers:
+        {
+            type: mongoose.Types.ObjectId,
+            ref: 'user'
         }
+
+
 
     });
 

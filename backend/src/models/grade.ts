@@ -3,6 +3,14 @@ const { Schema } = mongoose;
 
 const gradeSchema = new Schema(
     {
+
+        user:
+        {
+            type: mongoose.Types.ObjectId,
+            ref: 'user',
+            required: true
+        },
+
         
         fit_quality:
         {

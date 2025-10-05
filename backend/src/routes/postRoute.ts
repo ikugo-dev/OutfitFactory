@@ -10,20 +10,16 @@ const router = Router();
 
 router.patch("/post/add_comment", postCtrl.addComment);
 router.patch("/post/like", postCtrl.like);
-router.patch("/post/like", postCtrl.unlike);
+router.patch("/post/unlike", postCtrl.unlike); //treba li mi
 router.patch("/post/add_grade", postCtrl.addGrade);
 router.get("/post/:id", postCtrl.getPost);
-router.delete("post/:id",postCtrl.deletePost);
+router.delete("/post/:id",postCtrl.deletePost);
 
 router.post("/create_post", postCtrl.createPost);
-router.route("/edit_post")
-    .patch(postCtrl.publish)
-    .patch(postCtrl.unpublish); 
-
 router.get("/:id", postCtrl.getPost);
 
 
-
+//grade routes
 router.get("/grade/:id", gradeCtrl.getGrade);
 router.post("/create_grade", gradeCtrl.createGrade);
 router.patch("/grade/add_fit", gradeCtrl.addFit);
@@ -33,14 +29,14 @@ router.patch("/grade/add_comfort", gradeCtrl.addComfort);
 router.delete("/grade/:id", gradeCtrl.deleteGrade);
 
 
-
+//outfit routes
 router.get("/outfit/:id", outfitCtrl.getOutfit);
 router.post("/create_outfit", outfitCtrl.createOutfit);
 router.patch("/outfit/add_garment", outfitCtrl.addGarment);
 router.delete("/outfit/:id", outfitCtrl.deleteOutfit);
 
 
-
+//garment routes
 router.get("/garment/:id", garmentCtrl.getGarment);
 router.post("/create_garment", garmentCtrl.createGarment);
 router.patch("/garment/add_image", garmentCtrl.addImage);
@@ -49,6 +45,7 @@ router.patch("/garment/add_material", garmentCtrl.addMaterial);
 router.patch("/garment/add_gender", garmentCtrl.addGender);
 router.delete("/garment/:id", garmentCtrl.deleteGarment);
 
+//comment routes
 router.get("/comment/:id", commentCtrl.getComment);
 router.post("/create_comment", commentCtrl.createComment);
 router.patch("/comment/like", commentCtrl.likeComment);
@@ -57,6 +54,13 @@ router.delete("/comment/:id", commentCtrl.deleteComment);
 
 
 
+/*
+fale:
+
+
+
+
+*/
 
 
 module.exports = router;

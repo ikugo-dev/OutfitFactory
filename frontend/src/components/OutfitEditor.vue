@@ -6,7 +6,6 @@
         <div class="outfit-flex">
           <div v-for="(item, i) in outfit.clothes" :key="i" class="outfit-slot-wrapper" >
             <OutfitSlot :item="item" editable @select="removeItem(i)" />
-            <button class="remove-btn" @click="removeItem(i)">✕</button>
           </div>
 
           <div class="outfit-slot-wrapper add-slot" @click="openSelector">+</div>
@@ -111,7 +110,6 @@ function removeItem(index: number) {
   justify-content: flex-start;
   padding: 1rem;
   border: 0.2rem solid black;
-  background-color: var(--background);
   box-sizing: border-box;
 }
 
@@ -123,7 +121,7 @@ function removeItem(index: number) {
   align-items: flex-start;
   padding: 1rem;
   border: 0.2rem solid black;
-  background-color: white;
+  background-color: var(--background);
   overflow: hidden;
 }
 

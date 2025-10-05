@@ -1,24 +1,37 @@
 <template>
-  <div class="outfit-slot" :class="{ clickable: editable }" @click="handleClick" >
-    <img v-if="item?.imageUrl" :src="item.imageUrl" alt="clothing"/>
+  <div
+    class="outfit-slot"
+    :class="{ clickable: editable }"
+    @mouseenter="showTooltip = true"
+    @mouseleave="showTooltip = false"
+    @mousemove="updateTooltipPosition"
+    @click="handleClick"
+  >
+    <img v-if="item?.imageUrl" :src="item.imageUrl" alt="clothing" />
     <div v-else class="empty-slot">
       <span v-if="editable">+</span>
     </div>
 
-    <div v-if="item" class="hover-panel">
-      <div class="info-row"><strong>{{ item.name }}</strong></div>
-      <div class="info-row">Brand: {{ item.brand }}</div>
-      <div class="info-row">Price: €{{ item.price }}</div>
-      <div class="info-row">Material: {{ item.material }}</div>
-      <div class="info-row">Colors: {{ item.colors }}</div>
-      <div class="info-row">Gender: {{ item.gender }}</div>
-      <div class="info-row">Category: {{ item.category }}</div>
-    </div>
+    <teleport to="body">
+      <div
+        v-if="showTooltip && item"
+        class="hover-panel"
+        :style="{ top: tooltipY + 'px', left: tooltipX + 'px' }"
+      >
+        <div class="info-row"><b>{{ item.name }}</b></div>
+        <div class="info-row">Category: {{ item.category }}</div>
+        <div class="info-row">Gender: {{ item.gender }}</div>
+        <div class="info-row">Brand: {{ item.brand }}</div>
+        <div class="info-row">Color: {{ item.color }}</div>
+        <div class="info-row">Material: {{ item.material }}</div>
+        <div class="info-row">Price: €{{ item.price }}</div>
+      </div>
+    </teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from "vue";
+import { ref } from "vue";
 import type { ArticleType } from "@/types";
 
 const props = defineProps<{
@@ -30,8 +43,17 @@ const emit = defineEmits<{
   (e: "select"): void;
 }>();
 
+const showTooltip = ref(false);
+const tooltipX = ref(0);
+const tooltipY = ref(0);
+
 function handleClick() {
   if (props.editable) emit("select");
+}
+
+function updateTooltipPosition(e: MouseEvent) {
+  tooltipX.value = e.clientX + 12;
+  tooltipY.value = e.clientY + 12;
 }
 </script>
 
@@ -52,37 +74,29 @@ img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  flex-shrink: 0;
 }
 
 .outfit-slot.clickable:hover {
-  transform: scale(1.03);
+  transform: scale(1.05);
+  opacity: 0.6;
   cursor: pointer;
-  background: #f0f0f0;
 }
 
-/* Hover info panel */
+.empty-slot {
+  font-size: 2em;
+  color: #999;
+}
+
 .hover-panel {
-  position: absolute;
-  top: 0;
-  left: 110%;
+  position: fixed;
   border: 0.2rem solid black;
-  width: 200px;
-  background: #fff;
-  border: 1px solid #ddd;
+  background: var(--background);
   padding: 8px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-  font-size: 12px;
   z-index: 50;
-  display: none;
-}
-
-.outfit-slot:hover .hover-panel {
-  display: block;
+  pointer-events: none;
 }
 
 .info-row {
   margin-bottom: 4px;
 }
-
 </style>

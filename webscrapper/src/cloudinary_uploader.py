@@ -17,7 +17,7 @@ def upload(image_url: str):
         image_url,
         folder="garments",
         transformation=[{
-            "height": 320,
+            "height": 280,
             "crop": "scale",
             "fetch_format": "auto",
             "quality": "auto:low"

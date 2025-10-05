@@ -1,11 +1,13 @@
 export interface ArticleType {
   id: number;
-  brand: string;
-  name: string;
-  type: string;
+  imageUrl: string;
   gender: string;
+  category: string;
+  name: string;
+  color: string;
+  material: string;
   price: number;
-  colour: string[];
+  brand: string;
 }
 
 export interface OutfitType {
@@ -19,7 +21,7 @@ export interface UserType {
   username: string;
   password: string;
   email: string;
-  profilePicture: string; // ImageData ???
+  profilePicture: string;
   followers: number;
   following: UserType[];
 }
@@ -35,6 +37,7 @@ export interface PostType {
   id: number;
   user: UserType;
   outfit: OutfitType | undefined;
+  caption: string;
   likes: number;
   comments: CommentType[] | undefined;
   visible: boolean;

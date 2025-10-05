@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { type PostType } from "../types.ts"
+import { type PostType } from "@/types.ts"
 defineProps<{
   post: PostType
 }>()

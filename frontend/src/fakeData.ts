@@ -93,16 +93,11 @@ function randomOutfit(): OutfitType {
     clothes: [],
   };
 
-  const categories = ["top", "bottom", "jacket", "shoes"];
-  for (const cat of categories) {
-    const items = clothingPool.filter((c) => c.category === cat);
-    if (items.length) outfit.clothes.push(randomItem(items));
+  for (let i = 0; i < 6; i++) {
+    if (Math.random() > 0.2) {
+      outfit.clothes.push(randomItem(clothingPool));
+    }
   }
-
-  const accessories = clothingPool.filter((c) => c.category === "accessory");
-  outfit.clothes.push(randomItem(accessories));
-  if (Math.random() > 0.5) outfit.clothes.push(randomItem(accessories));
-
   return outfit;
 }
 

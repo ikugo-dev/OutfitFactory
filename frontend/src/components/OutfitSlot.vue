@@ -1,24 +1,16 @@
 <template>
-  <div
-    class="outfit-slot"
-    :class="{ clickable: editable }"
-    @click="handleClick"
-  >
+  <div class="outfit-slot" :class="{ clickable: editable }" @click="handleClick" >
     <img v-if="item?.imageUrl" :src="item.imageUrl" alt="clothing"/>
     <div v-else class="empty-slot">
       <span v-if="editable">+</span>
     </div>
 
-    <!-- Hover info panel -->
     <div v-if="item" class="hover-panel">
       <div class="info-row"><strong>{{ item.name }}</strong></div>
       <div class="info-row">Brand: {{ item.brand }}</div>
       <div class="info-row">Price: €{{ item.price }}</div>
       <div class="info-row">Material: {{ item.material }}</div>
-      <div class="info-row">
-        Colors:
-        <span v-for="c in item.color" :key="c" class="chip">{{ c }}</span>
-      </div>
+      <div class="info-row">Colors: {{ item.colors }}</div>
       <div class="info-row">Gender: {{ item.gender }}</div>
       <div class="info-row">Category: {{ item.category }}</div>
     </div>
@@ -49,7 +41,7 @@ function handleClick() {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  border: 2px solid blue;
+  border: 0.2em solid black;
   aspect-ratio: 1 / 1;
   display: flex;
   justify-content: center;
@@ -93,12 +85,4 @@ img {
   margin-bottom: 4px;
 }
 
-.chip {
-  display: inline-block;
-  background: #f0f0f0;
-  padding: 2px 6px;
-  border-radius: 999px;
-  margin-right: 4px;
-  font-size: 10px;
-}
 </style>

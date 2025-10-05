@@ -1,22 +1,27 @@
 <template>
-  <div class="outfit-grid">
-    <OutfitSlot
-      v-for="(slot, i) in slots"
-      :key="i"
-      :item="outfit.clothes[i]"
-      editable
-      @select="openSelector(i)"
+  <div class="outfit-editor">
+    <div class="outfit-flex">
+      <div
+        v-for="(item, i) in outfit.clothes"
+        :key="i"
+        class="outfit-slot-wrapper"
+      >
+        <OutfitSlot :item="item" editable @select="removeItem(i)" />
+        <button class="remove-btn" @click="removeItem(i)">✕</button>
+      </div>
+
+      <!-- Add button slot -->
+      <div class="outfit-slot-wrapper add-slot" @click="openSelector">
+        <div class="add-btn">+</div>
+      </div>
+    </div>
+
+    <OutfitSelectionPanel
+      v-if="isSelecting"
+      @close="isSelecting = false"
+      @selectArticle="addItem"
     />
   </div>
-
-  <OutfitSelectionPanel
-    v-if="selectedSlotIndex !== null"
-    :category="slots[selectedSlotIndex].category"
-    :brand="slots[selectedSlotIndex].brand || null"
-    :availableColors="availableColors"
-    @close="selectedSlotIndex = null"
-    @selectArticle="selectItem"
-  />
 </template>
 
 <script setup lang="ts">
@@ -29,46 +34,74 @@ const props = defineProps<{ modelValue: OutfitType }>();
 const emit = defineEmits(["update:modelValue"]);
 
 const outfit = ref<OutfitType>(props.modelValue);
+const isSelecting = ref(false);
 
-const slots = [
-  { label: "Top", category: "top" },
-  { label: "Bottom", category: "bottom" },
-  { label: "Shoes", category: "shoes" },
-  { label: "Jacket", category: "jacket" },
-  { label: "Accessory 1", category: "accessory", index: 0 },
-  { label: "Accessory 2", category: "accessory", index: 1 },
-];
-
-const selectedSlotIndex = ref<number | null>(null);
-const availableColors = ["Red","Blue","Green","Black","White","Yellow","Orange","Purple"];
-
-function openSelector(index: number) {
-  selectedSlotIndex.value = index;
+function openSelector() {
+  isSelecting.value = true;
 }
 
-function selectItem(article: ArticleType) {
-  if (selectedSlotIndex.value === null) return;
-
-  // Determine slot index and whether it's an accessory
-  const slot = slots[selectedSlotIndex.value];
-
-  if (slot.category === "accessory" && slot.index != null) {
-    outfit.value.clothes[slot.index] = article;
-  } else {
-    outfit.value.clothes[selectedSlotIndex.value] = article;
-  }
-
+function addItem(article: ArticleType) {
+  outfit.value.clothes.push(article);
   emit("update:modelValue", outfit.value);
-  selectedSlotIndex.value = null;
+  isSelecting.value = false;
+}
+
+function removeItem(index: number) {
+  outfit.value.clothes.splice(index, 1);
+  emit("update:modelValue", outfit.value);
 }
 </script>
 
 <style scoped>
-.outfit-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+.outfit-editor {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.outfit-flex {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 0.5rem;
-  width: 300px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.outfit-slot-wrapper {
+  position: relative;
+  flex: 1 1 calc(50% - 0.5rem);
+  max-width: calc(50% - 0.5rem);
+  aspect-ratio: 1 / 1;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  border: none;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.8rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.add-slot {
+  border: 2px dashed #666;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.add-btn {
+  font-size: 2rem;
+  font-weight: bold;
 }
 </style>

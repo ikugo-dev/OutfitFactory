@@ -1,8 +1,8 @@
 <template>
   <div class="grid-wrapper">
-    <div class="outfit-grid">
+    <div class="outfit-flex">
       <OutfitSlot
-        v-for="(item, i) in filledSlots"
+        v-for="(item, i) in outfit.clothes"
         :key="i"
         :item="item"
         :editable="false"
@@ -14,25 +14,32 @@
 <script setup lang="ts">
 import type { OutfitType } from "@/types";
 import OutfitSlot from "@/components/OutfitSlot.vue";
-
-const props = defineProps<{ outfit: OutfitType }>();
-
-const filledSlots = Array.from({ length: 6 }, (_, i) => props.outfit.clothes[i] || null);
+defineProps<{
+  outfit: OutfitType
+}>();
 </script>
 
 <style scoped>
-.grid-wrapper {
+.outfit-viewer {
+  margin-top: 1rem;
   width: 100%;
-  overflow: hidden;
+  display: flex;
+  justify-content: center;
   margin: 0.5rem;
+  overflow: hidden;
 }
 
-.outfit-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-auto-rows: 1fr; /* force equal rows */
-  width: 100%;
-  height: 100%;
+.outfit-flex {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 0.5rem;
+  width: 100%;
+}
+
+.outfit-flex > * {
+  flex: 0 0 calc(50% - 0.5rem); /* 2 columns */
+  max-width: calc(50% - 0.5rem);
+  aspect-ratio: 1 / 1;
 }
 </style>

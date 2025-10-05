@@ -26,7 +26,6 @@ const color = "#" + ((1 << 24) * Math.random() | 0).toString(16).padStart(6, "0"
   display: flex;
   flex-direction: column;
   width: 100%;
-  aspect-ratio: 3/4;
   padding: 0.5rem;
   border: 0.2rem solid black;
   justify-content: center;
@@ -34,9 +33,9 @@ const color = "#" + ((1 << 24) * Math.random() | 0).toString(16).padStart(6, "0"
 .outfit-container {
   width: 100%;
   height: auto;
-  aspect-ratio: 3 / 4;
   background-color: var(--background);
   border: 0.2rem solid black;
+  padding: 0.5rem 0.2rem 0.5rem;
   display:flex;
   justify-content:center;
 }
@@ -50,5 +49,3 @@ const color = "#" + ((1 << 24) * Math.random() | 0).toString(16).padStart(6, "0"
   text-overflow: ellipsis;
 }
 </style>
-
-

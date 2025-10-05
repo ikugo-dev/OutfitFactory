@@ -5,8 +5,8 @@
 </template>
 
 <script setup lang="ts">
-import type { PostType } from '@/types';
-import PostCard from './PostCard.vue'
+import type { PostType } from "@/types";
+import PostCard from "./PostCard.vue"
 defineProps<{
   posts: PostType[]
 }>()

@@ -12,8 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import type { OutfitType } from "@/types";
-import OutfitSlot from "@/components/OutfitSlot.vue";
+import type { OutfitType } from "@/types.ts";
+import OutfitSlot from "./OutfitSlot.vue";
 defineProps<{
   outfit: OutfitType
 }>();

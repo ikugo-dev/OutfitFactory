@@ -1,7 +1,7 @@
 <template>
   <aside class="panel">
     <div class="panel-header">
-      <h4>Choose item ({{ category || 'any' }})</h4>
+      <h4>Choose item ({{ category || "any" }})</h4>
       <button class="btn-close" @click="$emit('close')">✕</button>
     </div>
 
@@ -69,9 +69,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, reactive, onMounted } from 'vue';
-import type { ArticleType } from '../types';
-import { fetchAllArticles } from '../fakeData.ts';
+import { ref, watch, reactive, onMounted } from "vue";
+import type { ArticleType } from "../types";
+import { fetchAllArticles } from "../fakeData.ts";
 
 const props = defineProps<{
   category?: string | null;

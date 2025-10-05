@@ -4,15 +4,15 @@
       <OutfitViewer :outfit="post.outfit"/>
     </div>
 
-    <h3 class="caption">{{ post.user.username }} : {{ post.caption || '...' }}</h3>
+    <h3 class="caption">{{ post.user.username }} : {{ post.caption || "..." }}</h3>
     <PostCardControls :post="post" />
   </div>
 </template>
 
 <script setup lang="ts">
-import OutfitViewer from './OutfitViewer.vue';
-import PostCardControls from './PostCardControls.vue';
-import type { PostType } from '../types';
+import OutfitViewer from "./OutfitViewer.vue";
+import PostCardControls from "./PostCardControls.vue";
+import type { PostType } from "@/types.ts"
 defineProps<{
   post: PostType
 }>();

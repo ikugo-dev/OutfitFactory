@@ -26,8 +26,8 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import OutfitSlot from "@/components/OutfitSlot.vue";
-import OutfitSelectionPanel from "@/components/OutfitSelectionPanel.vue";
+import OutfitSlot from "./OutfitSlot.vue";
+import OutfitSelectionPanel from "./OutfitSelectionPanel.vue";
 import type { OutfitType, ArticleType } from "@/types";
 
 const props = defineProps<{ modelValue: OutfitType }>();

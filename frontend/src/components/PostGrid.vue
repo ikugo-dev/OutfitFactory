@@ -5,9 +5,8 @@
 </template>
 
 <script setup lang="ts">
-import type { PostType } from '@/types';
-import PostCard from './PostCard.vue'
-
+import type { PostType } from "@/types";
+import PostCard from "./PostCard.vue"
 defineProps<{
   posts: PostType[]
 }>()
@@ -15,17 +14,20 @@ defineProps<{
 
 <style scoped>
 .grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
-  justify-items: center;
+  column-count: 2;
+  column-gap: 1rem;
   max-width: 1280px;
   margin: 0 auto;
 }
 
+.grid > * {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+}
+
 @media (max-width: 540px) {
   .grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    column-count: 1;
   }
 }
 </style>

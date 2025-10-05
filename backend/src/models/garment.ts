@@ -19,20 +19,19 @@ const garmentSchema = new Schema(
 
         color:[
         {
-            type: String, //TODO ovde treba color enum nesto i vidi za validate fju
-            
+            type: String,
+            default: "FFFF"
         }],
 
         material:[
         {
-            type: String, //TODO isto treba da bude u enum 
-            default: null
+            type: String
+
         }],
 
         gender:[
         {
-            type: String,
-            default: null
+            type: String
         }],
 
         brand:
@@ -43,4 +42,7 @@ const garmentSchema = new Schema(
 
     });
 
-module.exports = mongoose.model('garment', garmentSchema);
+module.exports =  mongoose.model('GarmentModel', garmentSchema);
+
+
+//vrv treba neki dodatan description

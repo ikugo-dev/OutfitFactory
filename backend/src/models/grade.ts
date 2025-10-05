@@ -3,6 +3,14 @@ const { Schema } = mongoose;
 
 const gradeSchema = new Schema(
     {
+
+        user:
+        {
+            type: mongoose.Types.ObjectId,
+            ref: 'user',
+            required: true
+        },
+
         
         fit_quality:
         {
@@ -39,4 +47,4 @@ const gradeSchema = new Schema(
 
     });
 
-module.exports = mongoose.model('grade', gradeSchema);
+module.exports = mongoose.model('GradeModel', gradeSchema);

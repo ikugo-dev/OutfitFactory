@@ -1,64 +1,75 @@
-import mongoose from 'mongoose';
-const { Schema } = mongoose;
+import mongoose, {Schema, Types} from "mongoose";
+
 
 const userSchema = new Schema(
     {
-        
-        username: 
-        {
+        username: {
             type: String,
             required: true,
             unique: true,
-            maxlength: 25
+            maxlength: 25,
         },
-        email:
-        {
+        email: {
             type: String,
             required: true,
             unique: true,
-            maxlength: 100 
+            maxlength: 100,
         },
 
-        password:
-        {
+        password: {
             type: String,
             required: true,
             unique: true,
-            maxlength: 50
+            maxlength: 50,
         },
 
-        avatar:
-        {
+        avatar: {
             type: String,
-            default: "https://cdn-icons-png.flaticon.com/512/53/53101.png"
+            default: "https://cdn-icons-png.flaticon.com/512/53/53101.png",
         },
 
-        posts:[
-        {
-            type: mongoose.Types.ObjectId,
-            ref : 'post'
-        }],
+        posts: [
+            {
+                type: Types.ObjectId,
+                ref: "post"
+            },
+        ],
 
-        followers:[
-        {
-            type: mongoose.Types.ObjectId,
-            ref : 'user',
-             
-        }],
+        followers: [
+            {
+                type: Types.ObjectId,
+                ref: "user"
+            },
+        ],
 
-        following:[
-        {
-            type: mongoose.Types.ObjectId,
-            ref : 'user',
-            
-        }],
+        following: [
+            {
+                type: Types.ObjectId,
+                ref: "user"
+            },
+        ],
 
-        liked:[
-        {
-            type: mongoose.Types.ObjectId,
-            ref : 'post'
-        }]
+        liked: [
+            {
+                type: Types.ObjectId,
+                ref: "post"
+            },
+        ],
 
-    });
+        closet: [
+            {
+                type: Types.ObjectId,
+                ref: 'garment'
+            }
+        ],
 
-module.exports = mongoose.model('user', userSchema);
+        outfits: [
+            {
+                type: Types.ObjectId,
+                ref: 'outfit'
+            }
+        ]
+    }
+);
+
+module.exports = mongoose.model('UserModel', userSchema);

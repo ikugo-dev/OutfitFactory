@@ -1,56 +1,16 @@
-import mongoose from 'mongoose';
-const { Schema } = mongoose;
+import mongoose, {Schema, Types } from "mongoose";
 
-const postSchema = new Schema(
+
+const PostSchema = new Schema(
     {
-        
-        user: 
-        {
-            type: mongoose.Types.ObjectId,
-            ref: 'user',
-            required: true
-        },
+        user: { type: Types.ObjectId, ref: "user", required: true },
+        outfit: { type: Types.ObjectId, ref: "outfit", required: true },
+        text: { type: String, maxlength: 128, default: null },
+        likes: { type: Number, min: 0, default: 0 },
+        likers: [{ type: Types.ObjectId, ref: "user" }],
+        comments: [{ type: Types.ObjectId, ref: "comment" }],
+        grades: [{ type: Types.ObjectId, ref: "grade" }]
+    }
+);
 
-        text: 
-        {
-            type: String,
-            maxlength: 128,
-            default: null
-        },
-
-        likes:
-        {
-            type: Number,
-            min: 0,
-            default: 0,
-        },
-
-        comments: [
-        {
-            type: mongoose.Types.ObjectId,  
-            ref: 'outfit'
-        }], 
-
-        grades:[
-        {
-            type: mongoose.Types.ObjectId,
-            ref: 'grade'
-        }],
-
-        outfit:
-        {
-            type: mongoose.Types.ObjectId,  
-            ref: 'outfit',
-            required: true
-        },
-
-        published:
-        {
-            type: Boolean,
-            default: false
-
-        }
-
-    });
-
-module.exports = mongoose.model('post', postSchema);
+module.exports = mongoose.model('PostModel', PostSchema);

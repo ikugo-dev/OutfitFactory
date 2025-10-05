@@ -1,285 +1,319 @@
-import {Request, Response} from 'express'; 
-const Post = require ("../models/post.ts");
-const User = require ( "../models/user.ts");
+import { Request, Response } from 'express';
+import { Types } from "mongoose";
+
+const PostModel = require("../models/post");
+const UserModel = require("../models/user");
+const OutfitModel = require("../models/outfit");
+const CommentModel = require("../models/comment");
+const GradeModel = require("../models/grade");
+
+async function getPostOr404(id: string) {
+    if (!Types.ObjectId.isValid(id)) {
+        throw { status: 400, message: "Invalid post ID." };
+    }
+    const post = await PostModel.findById(id).exec();
+    if (!post) {
+        console.log(id);
+        throw { status: 404, message: "Post not found." };
+    }
+    return post;
+}
+
+async function getUserOr404(id: string) {
+    if (!Types.ObjectId.isValid(id)) {
+        throw new Error("400");
+    }
+    const user = await UserModel.findById(id).exec();
+
+    if (!user) { 
+        throw Error("404");
+    }
+    return user;
+}
 
 
-export async function getPost(req: Request, res: Response): Promise <void>
-{
+const postCtrl = {
+
+async getPost (req: Request, res: Response) : Promise <void> {
     try{
-        const {ID} = req.body;
+        const id = req.params.id;
+        if (!id) throw Error("400");
+        const post = await getPostOr404(id);
+        
+        res.status(200).json(post).send();
+        return;
+    } 
+    catch(error) {
 
-        const post = await Post.findById(ID).exec();
-        if (post == null) {
-            res.status(404).json({error: "No such post."});
+        if (error instanceof Error && error.message == "400"){
+            res.status(400).json({message: "Invalid ID."}).send(); return;
+        }
+        if (error instanceof Error && error.message == "404") {
+            res.status(404).json({message: "Post not found."}).send(); return;
+        }
+        
+        res.status(500).json({message: "Server error."}).send(); return;
+    }
+},
+
+async createPost(req: Request, res: Response) : Promise <void> {
+    try {
+        const { id, text, outfitId} = req.body;
+        
+        const user = await getUserOr404(id);
+
+        if (text.length > 128) { //potencijalno nebitno
+            throw { status: 400, message: "Text too long." };
+        }
+        let textStr = text.toString();
+        const outfit = await OutfitModel.findById(outfitId);  
+        if (!outfit) {
+            throw { status: 404, message: "No such outfit." };
+        }
+        
+        const post = await PostModel.create({   
+            user: id,
+            text: textStr,
+            outfit: outfitId,
+        });
+        
+        const updateRes = await UserModel.updateOne({_id: id}, { $push: {posts : post._id}}).exec();
+        if (updateRes.modifiedCount == 0 ) {
+            res.status(500).json({error: "Server error."}).send();
             return;
         }   
-        res.status(200).json(post);
+        res.status(201).json(post).send();
         return;
-
-    }
-    catch(error)    {
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-
-}
-
-export async function createPost(req: Request, res: Response): Promise <void>
-{
-    try
-    {
-        const { Username, Text, Outfit, Published } = req.body;
-
-        let foundUsername = await User.exists({username: Username}).exec();  
-        
-        if ( foundUsername == null ) {
-            res.status(404).json({error: "No such user."});  
-            return;
+    }   
+    catch(error) {
+        console.log(error);
+        if (error instanceof Error && error.message == "400"){
+            res.status(400).json({message: "Invalid ID."}).send(); return;
+        }
+        if (error instanceof Error && error.message == "404") {
+            res.status(404).json({message: "Post not found."}).send(); return;
         }
         
-        if (Text.length() > 128) {
-            res.status(400).json({error: "Text too long."});
-            return;
+        res.status(500).json({message: "Server error."}).send(); return;
+    }
+},
+
+async like(req: Request, res: Response): Promise <void> { 
+    try{
+        const { id, userId } = req.body;
+        console.log(id, userId);
+        const post = await getPostOr404(id);
+        const user = await getUserOr404(userId);
+
+        const findRes = await PostModel.find({likers: userId}).exec();
+        if(findRes.length != 0){
+            res.status(400).json({message: "Already liked."}).send(); return;
+        }
+
+
+        let newLikes = new Number(post.likes +1);
+        const updateRes = await PostModel.updateOne({_id: id}, {$set: {likes: newLikes}});
+        const updateRes2 = await PostModel.updateOne({_id: id}, {$push: {likers: userId}});
+
+        if (updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0){
+            res.status(500).json({message: "Server error. (Update error)"}).send(); return;
+        }
+
+        res.status(200).json(newLikes).send();
+        return;
+    }
+    catch(error) {
+
+        console.log(error);
+        if (error instanceof Error && error.message == "400"){
+            res.status(400).json({message: "Invalid ID."}).send(); return;
+        }
+        if (error instanceof Error && error.message == "404") {
+            res.status(404).json({message: "Post not found."}).send(); return;
         }
         
-        if (Outfit.top == null || Outfit.bottom == null || Outfit.shoes == null){
-            res.status(400).json({error: "Outfit requires at least a top, a bottom, and footwear."});
-            return;
+        res.status(500).json({message: "Server error."}).send(); return;
+    }
+},
+
+async unlike(req: Request, res: Response) : Promise <void>{
+    try{
+        const { id, userId } = req.body;
+        console.log(id, userId);
+        const post = await getPostOr404(id);
+        const user = await getUserOr404(userId);
+
+        const findRes = await PostModel.find({likers: userId}).exec();
+        if(findRes.length == 0){
+            res.status(400).json({message: "Not liked."}).send(); return;
+        }
+
+        let newLikes;
+        if (post.likes-1 < 0) newLikes = new Number(0);
+        else newLikes = new Number(post.likes-1);
+
+        const updateRes = await PostModel.updateOne({_id: id}, {$set: {likes: newLikes}});
+        const updateRes2 = await PostModel.updateOne({_id: id}, {$pull: {likers: userId}});
+
+        if (updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0){
+            res.status(500).json({message: "Server error. (Update error)"}).send(); return;
+        }
+
+        res.status(200).json(newLikes).send();
+        return;
+    }
+    catch(error) {
+
+        console.log(error);
+        if (error instanceof Error && error.message == "400"){
+            res.status(400).json({message: "Invalid ID."}).send(); return;
+        }
+        if (error instanceof Error && error.message == "404") {
+            res.status(404).json({message: "Post not found."}).send(); return;
         }
         
-        const post = new Post(Username, Text, 0, null, 0.0, Outfit, Published);
+        res.status(500).json({message: "Server error."}).send(); return;
+    }
+},
 
-        res.status(200).json(post);
+async addComment(req: Request, res: Response) : Promise <void>{
+    try{
+        const { id, commentId } = req.body;
+        const post = await getPostOr404(id);
+        const comment = await CommentModel.findById(commentId);
+        if (!comment) throw Error("404");
+
+        const updateRes = await PostModel.updateOne({_id: id}, {$push: {comments: commentId}}).exec();
+        console.log(updateRes);
+        if (updateRes.modifiedCount == 0) throw Error("500");
+        res.status(200).send();
         return;
+
+    } 
+    catch(error) {
+        console.log(error);
+
+        if (error instanceof Error && error.message == "400"){
+            res.status(400).json({message: "Invalid ID."}).send(); return;
+        }
+        if (error instanceof Error && error.message == "404"){
+            res.status(404).json({message: "Post not found."}).send(); return;
+        }
+        
+        res.status(500).json({message: "Server error."}).send(); return;    
     }
-    catch(error)    {
-        res.status(500).json({error: "Server error."});
+
+},
+
+async addGrade(req: Request, res: Response) : Promise <void> {
+    try {
+        const { id, gradeId } = req.body;
+        const post = await getPostOr404(id);
+        
+        const grade = await GradeModel.findById(gradeId);
+        if (!grade) throw Error("404");
+
+        const updateRes = await PostModel.updateOne({_id: id}, {$push: {grades: gradeId}}).exec();
+        if (updateRes.modifiedCount ==0) throw Error("500");
+        res.status(200) .send();
         return;
-    }
-}
-
-
-export async function like(req: Request, res: Response): Promise <void>
-{
-    try
-    {
-        const {ID} = req.body;
-
-        let foundPost = await Post.find({_id: ID}).exec();  
-        if ( foundPost == null ) {
-            res.status(404).json({error: "No such user."});  
-            return;
-        }
-
-        var likeNumber = foundPost.likes;
-        likeNumber++;
-
-        const updateRes = await foundPost.updateOne({likes: likeNumber});
-        if (updateRes.upsertedCount == 0 ) {
-            (res.status(500).json({error: "Server error."})); 
-            return;
-        }
-    }
-    catch(error)
-    {
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-}
-
-export async function unlike(req: Request, res: Response): Promise <void>
-{
-    try
-    {
-        const {ID} = req.body;
-
-        let foundPost = await Post.find({_id: ID}).exec();  
-        if ( foundPost == null ) { 
-            res.status(404).json({error: "No such user."});
-            return;
-        }  
-        //  TODO cuvanje lajkovanih postova
-
-        let likeNumber = foundPost.likes;
-        likeNumber--;
-
-        const updateRes = await foundPost.updateOne({likes: likeNumber});
-        if (updateRes.upsertedCount == 0 ) { 
-            res.status(500).json({error: "Server error."}); 
-            return;
-        }
 
     }
-    catch(error)
-    {
-        res.status(500).json({error: "Server error."});
-        return;
+    catch(error) {
+
+        if (error instanceof Error && error.message == "400"){
+            res.status(400).json({message: "Invalid ID."}).send(); return;
+        }
+        if (error instanceof Error && error.message == "404") {
+            res.status(404).json({message: "Post not found."}).send(); return;
+        }
+        
+        res.status(500).json({message: "Server error."}).send(); return;  
     }
-}
+},
+
+/*
+async publish (req: Request, res: Response) : Promise <void> {
+    
+    try {
+        const { id } = req.body;
+        const post = await getPostOr404(id);
+
+        if (post.published) throw Error("400");
 
 
-export async function addComment(req: Request, res: Response): Promise <void>
-{
-    try
-    {
-        const {ID, Comment} = req.body;
+        const updateRes = await PostModel.updateOne({_id: id}, {$set: {published: true}}).exec();
+        if (updateRes.modifiedCount == 0) throw Error("500");
 
-        let post = await Post.find({_id: ID}).exec();  
-        if ( post == null ) { 
-            res.status(404).json({error: "No such user."});  
-            return;
-        }
-
-        const newPost = await post.Update( {$push: { comments: Comment } }, { new: true })
-        if(newPost == null) {
-            res.status(500).json({error: "Server error."});
-            return;
-        }
-
-        res.status(200).json(post);
+        res.status(200).send();
         return;
     }
     catch(error){
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-}
 
-export async function addGrade(req: Request, res: Response): Promise <void>
-{
-    try
-    {
-        const {ID, Grade} = req.body;
-
-        let post = await Post.findByID(ID).exec();  
-        if ( post == null ) {
-            res.status(404).json({error: "No such user."});  
-            return;
+        if (error instanceof Error && error.message == "400"){
+            res.status(400).json({message: "Post already public."}).send(); return;
         }
-
-        const newPost = await post.Update( {$push: { grade: Grade } }, { new: true })
-        if (newPost == null) {
-            res.status(500).json({error: "Server error."});
-            return;
-        }
-
-        res.status(200).json(post);
-        return;
-    }
-    catch(error){
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-}
-
-
-export async function publish(req: Request, res: Response): Promise <void> 
-{
-    try
-    {
-        const {ID, Username, Published} = req.body;
-
-        let foundPost = await Post.find({_id: ID, username: Username}).exec();  
-        if ( foundPost == null ) {
-            res.status(404).json({error: "No such post from this user."});  
-            return;
-        }
-
-        if (Published == true) {    
-            res.status(500).json({error: "Post already published."});
-        }
-
-        const updateRes = await foundPost.updateOne({publish: true});
-        if (updateRes.upsertedCount == 0 )  {
-            res.status(500).json({error: "Server error."});
-            return;
-        }
-    }
-    catch(error)
-    {
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-}
-
-export async function unpublish(req: Request, res: Response): Promise <void>  
-{
-    try
-    {
-        const {ID, Username, Published} = req.body;
-
-        let foundPost = await Post.find({_id: ID, username: Username}).exec();  
-        if ( foundPost == null ) {
-            res.status(404).json({error: "No such post from this user."});  
-            return;
+        if (error instanceof Error && error.message == "404") {
+            res.status(404).json({message: "Post not found."}).send(); return;
         }
         
-        if (Published == false) {
-            res.status(500).json({error: "Post already private."});
-        }
-
-        const updateRes = await foundPost.updateOne({publish: false});
-        if (updateRes.upsertedCount == 0 )  {
-            res.status(500).json({error: "Server error."});
-            return;
-        }
+        res.status(500).json({message: "Server error."}).send(); return;   
     }
-    catch(error)
-    {
-        res.status(500).json({error: "Server error."});
+},
+
+async unpublish (req: Request, res: Response) : Promise <void> {
+    try{
+        const { id } = req.body;
+        const post = await getPostOr404(id);
+
+        if (!post.published) throw Error("400");
+
+        const updateRes = await PostModel.updateOne({_id: id}, {$set: {published: false}}).exec();
+        if (updateRes.modifiedCount == 0) throw Error("500");
+        res.status(200).send();
+        
         return;
     }
-}
+    catch (error) {
 
-
-
-export async function removeComment(req: Request, res: Response): Promise <void>  
-{
-    try
-    {
-        const {PostID, Username, Comment} = req.body;
-        let foundPost = await Post.find({_id: PostID, username: Username, comment: Comment}).exec();  
-        if ( foundPost == null ) {
-            res.status(404).json({error: "No such comment from this user on this post."});  
-            return;
-        }  
-
-
-
-    }
-    catch(error)
-    {
-        res.status(500).json({error: "Server error."});
-        return;
-    }
-}
-
-
-export async function deletePost(req: Request, res: Response): Promise <void>  
-{
-    try
-    {
-        const {ID, Username, Published} = req.body;
-
-        let foundPost = await Post.find({_id: ID, username: Username}).exec();  
-        if ( foundPost == null ) {
-            res.status(404).json({error: "No such post from this user."});  
-            return;
+        if (error instanceof Error && error.message == "400"){
+            res.status(400).json({message: "Post already private."}).send(); return;
+        }
+        if (error instanceof Error && error.message == "404") {
+            res.status(404).json({message: "Post not found."}).send(); return;
         }
         
-        if (Published == false) {
-            res.status(500).json({error: "Post already private."});
-        }
-
-        const updateRes = await foundPost.updateOne({publish: false});
-        if (updateRes.upsertedCount == 0 )  {
-            res.status(500).json({error: "Server error."});
-            return;
-        }
+        res.status(500).json({message: "Server error."}).send(); return;
     }
-    catch(error)
-    {
-        res.status(500).json({error: "Server error."});
+},
+*/
+async deletePost (req: Request, res: Response) : Promise <void> {
+    try{
+        const id  = req.params.id;
+        if (!id) throw Error("400");
+        const post = await getPostOr404(id);
+
+        const deleteRes = await PostModel.deleteOne({_id: id});
+        if (deleteRes.modifiedCount == 0) throw Error("500");
+
+        res.status(200).send();  
+        
         return;
     }
+    catch (error)
+    {
+        if (error instanceof Error && error.message == "400"){
+            res.status(400).json({message: "Invalid ID."}).send(); return;
+        }
+        if (error instanceof Error && error.message == "404") {
+            res.status(404).json({message: "Post not found."}).send(); return;
+        }
+        
+        res.status(500).json({message: "Server error."}).send(); return;
+    
+    }
 }
+
+}
+
+module.exports = postCtrl;

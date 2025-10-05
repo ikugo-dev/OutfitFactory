@@ -70,9 +70,8 @@
 
 <script setup lang="ts">
 import { ref, watch, reactive, onMounted } from "vue";
-import type { ArticleType } from "../types";
-import { fetchAllArticles } from "../fakeData.ts";
-
+import type { ArticleType } from "@/types";
+import { fetchAllArticles } from "@/fakeData.ts";
 const props = defineProps<{
   category?: string | null;
   brand?: string | null;

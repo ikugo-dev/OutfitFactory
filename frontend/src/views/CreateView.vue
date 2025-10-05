@@ -1,17 +1,8 @@
 <template>
   <div class="create-view">
     <h2>Create a New Outfit</h2>
-
     <div v-if="user">
       <OutfitEditor v-model="outfit" />
-
-      <textarea
-        v-model="caption"
-        placeholder="Describe your outfit..."
-        class="caption-input"
-      />
-
-      <button class="submit-btn" @click="submitPost">Post Outfit</button>
     </div>
 
     <div v-else class="login-message">
@@ -57,38 +48,3 @@ function submitPost() {
   caption.value = "";
 }
 </script>
-
-<style scoped>
-.create-view {
-  max-width: 600px;
-  margin: 2rem auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-.caption-input {
-  width: 100%;
-  min-height: 80px;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-}
-.submit-btn {
-  padding: 0.6rem 1.2rem;
-  background: black;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.submit-btn:hover {
-  background: #333;
-}
-.login-message {
-  text-align: center;
-  color: #777;
-}
-</style>

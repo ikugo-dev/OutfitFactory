@@ -1,21 +1,23 @@
 <template>
-  <div class="outfit-editor">
-    <div class="outfit-flex">
-      <div
-        v-for="(item, i) in outfit.clothes"
-        :key="i"
-        class="outfit-slot-wrapper"
-      >
-        <OutfitSlot :item="item" editable @select="removeItem(i)" />
-        <button class="remove-btn" @click="removeItem(i)">✕</button>
-      </div>
 
-      <!-- Add button slot -->
-      <div class="outfit-slot-wrapper add-slot" @click="openSelector">
-        <div class="add-btn">+</div>
+  <div class="outfit-editor">
+    <div class="post-card" :style="{ backgroundColor: color }">
+      <div class="current-outfit-editor">
+        <div class="outfit-flex">
+          <div v-for="(item, i) in outfit.clothes" :key="i" class="outfit-slot-wrapper" >
+            <OutfitSlot :item="item" editable @select="removeItem(i)" />
+            <button class="remove-btn" @click="removeItem(i)">✕</button>
+          </div>
+
+          <div class="outfit-slot-wrapper add-slot" @click="openSelector">+</div>
+        </div>
+      </div>
+      <textarea v-model="caption" placeholder="Describe your outfit..." class="caption-input" />
+      <div>
+        <button class="submit-btn" @click="submitPost">Post Outfit</button>
+        <button class="submit-btn" @click="submitPost">Post Outfit</button>
       </div>
     </div>
-
     <OutfitSelectionPanel
       v-if="isSelecting"
       @close="isSelecting = false"
@@ -29,6 +31,8 @@ import { ref } from "vue";
 import OutfitSlot from "./OutfitSlot.vue";
 import OutfitSelectionPanel from "./OutfitSelectionPanel.vue";
 import type { OutfitType, ArticleType } from "@/types";
+
+const color = "#" + ((1 << 24) * Math.random() | 0).toString(16).padStart(6, "0");
 
 const props = defineProps<{ modelValue: OutfitType }>();
 const emit = defineEmits(["update:modelValue"]);
@@ -53,12 +57,6 @@ function removeItem(index: number) {
 </script>
 
 <style scoped>
-.outfit-editor {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
 .outfit-flex {
   display: flex;
@@ -76,32 +74,57 @@ function removeItem(index: number) {
   aspect-ratio: 1 / 1;
 }
 
-.remove-btn {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  border: none;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 0.8rem;
-  width: 1.2rem;
-  height: 1.2rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .add-slot {
   border: 2px dashed #666;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-}
-
-.add-btn {
   font-size: 2rem;
   font-weight: bold;
 }
+
+.caption {
+  margin: 0.5rem;
+  width: 20rem;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.outfit-editor {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.post-card {
+  flex: 1;
+  max-width: 45%; /* prevent it from being too wide */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 1rem;
+  border: 0.2rem solid black;
+  background-color: var(--background);
+  box-sizing: border-box;
+}
+
+/* Outfit grid area inside postcard */
+.current-outfit-editor {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1rem;
+  border: 0.2rem solid black;
+  background-color: white;
+  overflow: hidden;
+}
+
 </style>

@@ -12,21 +12,23 @@
       <span v-if="editable">+</span>
     </div>
 
-    <teleport to="body">
-      <div
-        v-if="showTooltip && item"
-        class="hover-panel"
-        :style="{ top: tooltipY + 'px', left: tooltipX + 'px' }"
-      >
-        <div class="info-row"><b>{{ item.name }}</b></div>
-        <div class="info-row">Category: {{ item.category }}</div>
-        <div class="info-row">Gender: {{ item.gender }}</div>
-        <div class="info-row">Brand: {{ item.brand }}</div>
-        <div class="info-row">Color: {{ item.color }}</div>
-        <div class="info-row">Material: {{ item.material }}</div>
-        <div class="info-row">Price: €{{ item.price }}</div>
-      </div>
-    </teleport>
+    <div v-if="!editable">
+      <teleport to="body">
+        <div
+          v-if="showTooltip && item"
+          class="hover-panel"
+          :style="{ top: tooltipY + 'px', left: tooltipX + 'px' }"
+        >
+          <div class="info-row"><b>{{ item.name }}</b></div>
+          <div class="info-row">Category: {{ item.category }}</div>
+          <div class="info-row">Gender: {{ item.gender }}</div>
+          <div class="info-row">Brand: {{ item.brand }}</div>
+          <div class="info-row">Color: {{ item.color }}</div>
+          <div class="info-row">Material: {{ item.material }}</div>
+          <div class="info-row">Price: €{{ item.price }}</div>
+        </div>
+      </teleport>
+    </div>
   </div>
 </template>
 
@@ -78,7 +80,7 @@ img {
 
 .outfit-slot.clickable:hover {
   transform: scale(1.05);
-  opacity: 0.6;
+  filter: brightness(0.5);
   cursor: pointer;
 }
 

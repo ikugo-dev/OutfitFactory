@@ -3,6 +3,7 @@ import HomeView from "../views/HomeView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import ExploreView from "../views/ExploreView.vue";
 import CreateView from "../views/CreateView.vue";
+import LoginView from "../views/LoginView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +40,10 @@ const router = createRouter({
   }, {
     path: "/*",
     redirect: "/explore?algo=new",
+  }, {
+    path: "/login",
+    name: "login page",
+    component: LoginView,
   }],
 });
 

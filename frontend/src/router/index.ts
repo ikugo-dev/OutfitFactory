@@ -19,19 +19,17 @@ const router = createRouter({
     path: "/explore/following",
     name: "explore following",
     component: ExploreView,
+    meta: { requiresAuth: true },
   }, {
     path: "/create",
     name: "outfit creator",
     component: CreateView,
+    meta: { requiresAuth: true },
   }, {
     path: "/profile",
     name: "my profile",
-    // beforeEnter: (_to, _from, next) => {
-    //   const loggedIn = !!localStorage.getItem('user') // auth check
-    //   if (!loggedIn) next({ name: 'Login'})
-    //   else next()
-    // },
     component: ProfileView,
+    meta: { requiresAuth: true },
   }, {
     path: "/profile/:username",
     name: "user profile",
@@ -45,6 +43,15 @@ const router = createRouter({
     name: "login page",
     component: LoginView,
   }],
+});
+
+router.beforeEach((to, _from, next) => {
+  const loggedIn = !!localStorage.getItem("userId");
+  if (to.meta.requiresAuth && !loggedIn) {
+    next({ name: "login page", query: { redirect: to.fullPath } });
+  } else {
+    next();
+  }
 });
 
 export default router;

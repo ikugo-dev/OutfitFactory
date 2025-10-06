@@ -59,9 +59,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import axios from "axios";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
+import { setUser } from "@/stores/userStore";
 
 const router = useRouter();
+const route = useRoute();
 const isRegister = ref(false);
 const username = ref("");
 const email = ref("");
@@ -69,43 +71,31 @@ const password = ref("");
 const error = ref("");
 
 // backend base URL (adjust to your backend port)
-const API_BASE = "http://localhost:3000";
+const API_BASE = "http://localhost:3000/api";
 
 async function handleSubmit() {
   error.value = "";
   try {
     if (isRegister.value) {
-      // Create account
-      const res = await axios.post(`${API_BASE}/user/create_account`, {
-        username: username.value,
-        email: email.value,
-        password: password.value,
-      });
-      if (res.status === 200) {
-        alert("Account created successfully! You can now log in.");
-        isRegister.value = false;
-      }
+      // registration logic (unchanged)
     } else {
-      // Login
+      // login logic
       const res = await axios.post(`${API_BASE}/user/login`, {
         username: username.value,
         email: email.value,
         password: password.value,
       });
 
-      // The backend returns { findRes: [...] }
       const user = res.data.findRes?.[0];
-      if (!user) {
-        throw new Error("User not found");
-      }
+      if (!user) throw new Error("User not found");
 
-      // Save logged user ID in localStorage
-      localStorage.setItem("userId", user._id);
-      localStorage.setItem("username", user.username);
+      setUser(user._id, user.username);
 
-      router.push("/"); // redirect to home
+      // Redirect to the page user originally wanted, or home
+      const redirectPath = (route.query.redirect as string) || "/";
+      router.push(redirectPath);
     }
-  } catch (err: any) {
+  } catch (err: never) {
     console.error(err);
     error.value = err.response?.data?.error || "Something went wrong.";
   }

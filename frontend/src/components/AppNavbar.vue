@@ -6,13 +6,16 @@
       :class="{ 'active-link': route.path === '/explore/following' }">Following</router-link>
     <router-link to="/create" :class="{ 'active-link': route.path === '/create' }">Create</router-link>
     <router-link to="/profile" :class="{ 'active-link': route.path === '/profile' }">Profile</router-link>
-    <!-- <a href="/create.html">Create</a> > -->
+    <LogoutButton v-if="currentUserId" />
   </nav>
 </template>
 
 
 <script setup lang="ts">
 import { useRoute } from "vue-router"
+import LogoutButton from "./LogoutButton.vue"
+import { currentUserId } from "@/stores/userStore";
+
 const route = useRoute();
 </script>
 

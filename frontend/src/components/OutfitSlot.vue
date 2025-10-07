@@ -7,7 +7,7 @@
     @mousemove="updateTooltipPosition"
     @click="handleClick"
   >
-    <img v-if="item?.imageUrl" :src="item.imageUrl" alt="clothing" />
+    <img v-if="item?.image_url" :src="item.image_url" alt="clothing" />
     <div v-else class="empty-slot">
       <span v-if="editable">+</span>
     </div>
@@ -34,10 +34,10 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import type { ArticleType } from "@/types";
+import type { GarmentType } from "@/types";
 
 const props = defineProps<{
-  item?: ArticleType | null;
+  item?: GarmentType | null;
   editable?: boolean;
 }>();
 

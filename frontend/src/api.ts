@@ -24,5 +24,5 @@ export async function createPost(
   outfitId: string,
   text: string,
 ) {
-  await api.post("/create_post", { userId, outfitId, text });
+  await api.post("/post/create_post", { userId, outfitId, text });
 }

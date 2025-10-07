@@ -1,124 +1,125 @@
-import {Request, Response} from 'express'; 
+import { Request, Response } from "express";
 const OutfitModel = require("../models/outfit");
 const GarmentModel = require("../models/garment");
 const UserModel = require("../models/user");
 
 const outfitCtrl = {
+    async getOutfit(req: Request, res: Response): Promise<void> {
+        try {
+            const id = req.params.id;
+            const outfit = await OutfitModel.findById(id).exec();
 
-async getOutfit(req: Request, res: Response): Promise <void>  {
-    try 
-    {
-        const  id  = req.params.id;
-        const outfit = await OutfitModel.findById(id).exec();
+            if (!outfit) {
+                res.status(404).json({ error: "Outfit not found." }).send();
+                return;
+            }
 
-        if (!outfit) {
-            res.status(404).json({error: "Outfit not found."}).send();
+            res.status(200).json(outfit).send();
+            return;
+        } catch (error) {
+            res.status(500).json({ error: "Server error." }).send();
             return;
         }
-        
-        res.status(200).json(outfit).send();
-        return;
-    }
-    catch (error) 
-    {
-        res.status(500).json({error: "Server error."}).send();
-        return;
-    }
-},
+    },
 
-async createOutfit(req: Request, res: Response): Promise<void> 
-{
-    try{
-        const {id} = req.body;
-        console.log(id);
-        const user = await UserModel.findById(id).exec();
-        if(!user){
-            res.status(404).json({error: "No such user."}).send();
-            return; 
-        }
+    async createOutfit(req: Request, res: Response): Promise<void> {
+        try {
+            const { id } = req.body;
+            console.log(id);
+            const user = await UserModel.findById(id).exec();
+            if (!user) {
+                res.status(404).json({ error: "No such user." }).send();
+                return;
+            }
 
-        const newOutfit = await OutfitModel.create({ owner: id, garments: [] });
-        
+            const newOutfit = await OutfitModel.create({
+                owner: id,
+                garments: [],
+            });
 
-        if (newOutfit == null){
-            res.status(500).json({error: "Outfit creation error."}).send();
+            if (newOutfit == null) {
+                res.status(500).json({ error: "Outfit creation error." })
+                    .send();
+                return;
+            }
+
+            const updateRes = await UserModel.updateOne({ _id: id }, {
+                $push: { outfits: newOutfit._id },
+            });
+            if (updateRes.modifiedCount == 0) {
+                res.status(500).json({
+                    error: "Server error. (Modified error)",
+                }).send();
+                return;
+            }
+
+            res.status(200).json(newOutfit).send();
+            return;
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: "Server error." }).send();
             return;
         }
+    },
 
-        const updateRes = await UserModel.updateOne({_id: id}, {$push: {outfits: newOutfit._id}});
-        if (updateRes.modifiedCount == 0){
-            res.status(500).json({error: "Server error. (Modified error)"}).send();
-            return; 
-        }
+    async addGarment(req: Request, res: Response): Promise<void> {
+        try {
+            const { id, garmentId } = req.body;
+            console.log(id, garmentId);
+            const outfit = await OutfitModel.findById(id).exec();
+            const garment = await GarmentModel.findById(garmentId).exec();
 
-        res.status(200).json(newOutfit).send();
-        return;
+            if (!outfit || !garment) {
+                res.status(404).json({ error: "Not found." }).send();
+                return;
+            }
 
-    }
-    catch(error){
-        console.log(error);
-        res.status(500).json({error: "Server error."}).send();
-        return; 
-    }
-},
+            let newOutfit = await OutfitModel.updateOne({ _id: id }, {
+                $push: { garments: garmentId },
+            }).exec();
+            if (newOutfit.modifiedCount == 0) {
+                throw new Error("500");
+            }
 
-
-async addGarment(req: Request, res: Response): Promise <void>  {
-    try {
-        const { id, garmentId } = req.body;
-        const outfit = await OutfitModel.findById(id).exec();
-        const garment = await GarmentModel.findById(garmentId).exec();
-
-        console.log("")
-        if (!outfit || !garment) {
-            res.status(404).json({error: "Not found."}).send();
+            res.status(200).json();
+            return;
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: "Server error." }).send();
             return;
         }
-        
-        let newOutfit = await OutfitModel.updateOne({_id: id}, { $push: { garments : garmentId }}).exec();
-        if(newOutfit.modifiedCount == 0) {
-            throw new Error("500");
-        }
+    },
 
-        res.status(200).json().send();
-        return;
-    }
-    catch (error) {
-        console.log(error);
-        res.status(500).json({error: "Server error."}).send();
-        return;
-    }
-},
+    async deleteOutfit(req: Request, res: Response): Promise<void> {
+        try {
+            const id = req.params.id;
+            const outfit = await OutfitModel.findById(id).exec();
 
+            if (!outfit) {
+                res.status(404).json({ error: "Outfit not found." }).send();
+                return;
+            }
+            const updateRes = await UserModel.updateOne({ _id: outfit.owner }, {
+                $pull: { outfits: id },
+            });
+            if (updateRes.modifiedCount == 0) {
+                res.status(500).json({
+                    error: "Server error. (Modified error)",
+                }).send();
+                return;
+            }
+            const deleteRes = await OutfitModel.deleteOne({ _id: id }).exec();
+            if (deleteRes.deletedCount == 0) {
+                throw new Error();
+            }
 
-async deleteOutfit(req: Request, res: Response): Promise <void>  {
-    try {
-        const id  = req.params.id;
-        const outfit = await OutfitModel.findById(id).exec();
-
-        if (!outfit) {
-            res.status(404).json({error: "Outfit not found."}).send();
+            res.status(200).json("Successfully deleted outfit").send();
+            return;
+        } catch (error) {
+            res.status(500).json({ error: "Server error." }).send();
             return;
         }
-        const updateRes = await UserModel.updateOne({_id: outfit.owner}, {$pull: {outfits: id}});
-        if (updateRes.modifiedCount == 0){
-            res.status(500).json({error: "Server error. (Modified error)"}).send();
-            return; 
-        }
-        const deleteRes = await OutfitModel.deleteOne({ _id: id }).exec();
-        if (deleteRes.deletedCount == 0 ) { 
-            throw new Error();
-        }
-
-        res.status(200).json("Successfully deleted outfit").send();
-        return;
-    }
-    catch (error) {
-        res.status(500).json({error: "Server error."}).send();
-        return;
-    }
-} 
-}
-
+    },
+};
 
 module.exports = outfitCtrl;

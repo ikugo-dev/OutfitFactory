@@ -23,12 +23,14 @@ export interface CommentType {
 }
 
 export interface GarmentType {
-  _id: string;
-  images: string[];
-  category: string | null;
-  color: string[];
-  material: string[];
-  gender: string[];
+  _id: number;
+  image_url: string;
+  gender: string;
+  category: string;
+  name: string;
+  color: string;
+  material: string;
+  price: number;
   brand: string;
 }
 

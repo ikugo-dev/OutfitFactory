@@ -6,9 +6,10 @@ const PostModel = require("../models/post");
 const GarmentModel = require("../models/garment");
 
 async function getUserOr404(id: string) {
-    if (!Types.ObjectId.isValid(id)) {
-        throw new Error("400");
-    }
+    // if (!Types.ObjectId.isValid(id)) {
+    //     throw new Error("400");
+    // }
+    console.log("getUserOr404 → id:", id);
     const user = await UserModel.findById(id).exec();
 
     if (!user) { 

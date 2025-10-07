@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const garmentSchema = new Schema({
-    id: { type: Number, required: true, unique: true },
     image_url: { type: String, required: true },
     gender: { type: String, required: true },
     category: { type: String, required: true },

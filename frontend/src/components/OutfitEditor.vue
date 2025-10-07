@@ -30,7 +30,7 @@ import OutfitSlot from './OutfitSlot.vue'
 import OutfitSelectionPanel from './OutfitSelectionPanel.vue'
 import { ref } from "vue";
 import { createOutfit, addGarmentToOutfit, createPost } from "@/api.ts";
-import { currentUsername, currentUserId } from "@/stores/userStore.ts";
+import { currentUserId } from "@/stores/userStore.ts";
 import { GarmentType, OutfitType } from "@types.ts";
 const caption = ref("");
 const outfit = ref<OutfitType>({
@@ -52,29 +52,29 @@ function addItem(garment: GarmentType) {
 function removeItem(index: number) {
   outfit.value.clothes.splice(index, 1);
 }
-
 async function submitPost() {
-  if (!currentUsername) {
-    alert("You must be logged in!");
-    return;
-  }
-
   if (outfit.value.clothes.length === 0) {
     alert("You must add at least one garment!");
     return;
   }
 
   try {
-    const createdOutfit = await createOutfit(currentUserId);
+    // 1️⃣ Create the outfit
+    const createdOutfit = await createOutfit(currentUserId.value);
     const outfitId = createdOutfit._id;
 
+
     for (const g of outfit.value.clothes) {
-      await addGarmentToOutfit(outfitId, g.id);
+      await addGarmentToOutfit(outfitId, g._id);
     }
 
-    await createPost(currentUserId, outfitId, caption.value);
+    // 3️⃣ Create post
+    await createPost(currentUserId.value, outfitId, caption.value);
+
+    // 4️⃣ Done!
     alert("Post created successfully!");
 
+    // Reset
     caption.value = "";
     outfit.value = { clothes: [] };
   } catch (err) {

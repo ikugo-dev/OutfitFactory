@@ -25,9 +25,9 @@ router.patch("/grade/add_comfort", gradeCtrl.addComfort);
 router.delete("/grade/:id", gradeCtrl.deleteGrade);
 
 //outfit routes
-router.get("/outfit/:id", outfitCtrl.getOutfit);
 router.post("/create_outfit", outfitCtrl.createOutfit);
 router.patch("/outfit/add_garment", outfitCtrl.addGarment);
+router.get("/outfit/:id", outfitCtrl.getOutfit);
 router.delete("/outfit/:id", outfitCtrl.deleteOutfit);
 
 //garment routes

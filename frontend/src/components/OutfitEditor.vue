@@ -14,7 +14,7 @@
       <textarea v-model="caption" placeholder="Describe your outfit..." class="caption-input" />
       <div>
         <button class="submit-btn" @click="submitPost">Post Outfit</button>
-        <button class="submit-btn" @click="submitPost">Post Outfit</button>
+        <!-- <button class="submit-btn" @click="submitPost">Post Outfit</button> -->
       </div>
     </div>
     <OutfitSelectionPanel
@@ -26,32 +26,61 @@
 </template>
 
 <script setup lang="ts">
+import OutfitSlot from './OutfitSlot.vue'
+import OutfitSelectionPanel from './OutfitSelectionPanel.vue'
 import { ref } from "vue";
-import OutfitSlot from "./OutfitSlot.vue";
-import OutfitSelectionPanel from "./OutfitSelectionPanel.vue";
-import type { OutfitType, ArticleType } from "@/types";
+import { createOutfit, addGarmentToOutfit, createPost } from "@/api.ts";
+import { currentUsername, currentUserId } from "@/stores/userStore.ts";
+import { GarmentType, OutfitType } from "@types.ts";
+const caption = ref("");
+const outfit = ref<OutfitType>({
+  clothes: [],
+});
 
 const color = "#" + ((1 << 24) * Math.random() | 0).toString(16).padStart(6, "0");
 
-const props = defineProps<{ modelValue: OutfitType }>();
-const emit = defineEmits(["update:modelValue"]);
-
-const outfit = ref<OutfitType>(props.modelValue);
 const isSelecting = ref(false);
-
 function openSelector() {
   isSelecting.value = true;
 }
 
-function addItem(article: ArticleType) {
-  outfit.value.clothes.push(article);
-  emit("update:modelValue", outfit.value);
+function addItem(garment: GarmentType) {
+  outfit.value.clothes.push(garment);
   isSelecting.value = false;
 }
 
 function removeItem(index: number) {
   outfit.value.clothes.splice(index, 1);
-  emit("update:modelValue", outfit.value);
+}
+
+async function submitPost() {
+  if (!currentUsername) {
+    alert("You must be logged in!");
+    return;
+  }
+
+  if (outfit.value.clothes.length === 0) {
+    alert("You must add at least one garment!");
+    return;
+  }
+
+  try {
+    const createdOutfit = await createOutfit(currentUserId);
+    const outfitId = createdOutfit._id;
+
+    for (const g of outfit.value.clothes) {
+      await addGarmentToOutfit(outfitId, g.id);
+    }
+
+    await createPost(currentUserId, outfitId, caption.value);
+    alert("Post created successfully!");
+
+    caption.value = "";
+    outfit.value = { clothes: [] };
+  } catch (err) {
+    console.error(err);
+    alert("Error creating post!");
+  }
 }
 </script>
 

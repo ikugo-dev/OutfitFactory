@@ -1,44 +1,59 @@
-export interface ArticleType {
-  id: number;
-  imageUrl: string;
-  gender: string;
-  category: string;
-  name: string;
-  color: string;
-  material: string;
-  price: number;
-  brand: string;
-}
-
-export interface OutfitType {
-  id: number;
-  name: string;
-  clothes: ArticleType[];
-}
+export type Ref<T> = string | T;
 
 export interface UserType {
-  id: number;
+  _id: string;
   username: string;
-  password: string;
   email: string;
-  profilePicture: string;
-  followers: number;
-  following: UserType[];
+  password: string;
+  avatar: string;
+  posts: Ref<PostType>[];
+  followers: Ref<UserType>[];
+  following: Ref<UserType>[];
+  liked: Ref<PostType>[];
+  closet: Ref<GarmentType>[];
+  outfits: Ref<OutfitType>[];
 }
 
 export interface CommentType {
-  id: number;
-  user: UserType;
+  _id: string;
+  user: Ref<UserType>;
   text: string;
   likes: number;
+  likers: Ref<UserType>[];
+}
+
+export interface GarmentType {
+  _id: string;
+  images: string[];
+  category: string | null;
+  color: string[];
+  material: string[];
+  gender: string[];
+  brand: string;
+}
+
+export interface GradeType {
+  _id: string;
+  user: Ref<UserType>;
+  fit_quality: number;
+  material_quality: number;
+  design: number;
+  comfort: number;
+}
+
+export interface OutfitType {
+  _id: string;
+  owner: Ref<UserType>;
+  garments: Ref<GarmentType>[];
 }
 
 export interface PostType {
-  id: number;
-  user: UserType;
-  outfit: OutfitType | undefined;
-  caption: string;
+  _id: string;
+  user: Ref<UserType>;
+  outfit: Ref<OutfitType>;
+  text: string | null;
   likes: number;
-  comments: CommentType[] | undefined;
-  visible: boolean;
+  likers: Ref<UserType>[];
+  comments: Ref<CommentType>[];
+  grades: Ref<GradeType>[];
 }

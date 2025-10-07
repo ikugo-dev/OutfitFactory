@@ -5,7 +5,6 @@ const gradeCtrl = require("../controllers/gradeController");
 const garmentCtrl = require("../controllers/garmentController");
 const commentCtrl = require("../controllers/commentController");
 
-
 const router = Router();
 
 router.patch("/post/add_comment", postCtrl.addComment);
@@ -13,11 +12,8 @@ router.patch("/post/like", postCtrl.like);
 router.patch("/post/unlike", postCtrl.unlike); //treba li mi
 router.patch("/post/add_grade", postCtrl.addGrade);
 router.get("/post/:id", postCtrl.getPost);
-router.delete("/post/:id",postCtrl.deletePost);
-
-router.post("/create_post", postCtrl.createPost);
-router.get("/:id", postCtrl.getPost);
-
+router.delete("/post/:id", postCtrl.deletePost);
+router.post("/post/create_post", postCtrl.createPost);
 
 //grade routes
 router.get("/grade/:id", gradeCtrl.getGrade);
@@ -28,16 +24,15 @@ router.patch("/grade/add_design", gradeCtrl.addDesign);
 router.patch("/grade/add_comfort", gradeCtrl.addComfort);
 router.delete("/grade/:id", gradeCtrl.deleteGrade);
 
-
 //outfit routes
 router.get("/outfit/:id", outfitCtrl.getOutfit);
 router.post("/create_outfit", outfitCtrl.createOutfit);
 router.patch("/outfit/add_garment", outfitCtrl.addGarment);
 router.delete("/outfit/:id", outfitCtrl.deleteOutfit);
 
-
 //garment routes
 router.get("/garment/:id", garmentCtrl.getGarment);
+router.get("/garments", garmentCtrl.getGarments);
 router.post("/create_garment", garmentCtrl.createGarment);
 router.patch("/garment/add_image", garmentCtrl.addImage);
 router.patch("/garment/add_color", garmentCtrl.addColor);
@@ -52,8 +47,6 @@ router.patch("/comment/like", commentCtrl.likeComment);
 router.patch("/comment/unlike", commentCtrl.unlikeComment);
 router.delete("/comment/:id", commentCtrl.deleteComment);
 
-
-
 /*
 fale:
 
@@ -61,6 +54,5 @@ fale:
 
 
 */
-
 
 module.exports = router;

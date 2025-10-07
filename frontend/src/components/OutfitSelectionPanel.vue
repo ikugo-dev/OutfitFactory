@@ -87,7 +87,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from "vue";
 import type { ArticleType } from "@/types";
-import { fetchAllArticles } from "@/fakeData.ts";
+import { fetchAllGarments } from "@/api";
 
 const props = defineProps<{
   brand?: string | null;
@@ -124,7 +124,7 @@ const loading = ref(false);
 
 async function loadArticles() {
   loading.value = true;
-  allArticles.value = await fetchAllArticles();
+  allArticles.value = await fetchAllGarments();
   filteredArticles.value = allArticles.value;
   loading.value = false;
 }

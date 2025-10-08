@@ -20,7 +20,7 @@
     <OutfitSelectionPanel
       v-if="isSelecting"
       @close="isSelecting = false"
-      @selectArticle="addItem"
+      @selectGarment="addItem"
     />
   </div>
 </template>
@@ -59,22 +59,14 @@ async function submitPost() {
   }
 
   try {
-    // 1️⃣ Create the outfit
     const createdOutfit = await createOutfit(currentUserId.value);
     const outfitId = createdOutfit._id;
-
-
     for (const g of outfit.value.clothes) {
       await addGarmentToOutfit(outfitId, g._id);
     }
+    await createPost(currentUserId.value, caption.value, outfitId);
 
-    // 3️⃣ Create post
-    await createPost(currentUserId.value, outfitId, caption.value);
-
-    // 4️⃣ Done!
     alert("Post created successfully!");
-
-    // Reset
     caption.value = "";
     outfit.value = { clothes: [] };
   } catch (err) {

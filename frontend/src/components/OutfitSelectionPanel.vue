@@ -56,17 +56,17 @@
 
     <div class="results">
       <div v-if="loading">Loading…</div>
-      <div v-else-if="filteredArticles.length === 0">No items match.</div>
+      <div v-else-if="filteredGarments.length === 0">No items match.</div>
 
       <ul v-else class="items">
         <li
-          v-for="a in filteredArticles"
+          v-for="a in filteredGarments"
           :key="a.id"
           class="item"
           @click="select(a)"
         >
           <div class="image">
-            <img :src="a.imageUrl" alt="item image" />
+            <img :src="a.image_url" alt="item image" />
           </div>
           <div class="info">
             <div class="name">{{ a.name }}</div>
@@ -86,7 +86,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from "vue";
-import type { ArticleType } from "@/types";
+import type { GarmentType } from "@/types";
 import { fetchAllGarments } from "@/api";
 
 const props = defineProps<{
@@ -96,7 +96,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "close"): void;
-  (e: "selectArticle", article: ArticleType): void;
+  (e: "selectGarment", article: GarmentType): void;
 }>();
 
 const brand = props.brand ?? "";
@@ -118,14 +118,14 @@ const availableCategories = ref<string[]>([
   "accessories",
 ]);
 
-const allArticles = ref<ArticleType[]>([]);
-const filteredArticles = ref<ArticleType[]>([]);
+const allGarments = ref<GarmentType[]>([]);
+const filteredGarments = ref<GarmentType[]>([]);
 const loading = ref(false);
 
-async function loadArticles() {
+async function loadGarments() {
   loading.value = true;
-  allArticles.value = await fetchAllGarments();
-  filteredArticles.value = allArticles.value;
+  allGarments.value = await fetchAllGarments();
+  filteredGarments.value = allGarments.value;
   loading.value = false;
 }
 
@@ -141,7 +141,7 @@ function applyFilters() {
   const br = brand;
   const gender = localFilters.gender;
 
-  filteredArticles.value = allArticles.value.filter((a) => {
+  filteredGarments.value = allGarments.value.filter((a) => {
     if (br && a.brand !== br) return false;
     if (cat && a.category.toLowerCase() !== cat) return false;
     if (gender !== "both" && a.gender.toLowerCase() !== gender) return false;
@@ -161,15 +161,15 @@ function resetFilters() {
   localFilters.priceFrom = null;
   localFilters.priceTo = null;
   selectedCategory.value = "";
-  filteredArticles.value = allArticles.value;
+  filteredGarments.value = allGarments.value;
 }
 
-function select(article: ArticleType) {
-  emit("selectArticle", article);
+function select(article: GarmentType) {
+  emit("selectGarment", article);
 }
 
 onMounted(() => {
-  loadArticles();
+  loadGarments();
 });
 
 watch(

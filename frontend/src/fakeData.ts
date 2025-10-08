@@ -1,32 +1,11 @@
 import {
-  type ArticleType,
+  type GarmentType,
   type OutfitType,
   type PostType,
   type UserType,
 } from "./types.ts";
 
-export function getFakeUser(): UserType {
-  return {
-    id: 69,
-    username: "FakeUser",
-    password: "pswrd123",
-    email: "fakeemail@email.com",
-    followers: 360,
-    following: [],
-    profilePicture: "",
-  } as UserType;
-}
-
-export function getFakePost(id: number): PostType {
-  return {
-    id: id,
-    user: getFakeUser(),
-    likes: 420,
-    visible: true,
-  } as PostType;
-}
-
-export function fetchAllArticles(): Promise<ArticleType[]> {
+export function fetchAllGarments(): Promise<GarmentType[]> {
   return new Promise((resolve) => {
     setTimeout(() => resolve(clothingPool), 1000);
   });
@@ -34,6 +13,10 @@ export function fetchAllArticles(): Promise<ArticleType[]> {
 
 function randomItem<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
+}
+
+export function getFakeUser() {
+  return null;
 }
 
 export const fakeUsers: UserType[] = [
@@ -80,7 +63,7 @@ fakeUsers.forEach((u) => {
   u.following = fakeUsers.filter((v) => v.id !== u.id && Math.random() > 0.6);
 });
 
-// --- Mock Clothing Articles --------------------------------------------------
+// --- Mock Clothing Garments --------------------------------------------------
 
 import { clothingPool } from "./MOCK_DATA.ts";
 
@@ -118,7 +101,6 @@ export function getFakePosts(count = 5): PostType[] {
     const outfit = randomOutfit();
 
     posts.push({
-      id: i + 1,
       user,
       outfit,
       caption: randomItem(captions),

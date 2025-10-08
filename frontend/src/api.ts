@@ -21,8 +21,8 @@ export async function addGarmentToOutfit(outfitId: string, garmentId: string) {
 
 export async function createPost(
   userId: string,
-  outfitId: string,
   text: string,
+  outfitId: string,
 ) {
-  await api.post("/post/create_post", { userId, outfitId, text });
+  await api.post("/post/create_post", { id: userId, text, outfitId });
 }

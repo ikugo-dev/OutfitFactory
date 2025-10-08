@@ -8,9 +8,9 @@ const CommentModel = require("../models/comment");
 const GradeModel = require("../models/grade");
 
 async function getPostOr404(id: string) {
-    if (!Types.ObjectId.isValid(id)) {
-        throw { status: 400, message: "Invalid post ID." };
-    }
+    // if (!Types.ObjectId.isValid(id)) {
+    //     throw { status: 400, message: "Invalid post ID." };
+    // }
     const post = await PostModel.findById(id).exec();
     if (!post) {
         console.log(id);
@@ -20,9 +20,9 @@ async function getPostOr404(id: string) {
 }
 
 async function getUserOr404(id: string) {
-    if (!Types.ObjectId.isValid(id)) {
-        throw new Error("400");
-    }
+    // if (!Types.ObjectId.isValid(id)) {
+    //     throw new Error("400");
+    // }
     const user = await UserModel.findById(id).exec();
 
     if (!user) { 
@@ -59,6 +59,7 @@ async getPost (req: Request, res: Response) : Promise <void> {
 async createPost(req: Request, res: Response) : Promise <void> {
     try {
         const { id, text, outfitId} = req.body;
+        console.log("🧩 createPost payload:", { id, text, outfitId });
         
         const user = await getUserOr404(id);
 

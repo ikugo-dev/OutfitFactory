@@ -3,12 +3,10 @@ import {Types} from "mongoose";
 const CommentModel = require("../models/comment");
 const UserModel = require("../models/user");
 
-
-
 async function getUserOr404(id: string) {
-    if (!Types.ObjectId.isValid(id)) {
-        throw new Error("400");
-    }
+    // if (!Types.ObjectId.isValid(id)) {
+    //     throw new Error("400");
+    // }
     const user = await UserModel.findById(id).exec();
 
     if (!user) { 

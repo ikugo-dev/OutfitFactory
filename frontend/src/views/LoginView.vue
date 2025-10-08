@@ -58,9 +58,8 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import axios from "axios";
 import { useRouter, useRoute } from "vue-router";
-import { setUser } from "@/stores/userStore";
+import { login } from "@/api.ts";
 
 const router = useRouter();
 const route = useRoute();
@@ -70,28 +69,12 @@ const email = ref("");
 const password = ref("");
 const error = ref("");
 
-// backend base URL (adjust to your backend port)
-const API_BASE = "http://localhost:3000/api";
-
 async function handleSubmit() {
   error.value = "";
   try {
-    if (isRegister.value) {
-      // registration logic (unchanged)
-    } else {
-      // login logic
-      const res = await axios.post(`${API_BASE}/user/login`, {
-        username: username.value,
-        email: email.value,
-        password: password.value,
-      });
+    if (!isRegister.value) {
+      login(username.value, email.value, password.value);
 
-      const user = res.data.findRes?.[0];
-      if (!user) throw new Error("User not found");
-
-      setUser(user._id, user.username);
-
-      // Redirect to the page user originally wanted, or home
       const redirectPath = (route.query.redirect as string) || "/";
       router.push(redirectPath);
     }

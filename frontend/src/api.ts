@@ -1,9 +1,26 @@
 import axios from "axios";
+import { setUser } from "@/stores/userStore.ts";
 
 const api = axios.create({
   baseURL: "http://localhost:3000/api",
   withCredentials: false,
 });
+
+export async function login(username: string, email: string, password: string) {
+  const res = await api.post("/user/login", {
+    username: username,
+    email: email,
+    password: password,
+  });
+
+  const user = res.data.findRes?.[0];
+  if (!user) {
+    console.log("User not found");
+    return;
+  }
+
+  setUser(user._id, user.username);
+}
 
 export async function fetchAllGarments() {
   const res = await api.get("/garments");

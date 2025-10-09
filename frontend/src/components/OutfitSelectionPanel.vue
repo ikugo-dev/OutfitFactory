@@ -59,12 +59,7 @@
       <div v-else-if="filteredGarments.length === 0">No items match.</div>
 
       <ul v-else class="items">
-        <li
-          v-for="a in filteredGarments"
-          :key="a.id"
-          class="item"
-          @click="select(a)"
-        >
+        <li v-for="a in filteredGarments" :key="a.id" class="item" @click="select(a)">
           <div class="image">
             <img :src="a.image_url" alt="item image" />
           </div>
@@ -191,25 +186,30 @@ watch(
   background: white;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
+
 .panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .btn-close {
   border: 0;
   background: transparent;
   font-size: 18px;
   cursor: pointer;
 }
+
 .filters {
   margin-top: 8px;
 }
+
 .filter-row {
   margin-bottom: 10px;
   display: flex;
   flex-direction: column;
 }
+
 .brand-label {
   color: #777;
   font-size: 14px;
@@ -218,24 +218,29 @@ watch(
   border-radius: 4px;
   padding: 6px;
 }
+
 .price-row input {
   width: 48%;
   margin-right: 4%;
 }
+
 .actions {
   display: flex;
   flex-direction: row;
   gap: 8px;
 }
+
 .actions button {
   padding: 6px 10px;
   cursor: pointer;
 }
+
 .results {
   margin-top: 12px;
   max-height: 480px;
   overflow-y: auto;
 }
+
 .items {
   border: 0.2rem solid black;
   list-style: none;
@@ -245,6 +250,7 @@ watch(
   flex-direction: column;
   gap: 10px;
 }
+
 .item {
   display: flex;
   border: 1px solid #eee;
@@ -253,9 +259,11 @@ watch(
   cursor: pointer;
   transition: background 0.2s;
 }
+
 .item:hover {
   background: #fafafa;
 }
+
 .image {
   width: 50%;
   aspect-ratio: 1 / 1;
@@ -264,11 +272,14 @@ watch(
   align-items: center;
   justify-content: center;
 }
+
 .image img {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* keeps full image visible, no cropping */
+  object-fit: contain;
+  /* keeps full image visible, no cropping */
 }
+
 .info {
   width: 50%;
   padding: 8px;
@@ -276,14 +287,17 @@ watch(
   flex-direction: column;
   justify-content: center;
 }
+
 .info .name {
   font-weight: 600;
   margin-bottom: 4px;
 }
+
 .meta {
   font-size: 12px;
   color: #666;
 }
+
 .desc {
   margin-top: 6px;
   font-size: 12px;

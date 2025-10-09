@@ -35,4 +35,3 @@ router.get("/find", userCtrl.getOne);
 */
 
 module.exports = router;
-

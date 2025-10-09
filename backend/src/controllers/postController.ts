@@ -56,10 +56,20 @@ async getPost (req: Request, res: Response) : Promise <void> {
     }
 },
 
+async getPosts (req: Request, res: Response) : Promise <void> {
+    try{
+        const posts = await PostModel.find().exec();
+        res.status(200).json(posts).send();
+        return;
+    } 
+    catch(_error) {
+        res.status(500).json({message: "Server error."}).send(); return;
+    }
+},
+
 async createPost(req: Request, res: Response) : Promise <void> {
     try {
         const { id, text, outfitId} = req.body;
-        console.log("🧩 createPost payload:", { id, text, outfitId });
         
         const user = await getUserOr404(id);
 

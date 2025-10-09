@@ -13,6 +13,7 @@ router.patch("/post/unlike", postCtrl.unlike); //treba li mi
 router.patch("/post/add_grade", postCtrl.addGrade);
 router.post("/post/create_post", postCtrl.createPost);
 router.get("/post/:id", postCtrl.getPost);
+router.get("/posts", postCtrl.getPosts);
 router.delete("/post/:id", postCtrl.deletePost);
 
 //grade routes

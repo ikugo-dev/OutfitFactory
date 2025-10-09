@@ -1,6 +1,6 @@
 <template>
   <div class="grid">
-    <PostCard v-for="p in posts" :key="p.id" :post="p" />
+    <PostCard v-for="p in posts" :key="p._id" :post="p" />
   </div>
 </template>
 

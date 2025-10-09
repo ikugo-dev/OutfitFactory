@@ -1,12 +1,6 @@
 <template>
-  <div
-    class="outfit-slot"
-    :class="{ clickable: editable }"
-    @mouseenter="showTooltip = true"
-    @mouseleave="showTooltip = false"
-    @mousemove="updateTooltipPosition"
-    @click="handleClick"
-  >
+  <div class="outfit-slot" :class="{ clickable: editable }" @mouseenter="showTooltip = true"
+    @mouseleave="showTooltip = false" @mousemove="updateTooltipPosition" @click="handleClick">
     <img v-if="item?.image_url" :src="item.image_url" alt="clothing" />
     <div v-else class="empty-slot">
       <span v-if="editable">+</span>
@@ -14,11 +8,7 @@
 
     <div v-if="!editable">
       <teleport to="body">
-        <div
-          v-if="showTooltip && item"
-          class="hover-panel"
-          :style="{ top: tooltipY + 'px', left: tooltipX + 'px' }"
-        >
+        <div v-if="showTooltip && item" class="hover-panel" :style="{ top: tooltipY + 'px', left: tooltipX + 'px' }">
           <div class="info-row"><b>{{ item.name }}</b></div>
           <div class="info-row">Category: {{ item.category }}</div>
           <div class="info-row">Gender: {{ item.gender }}</div>

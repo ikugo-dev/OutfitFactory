@@ -10,6 +10,9 @@ const PostSchema = new Schema(
         likers: [{ type: Types.ObjectId, ref: "user" }],
         comments: [{ type: Types.ObjectId, ref: "comment" }],
         grades: [{ type: Types.ObjectId, ref: "grade" }]
+    },
+    { 
+        timestamps: true
     }
 );
 

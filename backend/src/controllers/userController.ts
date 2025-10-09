@@ -103,7 +103,8 @@ async getPosts(req: Request, res: Response): Promise <void>
             return;
         }
 
-        res.status(200).json(user.posts).send();
+        const posts = await PostModel.find({ _id: { $in: user.posts } });
+        res.status(200).json(posts).send();
         return;
     }
     catch (error) {

@@ -1,25 +1,39 @@
 <template>
   <div class="post-card" :style="{ backgroundColor: color }">
     <div class="outfit-container">
-      <OutfitViewer :outfit="post.outfit"/>
+      <OutfitViewer v-if="outfit" :outfit="outfit" />
+      <div v-else class="loading">Loading outfit...</div>
     </div>
-
-    <h3 class="caption">{{ post.user.username }} : {{ post.caption || "..." }}</h3>
-    <PostCardControls :post="post" />
   </div>
 </template>
 
 <script setup lang="ts">
 import OutfitViewer from "./OutfitViewer.vue";
-import PostCardControls from "./PostCardControls.vue";
-import type { PostType } from "@/types.ts"
-defineProps<{
+import type { PostType, OutfitType } from "@/types";
+import { ref, onMounted } from "vue";
+import { fetchOutfit } from "@/api";
+
+const { post } = defineProps<{
   post: PostType
 }>();
 
-const color = "#" + ((1 << 24) * Math.random() | 0).toString(16).padStart(6, "0");
-</script>
+const outfit = ref<OutfitType | null>(null);
 
+onMounted(async () => {
+  try {
+    outfit.value = await fetchOutfit(post.outfit);
+    console.log(outfit.value);
+  } catch (err) {
+    console.error("Failed to fetch outfit:", err);
+  }
+});
+
+const color =
+  "#" +
+  ((1 << 24) * Math.random() | 0)
+    .toString(16)
+    .padStart(6, "0");
+</script>
 <style scoped>
 .post-card {
   position: relative;
@@ -30,14 +44,15 @@ const color = "#" + ((1 << 24) * Math.random() | 0).toString(16).padStart(6, "0"
   border: 0.2rem solid black;
   justify-content: center;
 }
+
 .outfit-container {
   width: 100%;
   height: auto;
   background-color: var(--background);
   border: 0.2rem solid black;
   padding: 0.5rem 0.2rem 0.5rem;
-  display:flex;
-  justify-content:center;
+  display: flex;
+  justify-content: center;
 }
 
 .caption {

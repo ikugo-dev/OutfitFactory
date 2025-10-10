@@ -10,14 +10,14 @@ const outfitCtrl = {
             const outfit = await OutfitModel.findById(id).exec();
 
             if (!outfit) {
-                res.status(404).json({ error: "Outfit not found." }).send();
+                res.status(404).json({ error: "Outfit not found." });
                 return;
             }
 
-            res.status(200).json(outfit).send();
+            res.status(200).json(outfit);
             return;
         } catch (error) {
-            res.status(500).json({ error: "Server error." }).send();
+            res.status(500).json({ error: "Server error." });
             return;
         }
     },
@@ -28,7 +28,7 @@ const outfitCtrl = {
             console.log(id);
             const user = await UserModel.findById(id).exec();
             if (!user) {
-                res.status(404).json({ error: "No such user." }).send();
+                res.status(404).json({ error: "No such user." });
                 return;
             }
 
@@ -39,7 +39,7 @@ const outfitCtrl = {
 
             if (newOutfit == null) {
                 res.status(500).json({ error: "Outfit creation error." })
-                    .send();
+                    ;
                 return;
             }
 
@@ -49,15 +49,15 @@ const outfitCtrl = {
             if (updateRes.modifiedCount == 0) {
                 res.status(500).json({
                     error: "Server error. (Modified error)",
-                }).send();
+                });
                 return;
             }
 
-            res.status(200).json(newOutfit).send();
+            res.status(200).json(newOutfit);
             return;
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: "Server error." }).send();
+            res.status(500).json({ error: "Server error." });
             return;
         }
     },
@@ -70,7 +70,7 @@ const outfitCtrl = {
             const garment = await GarmentModel.findById(garmentId).exec();
 
             if (!outfit || !garment) {
-                res.status(404).json({ error: "Not found." }).send();
+                res.status(404).json({ error: "Not found." });
                 return;
             }
 
@@ -85,7 +85,7 @@ const outfitCtrl = {
             return;
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: "Server error." }).send();
+            res.status(500).json({ error: "Server error." });
             return;
         }
     },
@@ -96,7 +96,7 @@ const outfitCtrl = {
             const outfit = await OutfitModel.findById(id).exec();
 
             if (!outfit) {
-                res.status(404).json({ error: "Outfit not found." }).send();
+                res.status(404).json({ error: "Outfit not found." });
                 return;
             }
             const updateRes = await UserModel.updateOne({ _id: outfit.owner }, {
@@ -105,7 +105,7 @@ const outfitCtrl = {
             if (updateRes.modifiedCount == 0) {
                 res.status(500).json({
                     error: "Server error. (Modified error)",
-                }).send();
+                });
                 return;
             }
             const deleteRes = await OutfitModel.deleteOne({ _id: id }).exec();
@@ -113,10 +113,10 @@ const outfitCtrl = {
                 throw new Error();
             }
 
-            res.status(200).json("Successfully deleted outfit").send();
+            res.status(200).json("Successfully deleted outfit");
             return;
         } catch (error) {
-            res.status(500).json({ error: "Server error." }).send();
+            res.status(500).json({ error: "Server error." });
             return;
         }
     },

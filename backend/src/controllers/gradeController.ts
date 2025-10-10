@@ -16,7 +16,7 @@ async getGrade(req: Request, res: Response): Promise <void>{
             return; 
         }
 
-        res.status(200).json(grade).send();
+        res.status(200).json(grade);
     }
     catch(error)    
     {
@@ -34,10 +34,10 @@ async createGrade(req: Request, res: Response): Promise <void>{
         if (newGrade == null) {
             throw new Error();
         }
-        res.status(200).json(newGrade).send();
+        res.status(200).json(newGrade);
     }
     catch(error){
-        res.status(500).json({error: "Server error."}).send();
+        res.status(500).json({error: "Server error."});
     }
 
 },
@@ -50,7 +50,7 @@ async addFit(req: Request, res: Response): Promise <void>{
         
         const grade = await GradeModel.findById(id).exec();
         if (grade == null) {
-            res.status(404).json({error: "No such post."}).send();
+            res.status(404).json({error: "No such post."});
             return; 
         }
         
@@ -60,13 +60,13 @@ async addFit(req: Request, res: Response): Promise <void>{
             throw new Error("500");
         }
 
-        res.status(200).json(grade).send();
+        res.status(200).json(grade);
         return;
     }
     catch(error)    
     {
         console.log(error);
-        res.status(500).json({error: "Server error."}).send();
+        res.status(500).json({error: "Server error."});
     }
 
 },
@@ -87,7 +87,7 @@ async addMaterial(req: Request, res: Response): Promise <void> {
             throw new Error("500");
         }
 
-        res.status(200).json(grade).send();
+        res.status(200).json(grade);
         return;
     }
     catch(error) {
@@ -111,7 +111,7 @@ async addDesign(req: Request, res: Response): Promise <void> {
             throw new Error();
         }
 
-        res.status(200).json(grade).send();
+        res.status(200).json(grade);
         return;
     }
     catch(error) {
@@ -135,7 +135,7 @@ async addComfort(req: Request, res: Response): Promise <void> {
             throw new Error();
         }
 
-        res.status(200).json(grade).send();
+        res.status(200).json(grade);
         return;
     }
     catch(error)    
@@ -161,7 +161,7 @@ async deleteGrade(req: Request, res: Response): Promise <void> {
             throw new Error();
         }
 
-        res.status(200).json("Successfully deleted garment").send();
+        res.status(200).json("Successfully deleted garment");
         return;
     }
     catch(error)    

@@ -72,7 +72,7 @@ const garmentCtrl = {
                 return;
             }
 
-            res.status(200).json(garment).send();
+            res.status(200).json(garment);
         } catch (error) {
             res.status(500).json({ error: "Server error." });
         }
@@ -85,7 +85,7 @@ const garmentCtrl = {
                 res.status(404).json({ error: "No garments in database." });
                 return;
             }
-            res.status(200).json(garments).send();
+            res.status(200).json(garments);
         } catch (error) {
             res.status(500).json({ error: "Server error." });
         }
@@ -97,12 +97,12 @@ const garmentCtrl = {
     //         if (newGarment == null) {
     //             throw new Error("500");
     //         }
-    //         res.status(200).json(newGarment).send();
+    //         res.status(200).json(newGarment);
     //     }
     //     catch(error)
     //     {
     //         console.log(error);
-    //         res.status(500).json({error: "Server error."}).send();
+    //         res.status(500).json({error: "Server error."});
     //         return;
     //     }
     //
@@ -127,11 +127,11 @@ const garmentCtrl = {
                 throw new Error("500");
             }
 
-            res.status(200).json().send();
+            res.status(200).json();
             return;
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: "Server error." }).send();
+            res.status(500).json({ error: "Server error." });
         }
     },
 
@@ -142,7 +142,7 @@ const garmentCtrl = {
 
             const garment = await GarmentModel.findById(id).exec();
             if (!garment) {
-                res.status(404).json({ error: "No such garment." }).send();
+                res.status(404).json({ error: "No such garment." });
                 return;
             }
 
@@ -150,15 +150,15 @@ const garmentCtrl = {
                 $push: { color: color },
             }).exec();
             if (newGarment.modifiedCount == 0) {
-                res.status(500).json({ error: "Server error." }).send();
+                res.status(500).json({ error: "Server error." });
                 return;
             }
 
-            res.status(200).json(garment).send();
+            res.status(200).json(garment);
             return;
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: "Server error." }).send();
+            res.status(500).json({ error: "Server error." });
         }
     },
 
@@ -176,14 +176,14 @@ const garmentCtrl = {
                 $addToSet: { material: material },
             }).exec();
             if (newGarment.modifiedCount == 0) {
-                res.status(500).json({ error: "Modified error." }).send();
+                res.status(500).json({ error: "Modified error." });
                 return;
             }
 
-            res.status(200).json(garment).send();
+            res.status(200).json(garment);
             return;
         } catch (error) {
-            res.status(500).json({ error: "Server error." }).send();
+            res.status(500).json({ error: "Server error." });
         }
     },
 
@@ -200,14 +200,14 @@ const garmentCtrl = {
                 $addToSet: { gender: gender },
             }).exec();
             if (newGarment.modifiedCount == 0) {
-                res.status(500).json({ error: "Modified error." }).send();
+                res.status(500).json({ error: "Modified error." });
                 return;
             }
 
             res.status(200).json(garment);
             return;
         } catch (error) {
-            res.status(500).json({ error: "Server error." }).send();
+            res.status(500).json({ error: "Server error." });
         }
     },
 
@@ -218,7 +218,7 @@ const garmentCtrl = {
 
             const post = await GarmentModel.findById(id).exec();
             if (post == null) {
-                res.status(404).json({ error: "No such garment." }).send();
+                res.status(404).json({ error: "No such garment." });
                 return;
             }
 
@@ -227,10 +227,10 @@ const garmentCtrl = {
                 throw new Error();
             }
 
-            res.status(200).json("Successfully deleted garment").send();
+            res.status(200).json("Successfully deleted garment");
             return;
         } catch (error) {
-            res.status(500).json({ error: "Server error." }).send();
+            res.status(500).json({ error: "Server error." });
             return;
         }
     },

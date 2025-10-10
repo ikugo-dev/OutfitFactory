@@ -28,19 +28,19 @@ async getUser(req: Request, res: Response): Promise <void>
         if(!id) throw Error("404");
         const user = await getUserOr404(id);
         
-        res.status(200).json(user).send(); //todo json returns
+        res.status(200).json(user); //todo json returns
         return;
     }
     catch (error) {
         
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     
     }
 },
@@ -50,42 +50,42 @@ async createUser(req: Request, res: Response): Promise<void>
     try {
         const { username, email, password } = req.body;
         if (!username || !email  || !password){
-            res.status(400).json({error: "JSON body is empty."}).send();
+            res.status(400).json({error: "JSON body is empty."});
         }
 
         const foundUsername = await UserModel.exists({username: username}).exec();  
         if ( foundUsername != null ){ 
-            res.status(400).json({error: "Username already taken."}).send();  
+            res.status(400).json({error: "Username already taken."});  
             return;
         }   
 
         let foundEmail = await UserModel.exists({email: email}).exec();  
         if ( foundEmail != null ) {
-            res.status(400).json({error: "Account with this email address already exists."}).send();  
+            res.status(400).json({error: "Account with this email address already exists."});  
             return;
         }
 
         const newUser = new UserModel({username, email, password});
         
         if (newUser == null){
-            res.status(400).json({error: "User creation error."}).send();
+            res.status(400).json({error: "User creation error."});
             return;
         }
         await newUser.save();
 
-        res.status(200).json(newUser).send();
+        res.status(200).json(newUser);
         return;
 
     }
     catch(error) {
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     ; 
     }
 
@@ -99,24 +99,24 @@ async getPosts(req: Request, res: Response): Promise <void>
         const user = await getUserOr404(id);
         
         if (user.posts.length == 0) {
-            res.status(404).json({error: "No posts."}).send();
+            res.status(404).json({error: "No posts."});
             return;
         }
 
         const posts = await PostModel.find({ _id: { $in: user.posts } });
-        res.status(200).json(posts).send();
+        res.status(200).json(posts);
         return;
     }
     catch (error) {
         
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     
     }
 },
@@ -131,22 +131,22 @@ async removeUser(req: Request, res: Response) : Promise<void>
         
         const deleteRes = await user.deleteOne();
         if (deleteRes.deletedCount == 0 ){
-            res.status(501).json({error: "Server error."}).send(); 
+            res.status(501).json({error: "Server error."}); 
             return;
         }
-        res.status(200).send();
+        res.status(200);
         return;
     }
     catch(error) {
         
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     
     }
 
@@ -163,27 +163,27 @@ async updateUsername(req: Request, res: Response) : Promise<void>
 
         const foundUsername = await UserModel.exists({username: newUsername}).exec();  
         if ( foundUsername != null ) {
-            res.status(400).json({error: "Username already taken."}).send();   
+            res.status(400).json({error: "Username already taken."});   
 
             return;
         }  
         const updateRes = await UserModel.updateOne({ _id: id },  {$set: { username: newUsername}}).exec();
         if (updateRes.modifiedCount == 0 )  {
-            res.status(501).json({error: "Server error."}).send(); return;
+            res.status(501).json({error: "Server error."}); return;
         }
-        res.status(200).send();
+        res.status(200);
         return;
     }
     catch(error){
             
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     
     }
 
@@ -198,27 +198,27 @@ async updatePassword(req: Request, res: Response) : Promise<void>
         const user = await getUserOr404(id);
 
         if (oldPassword != user.password) {
-            res.status(400).json({error: "Wrong password."}).send(); return;
+            res.status(400).json({error: "Wrong password."}); return;
         }
             
         const updateRes = await UserModel.updateOne({ _id: id }, {$set: { password: newPassword}}).exec();
         if (updateRes.modifiedCount == 0 ) { 
-            res.status(500).json({error: "Server error."}).send();
+            res.status(500).json({error: "Server error."});
             return;
         }
-        res.status(200).send();
+        res.status(200);
         return;
     }
     catch(error){
         
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
      
     }
 },
@@ -232,22 +232,22 @@ async updateAvatar(req: Request, res: Response) : Promise<void>
 
         const updateRes = await UserModel.updateOne({ _id: id },  {$set: { avatar: newAvatar}}).exec();
         if (updateRes.modifiedCount == 0 )  {
-            res.status(500).json({error: "Server error."}).send();
+            res.status(500).json({error: "Server error."});
             return;
         }
-        res.status(200).send();
+        res.status(200);
         return;
    
     } catch(error)
     {
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     
     }
 },
@@ -261,23 +261,23 @@ async removeAvatar(req: Request, res: Response) : Promise<void>
 
         const updateRes = await UserModel.updateOne({_id: id}, {$set: { avatar: "https://cdn-icons-png.flaticon.com/512/53/53101.png" }}).exec();
         if (updateRes.modifiedCount == 0 ) {
-            res.status(500).json({error: "Server error. (Modified is zero)"}).send();
+            res.status(500).json({error: "Server error. (Modified is zero)"});
             return;
         }   
-        res.status(200).send();
+        res.status(200);
         return;
     }
     catch(error)
     {
         
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
      
     }
 },
@@ -301,27 +301,27 @@ async follow(req: Request, res: Response) : Promise<any>
         const updateRes2= await UserModel.updateOne({_id: idToFollow}, {$push: { followers: user._id } }).exec();
         
         if(updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0) {
-            res.status(500).json({error: "Server error. (Modified is zero)"}).send();
+            res.status(500).json({error: "Server error. (Modified is zero)"});
             return;
         }
-        res.status(200).send();
+        res.status(200);
         return;
     }
     catch(error)
     {  
         console.log(error);
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "User error."}).send(); return;
+            res.status(400).json({message: "User error."}); return;
         }
         if (error instanceof Error && error.message == "401"){
-            res.status(400).json({message: "Already following each other."}).send(); return;
+            res.status(400).json({message: "Already following each other."}); return;
         }
         
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User(s) not found."}).send(); return;
+            res.status(404).json({message: "User(s) not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     
     }
 },
@@ -350,17 +350,17 @@ async unfollow(req: Request, res: Response) : Promise<any>
     {
         console.log(error);
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "User error."}).send(); return;
+            res.status(400).json({message: "User error."}); return;
         }
         if (error instanceof Error && error.message == "401"){
-            res.status(400).json({message: "Not following each other."}).send(); return;
+            res.status(400).json({message: "Not following each other."}); return;
         }
         
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
      
     }
 },
@@ -373,23 +373,23 @@ async getFollowers(req: Request, res: Response): Promise <void>
         const user = await getUserOr404(id);
         
         if (user.followers.length == 0) {
-            res.status(404).json({error: "No followers."}).send();
+            res.status(404).json({error: "No followers."});
             return;
         }
 
-        res.status(200).json(user.followers).send();
+        res.status(200).json(user.followers);
         return;
     }
     catch (error) { 
         
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     
     }
 },
@@ -403,23 +403,23 @@ async getFollowing(req: Request, res: Response): Promise <void>
         const user = await getUserOr404(id);
         
         if (user.following.length == 0) {
-            res.status(404).json({error: "No following."}).send();
+            res.status(404).json({error: "No following."});
             return;
         }
 
-        res.status(200).json(user.following).send();
+        res.status(200).json(user.following);
         return;
     }
     catch (error) { 
         
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     
     }
 },
@@ -432,23 +432,23 @@ async getCloset(req: Request, res: Response): Promise<void>
         const user = await getUserOr404(id);
         
         if (user.closet.length == 0) {
-            res.status(404).json({error: "No clothes in closet."}).send();
+            res.status(404).json({error: "No clothes in closet."});
             return;
         }
 
-        res.status(200).json(user.closet).send();
+        res.status(200).json(user.closet);
         return;
     }
     catch (error) { 
         
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     
     }
 },
@@ -468,7 +468,7 @@ async addToCloset(req: Request, res: Response): Promise <void> { //--
         
         const updateRes = await UserModel.updateOne({_id : id}, { $push: {closet: garmentId } }).exec();
         if(updateRes.modifiedCount == 0) {
-            res.status(500).json({error: "Modified error."}).send();  
+            res.status(500).json({error: "Modified error."});  
             return;
         }
 
@@ -477,7 +477,7 @@ async addToCloset(req: Request, res: Response): Promise <void> { //--
     }
     catch(error)    
     {
-        res.status(500).json({error: "Server error."}).send();
+        res.status(500).json({error: "Server error."});
     }
 },
 
@@ -495,7 +495,7 @@ async removeFromCloset(req: Request, res: Response): Promise <void> { //--
         
         const updateRes = await UserModel.updateOne({_id : id}, { $pull: {closet: garmentId } }).exec(); //provera prvo?
         if(updateRes.modifiedCount == 0) {
-            res.status(500).json({error: "Modified error."}).send();
+            res.status(500).json({error: "Modified error."});
             return;
         }
 
@@ -504,7 +504,7 @@ async removeFromCloset(req: Request, res: Response): Promise <void> { //--
     }
     catch(error)    
     {
-        res.status(500).json({error: "Server error."}).send();
+        res.status(500).json({error: "Server error."});
     }
 },
 
@@ -517,23 +517,23 @@ async getOutfits(req: Request, res: Response): Promise<void>
         const user = await getUserOr404(id);
         
         if (user.outfits.length == 0) {
-            res.status(404).json({error: "No outfits."}).send();
+            res.status(404).json({error: "No outfits."});
             return;
         }
 
-        res.status(200).json(user.outfits).send();
+        res.status(200).json(user.outfits);
         return;
     }
     catch (error) { 
         
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     
     }
 },
@@ -544,7 +544,7 @@ async logIn(req: Request, res: Response): Promise<void>
         const {username, email, password} = req.body;
         console.log(username, email, password);
         if (username == "" && email == "") {
-            res.status(400).json({error: "No params."}).send();
+            res.status(400).json({error: "No params."});
             return;
         }
 
@@ -556,22 +556,22 @@ async logIn(req: Request, res: Response): Promise<void>
         }
 
         if(findRes.length == 0) {
-            res.status(400).json({error: "Wrong paramegers for login."}).send();
+            res.status(400).json({error: "Wrong paramegers for login."});
             return;
         }
-        res.status(200).json({findRes}).send();
+        res.status(200).json({findRes});
         return;
     }
     catch (error) { 
         console.log(error);
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     
     }
 },
@@ -582,23 +582,23 @@ async getOne(req: Request, res: Response): Promise <void>
         const user = await UserModel.findOne();
         /*
         if (user.followers.length == 0) {
-            res.status(404).json({error: "No posts."}).send();
+            res.status(404).json({error: "No posts."});
             return;
         }
 */
-        res.status(200).json(user).send();
+        res.status(200).json(user);
         return;
     }
     catch (error) {
         
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "User not found."}).send(); return;
+            res.status(404).json({message: "User not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     
     }
 }

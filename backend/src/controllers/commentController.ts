@@ -28,10 +28,10 @@ async getComment(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        res.status(200).json(comment).send();
+        res.status(200).json(comment);
         return;
     } catch (error) {
-        res.status(500).json({ error: "Server error." }).send();
+        res.status(500).json({ error: "Server error." });
         return;
     }
 },
@@ -49,12 +49,12 @@ async createComment( req: Request, res: Response): Promise<void> {
             throw new Error("500");
         }
 
-        res.status(200).json(newComment).send();
+        res.status(200).json(newComment);
         return;
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: "Server error." }).send();
+        res.status(500).json({ error: "Server error." });
         return;
     }
 },
@@ -66,7 +66,7 @@ async deleteComment(req: Request, res: Response): Promise<void> {
         const comment = await CommentModel.findById(id).exec();
 
         if (!comment) {
-            res.status(404).json({ error: "No such comment."}).send();
+            res.status(404).json({ error: "No such comment."});
             return;
         }
 
@@ -86,14 +86,14 @@ async likeComment(req: Request, res: Response): Promise<void> { //--
 
         const comment = await CommentModel.findById(id).exec();
         if (!comment) {
-            res.status(404).json({ error: "No such comment." }).send();
+            res.status(404).json({ error: "No such comment." });
             return;
         }
         const user = await getUserOr404(userId); 
         
         const findRes = await CommentModel.find({likers: userId}).exec();
         if(findRes.length != 0){
-            res.status(400).json({message: "Already liked."}).send(); return;
+            res.status(400).json({message: "Already liked."}); return;
         }
 
         let likeNum = new Number(comment.likes+1);
@@ -104,15 +104,15 @@ async likeComment(req: Request, res: Response): Promise<void> { //--
 
         console.log(updateRes);
         if (updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0) {
-            res.status(500).json({ error: "Server error. (Modified is zero)" }).send();
+            res.status(500).json({ error: "Server error. (Modified is zero)" });
             return;
         }
-        res.status(200).send();
+        res.status(200);
         return;
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: "Server error." }).send();
+        res.status(500).json({ error: "Server error." });
         return;
     }
 },
@@ -125,14 +125,14 @@ async unlikeComment(req: Request, res: Response): Promise<void> { //--
 
         const comment = await CommentModel.findById(id).exec();
         if (!comment) {
-            res.status(404).json({ error: "No such comment." }).send();
+            res.status(404).json({ error: "No such comment." });
             return;
         }
         const user = await getUserOr404(userId); 
         
         const findRes = await CommentModel.find({likers: userId}).exec();
         if(findRes.length == 0){
-            res.status(400).json({message: "Not liked."}).send(); return;
+            res.status(400).json({message: "Not liked."}); return;
         }
 
         let likeNum;
@@ -145,15 +145,15 @@ async unlikeComment(req: Request, res: Response): Promise<void> { //--
 
         console.log(updateRes || updateRes2);
         if (updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0) {
-            res.status(500).json({ error: "Server error. (Modified is zero)" }).send();
+            res.status(500).json({ error: "Server error. (Modified is zero)" });
             return;
         }
-        res.status(200).send();
+        res.status(200);
         return;
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: "Server error." }).send();
+        res.status(500).json({ error: "Server error." });
         return;
     }
 },

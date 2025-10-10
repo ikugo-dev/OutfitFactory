@@ -1,11 +1,9 @@
 <template>
   <nav class="navbar">
-    <router-link :to="{ path: '/explore/new' }"
-      :class="{ 'active-link': route.path === '/explore/new' }">New</router-link>
-    <router-link :to="{ path: '/explore/following' }"
-      :class="{ 'active-link': route.path === '/explore/following' }">Following</router-link>
-    <router-link to="/create" :class="{ 'active-link': route.path === '/create' }">Create</router-link>
-    <router-link to="/profile" :class="{ 'active-link': route.path === '/profile' }">Profile</router-link>
+    <router-link to="/explore"   :class="{'active-link' :route.path==='/explore'       }">New</router-link>
+    <router-link to="/following" :class="{'active-link' :route.path==='/following' }">Following</router-link>
+    <router-link to="/create"    :class="{'active-link' :route.path==='/create'    }">Create</router-link>
+    <router-link to="/profile"   :class="{'active-link' :route.path==='/profile'   }">Profile</router-link>
     <LogoutButton v-if="currentUserId" />
   </nav>
 </template>

@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
-import ProfileView from "../views/ProfileView.vue";
 import ExploreView from "../views/ExploreView.vue";
+import FollowingView from "../views/FollowingView.vue";
 import CreateView from "../views/CreateView.vue";
+import ProfileView from "../views/ProfileView.vue";
 import LoginView from "../views/LoginView.vue";
 
 const router = createRouter({
@@ -12,13 +13,13 @@ const router = createRouter({
     name: "home",
     component: HomeView,
   }, {
-    path: "/explore/new",
-    name: "explore new",
+    path: "/explore",
+    name: "new global posts",
     component: ExploreView,
   }, {
-    path: "/explore/following",
-    name: "explore following",
-    component: ExploreView,
+    path: "/following",
+    name: "posts from people the user follows",
+    component: FollowingView,
     meta: { requiresAuth: true },
   }, {
     path: "/create",
@@ -35,9 +36,6 @@ const router = createRouter({
     name: "user profile",
     component: ProfileView,
     props: true,
-  }, {
-    path: "/*",
-    redirect: "/explore?algo=new",
   }, {
     path: "/login",
     name: "login page",

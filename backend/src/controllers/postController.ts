@@ -40,30 +40,45 @@ async getPost (req: Request, res: Response) : Promise <void> {
         if (!id) throw Error("400");
         const post = await getPostOr404(id);
         
-        res.status(200).json(post).send();
+        res.status(200).json(post);
         return;
     } 
     catch(error) {
 
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "Post not found."}).send(); return;
+            res.status(404).json({message: "Post not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     }
 },
 
 async getPosts (req: Request, res: Response) : Promise <void> {
     try{
-        const posts = await PostModel.find().exec();
-        res.status(200).json(posts).send();
+        console.log("query:", req.query);
+        const followingIds = !req.query.following
+            ? []
+            : Array.isArray(req.query.following)
+                ? req.query.following
+                : [req.query.following];
+        console.log(followingIds);
+        const filter = followingIds.length > 0
+            ? { user: { $in: followingIds } }
+            : {};
+        console.log(filter);
+        const posts = await PostModel
+            .find(filter)
+            .sort({ createdAt: -1 })
+            .exec();
+        console.log(posts);
+        res.status(200).json(posts);
         return;
     } 
     catch(_error) {
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     }
 },
 
@@ -90,22 +105,22 @@ async createPost(req: Request, res: Response) : Promise <void> {
         
         const updateRes = await UserModel.updateOne({_id: id}, { $push: {posts : post._id}}).exec();
         if (updateRes.modifiedCount == 0 ) {
-            res.status(500).json({error: "Server error."}).send();
+            res.status(500).json({error: "Server error."});
             return;
         }   
-        res.status(201).json(post).send();
+        res.status(201).json(post);
         return;
     }   
     catch(error) {
         console.log(error);
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "Post not found."}).send(); return;
+            res.status(404).json({message: "Post not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     }
 },
 
@@ -118,7 +133,7 @@ async like(req: Request, res: Response): Promise <void> {
 
         const findRes = await PostModel.find({likers: userId}).exec();
         if(findRes.length != 0){
-            res.status(400).json({message: "Already liked."}).send(); return;
+            res.status(400).json({message: "Already liked."}); return;
         }
 
 
@@ -127,23 +142,23 @@ async like(req: Request, res: Response): Promise <void> {
         const updateRes2 = await PostModel.updateOne({_id: id}, {$push: {likers: userId}});
 
         if (updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0){
-            res.status(500).json({message: "Server error. (Update error)"}).send(); return;
+            res.status(500).json({message: "Server error. (Update error)"}); return;
         }
 
-        res.status(200).json(newLikes).send();
+        res.status(200).json(newLikes);
         return;
     }
     catch(error) {
 
         console.log(error);
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "Post not found."}).send(); return;
+            res.status(404).json({message: "Post not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     }
 },
 
@@ -156,7 +171,7 @@ async unlike(req: Request, res: Response) : Promise <void>{
 
         const findRes = await PostModel.find({likers: userId}).exec();
         if(findRes.length == 0){
-            res.status(400).json({message: "Not liked."}).send(); return;
+            res.status(400).json({message: "Not liked."}); return;
         }
 
         let newLikes;
@@ -167,23 +182,23 @@ async unlike(req: Request, res: Response) : Promise <void>{
         const updateRes2 = await PostModel.updateOne({_id: id}, {$pull: {likers: userId}});
 
         if (updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0){
-            res.status(500).json({message: "Server error. (Update error)"}).send(); return;
+            res.status(500).json({message: "Server error. (Update error)"}); return;
         }
 
-        res.status(200).json(newLikes).send();
+        res.status(200).json(newLikes);
         return;
     }
     catch(error) {
 
         console.log(error);
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "Post not found."}).send(); return;
+            res.status(404).json({message: "Post not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     }
 },
 
@@ -197,7 +212,7 @@ async addComment(req: Request, res: Response) : Promise <void>{
         const updateRes = await PostModel.updateOne({_id: id}, {$push: {comments: commentId}}).exec();
         console.log(updateRes);
         if (updateRes.modifiedCount == 0) throw Error("500");
-        res.status(200).send();
+        res.status(200);
         return;
 
     } 
@@ -205,13 +220,13 @@ async addComment(req: Request, res: Response) : Promise <void>{
         console.log(error);
 
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404"){
-            res.status(404).json({message: "Post not found."}).send(); return;
+            res.status(404).json({message: "Post not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;    
+        res.status(500).json({message: "Server error."}); return;    
     }
 
 },
@@ -226,20 +241,20 @@ async addGrade(req: Request, res: Response) : Promise <void> {
 
         const updateRes = await PostModel.updateOne({_id: id}, {$push: {grades: gradeId}}).exec();
         if (updateRes.modifiedCount ==0) throw Error("500");
-        res.status(200) .send();
+        res.status(200) ;
         return;
 
     }
     catch(error) {
 
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "Post not found."}).send(); return;
+            res.status(404).json({message: "Post not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;  
+        res.status(500).json({message: "Server error."}); return;  
     }
 },
 
@@ -256,19 +271,19 @@ async publish (req: Request, res: Response) : Promise <void> {
         const updateRes = await PostModel.updateOne({_id: id}, {$set: {published: true}}).exec();
         if (updateRes.modifiedCount == 0) throw Error("500");
 
-        res.status(200).send();
+        res.status(200);
         return;
     }
     catch(error){
 
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Post already public."}).send(); return;
+            res.status(400).json({message: "Post already public."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "Post not found."}).send(); return;
+            res.status(404).json({message: "Post not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;   
+        res.status(500).json({message: "Server error."}); return;   
     }
 },
 
@@ -281,20 +296,20 @@ async unpublish (req: Request, res: Response) : Promise <void> {
 
         const updateRes = await PostModel.updateOne({_id: id}, {$set: {published: false}}).exec();
         if (updateRes.modifiedCount == 0) throw Error("500");
-        res.status(200).send();
+        res.status(200);
         
         return;
     }
     catch (error) {
 
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Post already private."}).send(); return;
+            res.status(400).json({message: "Post already private."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "Post not found."}).send(); return;
+            res.status(404).json({message: "Post not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     }
 },
 */
@@ -307,20 +322,20 @@ async deletePost (req: Request, res: Response) : Promise <void> {
         const deleteRes = await PostModel.deleteOne({_id: id});
         if (deleteRes.modifiedCount == 0) throw Error("500");
 
-        res.status(200).send();  
+        res.status(200);  
         
         return;
     }
     catch (error)
     {
         if (error instanceof Error && error.message == "400"){
-            res.status(400).json({message: "Invalid ID."}).send(); return;
+            res.status(400).json({message: "Invalid ID."}); return;
         }
         if (error instanceof Error && error.message == "404") {
-            res.status(404).json({message: "Post not found."}).send(); return;
+            res.status(404).json({message: "Post not found."}); return;
         }
         
-        res.status(500).json({message: "Server error."}).send(); return;
+        res.status(500).json({message: "Server error."}); return;
     
     }
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="explore-page">
-    <h2>Explore</h2>
+    <h2>Following</h2>
 
     <PostGrid :posts="posts" />
 
@@ -19,18 +19,16 @@ import type { PostType } from "@/types";
 import { fetchPosts } from "@/api.ts"
 
 const posts = ref<PostType[]>([]);
-const allPosts = ref<PostType[]>([]); // store everything fetched from backend
+const allPosts = ref<PostType[]>([]);
 const page = ref(0);
-const limit = 8; // how many posts to load per scroll
+const limit = 4;
 
 const load = async ($state: { complete(): void, loaded(): void }) => {
   if (allPosts.value.length === 0) {
-    // fetch all posts from backend once
     const response = await fetchPosts();
     allPosts.value = response || [];
   }
 
-  // Paginate manually
   const start = page.value * limit;
   const nextChunk = allPosts.value.slice(start, start + limit);
 

@@ -12,25 +12,27 @@
 import PostGrid from "@/components/PostGrid.vue";
 import InfiniteLoading from "v3-infinite-loading";
 import "v3-infinite-loading/lib/style.css";
+import { currentUserId } from "@/stores/userStore.ts";
+import { fetchUser, fetchPosts } from "@/api.ts"
 
 import { ref } from "vue";
 import type { PostType } from "@/types";
 
-import { fetchPosts } from "@/api.ts"
 
 const posts = ref<PostType[]>([]);
-const allPosts = ref<PostType[]>([]); // store everything fetched from backend
+const allPosts = ref<PostType[]>([]);
 const page = ref(0);
-const limit = 8; // how many posts to load per scroll
+const limit = 4;
 
 const load = async ($state: { complete(): void, loaded(): void }) => {
   if (allPosts.value.length === 0) {
-    // fetch all posts from backend once
-    const response = await fetchPosts();
+    const user = await fetchUser(currentUserId.value);
+    console.log(user);
+    const response = await fetchPosts(user.following);
+    console.log(response);
     allPosts.value = response || [];
   }
 
-  // Paginate manually
   const start = page.value * limit;
   const nextChunk = allPosts.value.slice(start, start + limit);
 

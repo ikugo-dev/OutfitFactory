@@ -44,8 +44,12 @@ export async function createPost(
   await api.post("/post/create_post", { id: userId, text, outfitId });
 }
 
-export async function fetchPosts() {
-  const res = await api.get("/posts");
+export async function fetchPosts(following: string[] = []) {
+  const res = await api.get("/posts", {
+    params: {
+      following: following,
+    },
+  });
   return res.data;
 }
 
@@ -66,5 +70,10 @@ export async function fetchOutfit(id: string) {
 
 export async function fetchGarment(id: string) {
   const res = await api.get(`/garment/${id}`);
+  return res.data;
+}
+
+export async function fetchUser(id: string) {
+  const res = await api.get(`/user/${id}`);
   return res.data;
 }

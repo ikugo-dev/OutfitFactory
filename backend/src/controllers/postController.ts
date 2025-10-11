@@ -58,12 +58,9 @@ async getPost (req: Request, res: Response) : Promise <void> {
 
 async getPosts (req: Request, res: Response) : Promise <void> {
     try{
-        console.log("query:", req.query);
         const userId = !req.query.userId
             ? "" 
             : req.query.userId;
-        console.log(userId);
-
         let filter = {};
         if (userId != "") {
             const user = await getUserOr404(userId as string)
@@ -72,17 +69,19 @@ async getPosts (req: Request, res: Response) : Promise <void> {
             }
             filter = { user: { $in: user.following } }
         }
-        console.log(filter);
         const posts = await PostModel
             .find(filter)
+            .populate({
+                path: "user",
+                select: "_id username avatar",
+            })
             .sort({ createdAt: -1 })
             .exec();
-        console.log(posts);
         res.status(200).json(posts);
         return;
     } 
-    catch(_error) {
-        res.status(500).json({message: "Server error."}); return;
+    catch(error) {
+        res.status(500).json({message: `Server error. ${error}`}); return;
     }
 },
 

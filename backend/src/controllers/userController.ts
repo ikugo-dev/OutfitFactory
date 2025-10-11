@@ -99,11 +99,21 @@ async getPosts(req: Request, res: Response): Promise <void>
         const user = await getUserOr404(id);
         
         if (user.posts.length == 0) {
-            res.status(404).json({error: "No posts."});
+            res.status(200).json({error: "No posts."});
             return;
         }
 
-        const posts = await PostModel.find({ _id: { $in: user.posts } });
+        const posts = await PostModel
+            .find({
+                _id: { $in: user.posts }
+            })
+            .populate({
+                path: "user",
+                select: "_id username avatar",
+            })
+            .sort({ createdAt: -1 })
+            .exec();
+
         res.status(200).json(posts);
         return;
     }

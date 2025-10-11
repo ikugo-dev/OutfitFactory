@@ -7,7 +7,7 @@ const commentSchema = new Schema(
         user: 
         {
             type: mongoose.Types.ObjectId,
-            ref: 'user',
+            ref: 'UserModel',
             required: true
         },
 
@@ -29,7 +29,7 @@ const commentSchema = new Schema(
         likers:
         {
             type: mongoose.Types.ObjectId,
-            ref: 'user'
+            ref: 'UserModel'
         }
 
 

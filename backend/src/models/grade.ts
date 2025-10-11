@@ -7,7 +7,7 @@ const gradeSchema = new Schema(
         user:
         {
             type: mongoose.Types.ObjectId,
-            ref: 'user',
+            ref: 'UserModel',
             required: true
         },
 

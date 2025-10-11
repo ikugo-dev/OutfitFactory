@@ -6,13 +6,13 @@ const outfitSchema = new Schema(
 
         owner: {
             type: mongoose.Types.ObjectId,
-            ref: 'user'
+            ref: 'UserModel'
         },
 
         garments:[
         {
             type: mongoose.Types.ObjectId,
-            ref: 'garment'
+            ref: 'GarmentModel'
         }]
 
         

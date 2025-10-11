@@ -27,7 +27,7 @@ import { useRoute, useRouter } from 'vue-router'
 import PostGrid from '../components/PostGrid.vue'
 import type { UserType, PostType } from '@/types.ts'
 
-import { fetchUser, fetchUserPosts } from '@/api.ts'
+import { fetchUserByUsername, fetchUserPosts } from '@/api.ts'
 import { currentUserId } from '@/stores/userStore.ts'
 
 const route = useRoute()
@@ -48,13 +48,13 @@ async function loadProfile() {
     // If route has username param, we’re viewing someone else’s profile
     if (route.params.username) {
       const username = route.params.username as string
-      const userData = await fetchUser(username) // assuming fetchUser can handle username or id
+      const userData = await fetchUserByUsername(username) // assuming fetchUser can handle username or id
       profile.value = userData
-      userId = userData.id
+      userId = userData._id
     } else {
       // Own profile
       userId = currentUserId.value || ""
-      profile.value = await fetchUser(userId)
+      profile.value = await fetchUserByUsername(userId)
     }
 
     // Fetch that user's posts

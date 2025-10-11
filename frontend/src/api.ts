@@ -73,7 +73,12 @@ export async function fetchGarment(id: string) {
   return res.data;
 }
 
-export async function fetchUser(id: string) {
+export async function fetchUserById(id: string) {
   const res = await api.get(`/user/${id}`);
+  return res.data;
+}
+
+export async function fetchUserByUsername(idLw: string) {
+  const res = await api.get(`/user/by_username/${idLw}`);
   return res.data;
 }

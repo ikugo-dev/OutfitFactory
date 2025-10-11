@@ -13,7 +13,7 @@ import PostGrid from "@/components/PostGrid.vue";
 import InfiniteLoading from "v3-infinite-loading";
 import "v3-infinite-loading/lib/style.css";
 import { currentUserId } from "@/stores/userStore.ts";
-import { fetchUser, fetchPosts } from "@/api.ts"
+import { fetchUserById, fetchPosts } from "@/api.ts"
 
 import { ref } from "vue";
 import type { PostType } from "@/types";

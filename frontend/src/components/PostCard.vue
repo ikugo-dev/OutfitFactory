@@ -7,7 +7,9 @@
     </div>
 
     <div class="post-footer" v-if="user">
-      <img v-if="user.avatar" class="avatar" :src="user.avatar" :alt="user.username" />
+      <RouterLink :to="`/profile/${user.username}`" class="user-link">
+        <img v-if="user.avatar" class="avatar" :src="user.avatar" :alt="user.username" />
+      </RouterLink>
       <div class="username">{{ user.username }} :</div>
       <div class="caption">{{ post.text }}</div>
     </div>

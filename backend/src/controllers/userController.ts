@@ -23,10 +23,36 @@ const userCtrl = {
 async getUser(req: Request, res: Response): Promise <void> 
 {
     try {
-        const id = req.params.id;  //username
+        const id = req.params.id;
         console.log(id);    
         if(!id) throw Error("404");
         const user = await getUserOr404(id);
+        
+        res.status(200).json(user); //todo json returns
+        return;
+    }
+    catch (error) {
+        
+        if (error instanceof Error && error.message == "400"){
+            res.status(400).json({message: "Invalid ID."}); return;
+        }
+        if (error instanceof Error && error.message == "404") {
+            res.status(404).json({message: "User not found."}); return;
+        }
+        
+        res.status(500).json({message: "Server error."}); return;
+    
+    }
+},
+
+async getUserByUsername(req: Request, res: Response): Promise <void> {
+    try {
+        const username = req.params.username;
+        console.log(username);    
+        if(!username) throw Error("404");
+        const user = await UserModel
+            .findOne({ username: username })
+            .exec();
         
         res.status(200).json(user); //todo json returns
         return;

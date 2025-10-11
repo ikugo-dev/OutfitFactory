@@ -26,9 +26,7 @@ const limit = 4;
 
 const load = async ($state: { complete(): void, loaded(): void }) => {
   if (allPosts.value.length === 0) {
-    const user = await fetchUser(currentUserId.value);
-    console.log(user);
-    const response = await fetchPosts(user.following);
+    const response = await fetchPosts(currentUserId.value);
     console.log(response);
     allPosts.value = response || [];
   }

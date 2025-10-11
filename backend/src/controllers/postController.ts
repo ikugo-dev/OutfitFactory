@@ -59,15 +59,19 @@ async getPost (req: Request, res: Response) : Promise <void> {
 async getPosts (req: Request, res: Response) : Promise <void> {
     try{
         console.log("query:", req.query);
-        const followingIds = !req.query.following
-            ? []
-            : Array.isArray(req.query.following)
-                ? req.query.following
-                : [req.query.following];
-        console.log(followingIds);
-        const filter = followingIds.length > 0
-            ? { user: { $in: followingIds } }
-            : {};
+        const userId = !req.query.userId
+            ? "" 
+            : req.query.userId;
+        console.log(userId);
+
+        let filter = {};
+        if (userId != "") {
+            const user = await getUserOr404(userId as string)
+            if (!user) {
+                res.status(400).json({message: "User not found"})
+            }
+            filter = { user: { $in: user.following } }
+        }
         console.log(filter);
         const posts = await PostModel
             .find(filter)

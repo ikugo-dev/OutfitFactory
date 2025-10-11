@@ -44,10 +44,10 @@ export async function createPost(
   await api.post("/post/create_post", { id: userId, text, outfitId });
 }
 
-export async function fetchPosts(following: string[] = []) {
+export async function fetchPosts(userId: string = "") {
   const res = await api.get("/posts", {
     params: {
-      following: following,
+      userId: userId,
     },
   });
   return res.data;

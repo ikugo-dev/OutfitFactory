@@ -1,16 +1,33 @@
 <template>
   <div class="post-card" :style="{ backgroundColor: color }">
+
     <div class="outfit-container">
       <OutfitViewer v-if="outfit" :outfit="outfit" />
       <div v-else class="loading">Loading outfit...</div>
     </div>
+
+    <div class="post-footer" v-if="user">
+      <img v-if="user.avatar" class="avatar" :src="user.avatar" :alt="user.username" />
+      <div class="username">{{ user.username }} :</div>
+      <div class="caption">{{ post.text }}</div>
+    </div>
+
+
+    <div class="post-info">
+      <span class="date">{{ new Date(post.createdAt).toLocaleDateString() }}</span>
+      •
+      <span class="likes">{{ post.likes }} likes</span>
+    </div>
+
+    <PostCardControls :post="post" />
   </div>
 </template>
 
 <script setup lang="ts">
 import OutfitViewer from "./OutfitViewer.vue";
-import type { PostType, OutfitType } from "@/types";
-import { ref, onMounted } from "vue";
+import PostCardControls from "./PostCardControls.vue";
+import type { PostType, OutfitType, UserType } from "@/types";
+import { ref, computed, onMounted } from "vue";
 import { fetchOutfit } from "@/api";
 
 const { post } = defineProps<{
@@ -19,10 +36,13 @@ const { post } = defineProps<{
 
 const outfit = ref<OutfitType | null>(null);
 
+const user = computed<UserType | null>(() =>
+  typeof post.user === "object" ? post.user : null
+);
+
 onMounted(async () => {
   try {
-    outfit.value = await fetchOutfit(post.outfit);
-    console.log(outfit.value);
+    outfit.value = await fetchOutfit(post.outfit as string);
   } catch (err) {
     console.error("Failed to fetch outfit:", err);
   }
@@ -55,12 +75,21 @@ const color =
   justify-content: center;
 }
 
-.caption {
-  margin: 0.5rem;
-  width: 20rem;
-  font-size: 0.9rem;
-  line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.post-footer {
+  display: flex;
+  align-items: center;
+  margin: 0.6rem;
+}
+
+.post-footer * {
+  margin-right: 0.5rem;
+}
+
+.avatar {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border: 0.2rem solid black;
+  background-color: teal;
 }
 </style>

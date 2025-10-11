@@ -58,4 +58,5 @@ export interface PostType {
   likers: Ref<UserType>[];
   comments: Ref<CommentType>[];
   grades: Ref<GradeType>[];
+  createdAt: string;
 }

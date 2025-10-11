@@ -78,7 +78,7 @@ const color =
 .post-footer {
   display: flex;
   align-items: center;
-  margin: 0.6rem;
+  margin: 0.6rem 0rem 0.6rem 0rem;
 }
 
 .post-footer * {
@@ -86,10 +86,7 @@ const color =
 }
 
 .avatar {
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  border: 0.2rem solid black;
-  background-color: teal;
+  width: 3em;
+  height: 3em;
 }
 </style>

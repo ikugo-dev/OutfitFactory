@@ -59,3 +59,11 @@ button:hover {
 button:active {
   background-color: var(--accent);
 }
+
+.avatar {
+  border-radius: 50%;
+  width: 6em;
+  height: 6em;
+  border: 0.2rem solid black;
+  background-color: var(--secondary);
+}

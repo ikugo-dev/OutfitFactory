@@ -83,12 +83,4 @@ watch(() => route.params.username, loadProfile, { immediate: true })
   gap: 1rem;
   padding: 1rem;
 }
-
-.avatar {
-  border-radius: 50%;
-  width: 80px;
-  height: 80px;
-  border: 0.2rem solid black;
-  background-color: teal;
-}
 </style>

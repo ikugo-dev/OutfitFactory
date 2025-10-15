@@ -20,7 +20,7 @@ defineProps<{
   margin: 0 auto;
 }
 
-.grid > * {
+.grid>* {
   break-inside: avoid;
   margin-bottom: 1rem;
 }

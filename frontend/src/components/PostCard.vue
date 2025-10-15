@@ -30,15 +30,14 @@ import OutfitViewer from "./OutfitViewer.vue";
 import PostCardControls from "./PostCardControls.vue";
 import type { PostType, OutfitType, UserType } from "@/types";
 import { ref, computed, onMounted } from "vue";
-import { fetchOutfit } from "@/api";
+import { fetchOutfit } from "@/api/postApi.ts";
 
 const { post } = defineProps<{
   post: PostType
 }>();
 
 const outfit = ref<OutfitType | null>(null);
-
-const user = computed<UserType | null>(() =>
+const user = computed<UserType | null>(() => // to avoid stupid null warrning
   typeof post.user === "object" ? post.user : null
 );
 

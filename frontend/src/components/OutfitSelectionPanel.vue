@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from "vue";
 import type { GarmentType } from "@/types";
-import { fetchAllGarments } from "@/api";
+import { fetchAllGarments } from "@/api/postApi";
 
 const props = defineProps<{
   brand?: string | null;

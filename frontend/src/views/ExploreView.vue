@@ -16,7 +16,7 @@ import "v3-infinite-loading/lib/style.css";
 import { ref } from "vue";
 import type { PostType } from "@/types";
 
-import { fetchPosts } from "@/api.ts"
+import { fetchPosts } from "@/api/postApi.ts"
 
 const posts = ref<PostType[]>([]);
 const allPosts = ref<PostType[]>([]);

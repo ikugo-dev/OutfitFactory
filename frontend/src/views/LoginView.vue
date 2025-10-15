@@ -40,11 +40,10 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import { registerUser, loginUser } from "@/api.ts";
+import { useRouter } from "vue-router";
+import { registerUser, loginUser } from "@/api/userApi.ts";
 
 const router = useRouter();
-const route = useRoute();
 const isRegister = ref(false);
 const username = ref("");
 const email = ref("");

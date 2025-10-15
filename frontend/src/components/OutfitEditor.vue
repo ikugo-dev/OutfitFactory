@@ -1,10 +1,9 @@
 <template>
-
   <div class="outfit-editor">
     <div class="post-card" :style="{ backgroundColor: color }">
       <div class="current-outfit-editor">
         <div class="outfit-flex">
-          <div v-for="(item, i) in outfit.clothes" :key="i" class="outfit-slot-wrapper" >
+          <div v-for="(item, i) in garments" :key="i" class="outfit-slot-wrapper">
             <OutfitSlot :item="item" editable @select="removeItem(i)" />
           </div>
 
@@ -17,11 +16,7 @@
         <!-- <button class="submit-btn" @click="submitPost">Post Outfit</button> -->
       </div>
     </div>
-    <OutfitSelectionPanel
-      v-if="isSelecting"
-      @close="isSelecting = false"
-      @selectGarment="addItem"
-    />
+    <OutfitSelectionPanel v-if="isSelecting" @close="isSelecting = false" @selectGarment="addItem" />
   </div>
 </template>
 
@@ -29,13 +24,10 @@
 import OutfitSlot from './OutfitSlot.vue'
 import OutfitSelectionPanel from './OutfitSelectionPanel.vue'
 import { ref } from "vue";
-import { createOutfit, addGarmentToOutfit, createPost } from "@/api.ts";
-import { currentUserId } from "@/stores/userStore.ts";
-import { GarmentType, OutfitType } from "@types.ts";
+import { createOutfit, addGarmentToOutfit, createPost } from "@/api/postApi.ts";
+import { type GarmentType } from "@/types.ts";
 const caption = ref("");
-const outfit = ref<OutfitType>({
-  clothes: [],
-});
+const garments = ref<GarmentType[]>([]);
 
 const color = "#" + ((1 << 24) * Math.random() | 0).toString(16).padStart(6, "0");
 
@@ -45,30 +37,30 @@ function openSelector() {
 }
 
 function addItem(garment: GarmentType) {
-  outfit.value.clothes.push(garment);
+  garments.value.push(garment);
   isSelecting.value = false;
 }
 
 function removeItem(index: number) {
-  outfit.value.clothes.splice(index, 1);
+  garments.value.splice(index, 1);
 }
 async function submitPost() {
-  if (outfit.value.clothes.length === 0) {
+  if (garments.value.length === 0) {
     alert("You must add at least one garment!");
     return;
   }
 
   try {
-    const createdOutfit = await createOutfit(currentUserId.value);
+    const createdOutfit = await createOutfit();
     const outfitId = createdOutfit._id;
-    for (const g of outfit.value.clothes) {
+    for (const g of garments.value) {
       await addGarmentToOutfit(outfitId, g._id);
     }
-    await createPost(currentUserId.value, caption.value, outfitId);
+    await createPost(caption.value, outfitId);
 
     alert("Post created successfully!");
     caption.value = "";
-    outfit.value = { clothes: [] };
+    garments.value = [];
   } catch (err) {
     console.error(err);
     alert("Error creating post!");
@@ -77,7 +69,6 @@ async function submitPost() {
 </script>
 
 <style scoped>
-
 .outfit-flex {
   display: flex;
   flex-wrap: wrap;
@@ -125,7 +116,8 @@ async function submitPost() {
 
 .post-card {
   flex: 1;
-  max-width: 45%; /* prevent it from being too wide */
+  max-width: 45%;
+  /* prevent it from being too wide */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -145,5 +137,4 @@ async function submitPost() {
   background-color: var(--background);
   overflow: hidden;
 }
-
 </style>

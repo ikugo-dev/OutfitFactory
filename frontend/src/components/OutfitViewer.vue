@@ -1,12 +1,7 @@
 <template>
-  <div v-if="loaded" class="grid-wrapper">
+  <div v-if="garments.length != 0" class="grid-wrapper">
     <div class="outfit-flex">
-      <OutfitSlot
-        v-for="(item, i) in garments"
-        :key="i"
-        :item="item"
-        :editable="false"
-      />
+      <OutfitSlot v-for="(item, i) in garments" :key="i" :item="item" :editable="false" />
     </div>
   </div>
   <div v-else>Loading outfit...</div>
@@ -14,38 +9,23 @@
 
 <script setup lang="ts">
 import OutfitSlot from "./OutfitSlot.vue";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import type { OutfitType, GarmentType } from "@/types";
-import { fetchGarment } from "@/api.ts";
+import { fetchGarment } from "@/api/postApi.ts";
 
 const props = defineProps<{ outfit: OutfitType }>();
 const garments = ref<GarmentType[]>([]);
-const loaded = ref(false);
 
 onMounted(async () => {
-  if (!props.outfit || !props.outfit.garments) return;
-
-  // Fetch each garment object by ID
+  // garments.value = await Promise.all(
+  //   props.outfit.garments((id: string) => fetchGarment(id))
+  // );
   garments.value = await Promise.all(
-    props.outfit.garments.map((id: string) => fetchGarment(id))
+    props.outfit.garments.map(async (garment) => {
+      return await fetchGarment(garment.toString());
+    })
   );
-
-  loaded.value = true;
 });
-
-// Optional: if outfit can change after mount
-watch(
-  () => props.outfit,
-  async (newOutfit) => {
-    if (!newOutfit || !newOutfit.garments) return;
-    loaded.value = false;
-    garments.value = await Promise.all(
-      newOutfit.garments.map((id: string) => fetchGarment(id))
-    );
-    loaded.value = true;
-  },
-  { deep: true }
-);
 </script>
 
 <style scoped>
@@ -66,8 +46,9 @@ watch(
   width: 100%;
 }
 
-.outfit-flex > * {
-  flex: 0 0 calc(50% - 0.5rem); /* 2 columns */
+.outfit-flex>* {
+  flex: 0 0 calc(50% - 0.5rem);
+  /* 2 columns */
   max-width: calc(50% - 0.5rem);
   aspect-ratio: 1 / 1;
 }

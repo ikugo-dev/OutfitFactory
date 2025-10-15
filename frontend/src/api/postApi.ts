@@ -1,5 +1,11 @@
-import api from "./baseApi.ts";
 import { currentUserId } from "@/stores/userStore.ts";
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: "http://localhost:3000/api",
+  withCredentials: false,
+});
+export default api;
 
 export async function fetchAllGarments() {
   const res = await api.get("/garments");
@@ -57,15 +63,5 @@ export async function fetchOutfit(id: string) {
 
 export async function fetchGarment(id: string) {
   const res = await api.get(`/garment/${id}`);
-  return res.data;
-}
-
-export async function fetchUserById(id: string) {
-  const res = await api.get(`/user/${id}`);
-  return res.data;
-}
-
-export async function fetchUserByUsername(id: string) {
-  const res = await api.get(`/user/by_username/${id}`);
   return res.data;
 }

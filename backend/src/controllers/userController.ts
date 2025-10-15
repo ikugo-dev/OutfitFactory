@@ -408,11 +408,6 @@ async getFollowers(req: Request, res: Response): Promise <void>
         if (!id) throw Error("404");
         const user = await getUserOr404(id);
         
-        if (user.followers.length == 0) {
-            res.status(404).json({error: "No followers."});
-            return;
-        }
-
         res.status(200).json(user.followers);
         return;
     }
@@ -438,11 +433,6 @@ async getFollowing(req: Request, res: Response): Promise <void>
         if (!id) throw Error("404");
         const user = await getUserOr404(id);
         
-        if (user.following.length == 0) {
-            res.status(404).json({error: "No following."});
-            return;
-        }
-
         res.status(200).json(user.following);
         return;
     }

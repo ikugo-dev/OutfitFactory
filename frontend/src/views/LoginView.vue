@@ -4,37 +4,19 @@
       <h2 class="title">{{ isRegister ? "Create Account" : "Login" }}</h2>
 
       <form @submit.prevent="handleSubmit" class="auth-form">
-        <!-- Username -->
         <div class="form-group">
           <label>Username</label>
-          <input
-            type="text"
-            v-model="username"
-            placeholder="Enter your username"
-            required
-          />
+          <input type="text" v-model="username" placeholder="Enter your username" required />
         </div>
 
-        <!-- Email (only for register) -->
         <div v-if="isRegister" class="form-group">
           <label>Email</label>
-          <input
-            type="email"
-            v-model="email"
-            placeholder="Enter your email"
-            required
-          />
+          <input type="email" v-model="email" placeholder="Enter your email" required />
         </div>
 
-        <!-- Password -->
         <div class="form-group">
           <label>Password</label>
-          <input
-            type="password"
-            v-model="password"
-            placeholder="Enter your password"
-            required
-          />
+          <input type="password" v-model="password" placeholder="Enter your password" required />
         </div>
 
         <button type="submit" class="btn primary">
@@ -59,7 +41,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { login } from "@/api.ts";
+import { registerUser, loginUser } from "@/api.ts";
 
 const router = useRouter();
 const route = useRoute();
@@ -72,13 +54,13 @@ const error = ref("");
 async function handleSubmit() {
   error.value = "";
   try {
-    if (!isRegister.value) {
-      login(username.value, email.value, password.value);
-
-      const redirectPath = (route.query.redirect as string) || "/";
-      router.push(redirectPath);
+    if (isRegister.value) {
+      registerUser(username.value, email.value, password.value);
+    } else {
+      loginUser(username.value, email.value, password.value);
+      router.push("/");
     }
-  } catch (err: never) {
+  } catch (err: any) {
     console.error(err);
     error.value = err.response?.data?.error || "Something went wrong.";
   }

@@ -6,20 +6,35 @@ const api = axios.create({
   withCredentials: false,
 });
 
-export async function login(username: string, email: string, password: string) {
+export async function loginUser(
+  username: string,
+  email: string,
+  password: string,
+) {
   const res = await api.post("/user/login", {
     username: username,
     email: email,
     password: password,
   });
-
   const user = res.data.findRes?.[0];
   if (!user) {
     console.log("User not found");
     return;
   }
-
   setUser(user._id, user.username);
+}
+
+export async function registerUser(
+  username: string,
+  email: string,
+  password: string,
+) {
+  const res = await api.post("/user/create_account", {
+    username: username,
+    email: email,
+    password: password,
+  });
+  return res.status;
 }
 
 export async function fetchAllGarments() {

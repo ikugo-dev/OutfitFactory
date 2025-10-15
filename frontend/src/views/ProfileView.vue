@@ -5,7 +5,7 @@
 
       <div class="profile-info">
         <h2>{{ profile.username }}</h2>
-        <h3>Followers: {{ profile.followers?.length || 0 }}</h3>
+        <h3>Followers: {{ profile.followers?.length }}</h3>
 
         <div class="profile-actions">
           <button v-if="isProfileOwner" @click="openSettings">Settings</button>
@@ -27,7 +27,7 @@ import { useRoute, useRouter } from 'vue-router'
 import PostGrid from '../components/PostGrid.vue'
 import type { UserType, PostType } from '@/types.ts'
 
-import { fetchUserByUsername, fetchUserPosts } from '@/api.ts'
+import { fetchUserById, fetchUserByUsername, fetchUserPosts } from '@/api.ts'
 import { currentUserId } from '@/stores/userStore.ts'
 
 const route = useRoute()
@@ -54,7 +54,7 @@ async function loadProfile() {
     } else {
       // Own profile
       userId = currentUserId.value || ""
-      profile.value = await fetchUserByUsername(userId)
+      profile.value = await fetchUserById(userId)
     }
 
     // Fetch that user's posts

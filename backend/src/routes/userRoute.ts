@@ -3,7 +3,7 @@ const userCtrl = require("../controllers/userController");
 
 const router = Router();
 
-router.post("/create_account/", userCtrl.createUser);
+router.post("/create_account", userCtrl.createUser);
 
 router.get("/by_username/:username", userCtrl.getUserByUsername);
 router.route("/:id")

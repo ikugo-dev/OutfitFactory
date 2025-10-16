@@ -80,16 +80,51 @@ def extract_category_product_links(browser: WebDriver, url: str):
             links.append((link['href']))
     return links
 
+# if __name__ == "__main__":
+#     browser = webdriver.Firefox()
+#     print("Started scrapping...");
+#     for category in links.categories:
+#         parsed_products = []
+#         product_links = extract_category_product_links(browser, category.link)
+#         for product_link in product_links:
+#             parsed_products.append(parse_product(browser, product_link, category.gender, category.name));
+#         print(parsed_products);
+#         print("Parsed " + str(len(parsed_products)) + " products!");
+#         mongodb_uploader.upload(parsed_products);
+#     print("Finished scrapping...!");
+#     browser.close()
+
+# prettier but more complicated implementation
 if __name__ == "__main__":
     browser = webdriver.Firefox()
-    print("Started scrapping...");
-    for category in links.categories:
+    print("    -> Started scraping  <-")
+
+    total_categories = len(links.categories)
+    overall_start = time.time()
+
+    for category_index, category in enumerate(links.categories, start=1):
+        print(f"Parsing category {category_index}/{total_categories}: '{category.name}' ({category.gender})")
+
+        category_start = time.time()
         parsed_products = []
+
         product_links = extract_category_product_links(browser, category.link)
-        for product_link in product_links:
-            parsed_products.append(parse_product(browser, product_link, category.gender, category.name));
-        print(parsed_products);
-        print("Parsed " + str(len(parsed_products)) + " products!");
-        mongodb_uploader.upload(parsed_products);
-    print("Finished scrapping...!");
+        total_products = len(product_links)
+
+        print(f"Found {total_products} products in '{category.name}'.")
+
+        for product_index, product_link in enumerate(product_links, start=1):
+            start_time = time.time()
+            product = parse_product(browser, product_link, category.gender, category.name)
+            parsed_products.append(product)
+            
+            print(f"[{product_index}/{total_products}] elapsed {(time.time() - category_start):.1f}s")
+
+        print(f"✅ Finished category '{category.name}'")
+        mongodb_uploader.upload(parsed_products)
+        print(f"✅ Uploaded {len(parsed_products)} products to MongoDB.\n")
+
+    total_time = time.time() - overall_start
+    print("    -> Finished scraping <-")
+    print(f"Finished scraping all categories in {total_time/60:.1f} minutes.")
     browser.close()

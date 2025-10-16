@@ -18,10 +18,10 @@
     <div class="post-info">
       <span class="date">{{ new Date(post.createdAt).toLocaleDateString() }}</span>
       •
-      <span class="likes">{{ post.likes }} likes</span>
+      <span class="likes">{{ post.likes + (likedByUser ? 1 : 0) }} likes</span>
     </div>
 
-    <PostCardControls :post="post" />
+    <PostCardControls :postId="post._id" @liked="likedByUser = true" @unliked="likedByUser = false" />
   </div>
 </template>
 
@@ -37,6 +37,8 @@ const { post } = defineProps<{
 }>();
 
 const outfit = ref<OutfitType | null>(null);
+const likedByUser = ref(false);
+
 const user = computed<UserType | null>(() => // to avoid stupid null warrning
   typeof post.user === "object" ? post.user : null
 );

@@ -1,7 +1,7 @@
 <template>
   <div class="post-controls">
-    <button><font-awesome-icon icon="fa-solid fa-thumbs-up" /></button>
-    <button><font-awesome-icon icon="fa-solid fa-thumbs-down" /></button>
+    <button @click="handleLike"><font-awesome-icon icon="fa-solid fa-thumbs-up" /></button>
+    <button @click="handleUnlike"><font-awesome-icon icon="fa-solid fa-thumbs-down" /></button>
     <button><font-awesome-icon icon="fa-solid fa-comment" /></button>
     <button><font-awesome-icon icon="fa-solid fa-thumbtack" /></button>
     <button><font-awesome-icon icon="fa-solid fa-shirt" /></button>
@@ -9,10 +9,24 @@
 </template>
 
 <script setup lang="ts">
-import { type PostType } from "@/types.ts"
-defineProps<{
-  post: PostType
+import { like, unlike } from "@/api/postInteractionsApi.ts"
+const props = defineProps<{
+  postId: string
 }>()
+const emit = defineEmits<{
+  (e: "liked"): void
+  (e: "unliked"): void
+}>()
+
+const handleLike = async () => {
+  await like(props.postId)
+  emit("liked")
+}
+
+const handleUnlike = async () => {
+  await unlike(props.postId)
+  emit("unliked")
+}
 </script>
 
 <style scoped>

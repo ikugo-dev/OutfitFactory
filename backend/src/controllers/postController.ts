@@ -130,13 +130,13 @@ async createPost(req: Request, res: Response) : Promise <void> {
 async like(req: Request, res: Response): Promise <void> { 
     try{
         const { id, userId } = req.body;
-        console.log(id, userId);
+        console.log("Liking:", id, userId);
         const post = await getPostOr404(id);
         const user = await getUserOr404(userId);
 
         const findRes = await PostModel.find({likers: userId}).exec();
         if(findRes.length != 0){
-            res.status(400).json({message: "Already liked."}); return;
+            res.status(200).json({message: "Already liked."}); return;
         }
 
 
@@ -168,18 +168,16 @@ async like(req: Request, res: Response): Promise <void> {
 async unlike(req: Request, res: Response) : Promise <void>{
     try{
         const { id, userId } = req.body;
-        console.log(id, userId);
+        console.log("Unliking:", id, userId);
         const post = await getPostOr404(id);
         const user = await getUserOr404(userId);
 
         const findRes = await PostModel.find({likers: userId}).exec();
         if(findRes.length == 0){
-            res.status(400).json({message: "Not liked."}); return;
+            res.status(200).json({message: "Not liked."}); return;
         }
 
-        let newLikes;
-        if (post.likes-1 < 0) newLikes = new Number(0);
-        else newLikes = new Number(post.likes-1);
+        const newLikes = new Number(post.likes-1 < 0 ? 0 : post.likes-1);
 
         const updateRes = await PostModel.updateOne({_id: id}, {$set: {likes: newLikes}});
         const updateRes2 = await PostModel.updateOne({_id: id}, {$pull: {likers: userId}});

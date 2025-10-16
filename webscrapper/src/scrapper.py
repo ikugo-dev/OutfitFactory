@@ -1,4 +1,5 @@
 import cloudinary_uploader
+import mongodb_uploader
 import links
 import random
 import time
@@ -21,7 +22,7 @@ def parse_product(browser: WebDriver, url: str, gender: str, category: str):
         else:
             return tag.text.strip()
 
-    id_value        = url[29:] # da izbrisemo "https://www.sinsay.com/rs/sr/"
+    # id_value        = url[29:] # da izbrisemo "https://www.sinsay.com/rs/sr/"
     name_value      = safe_select("h1[data-testid='product-name']")
     price_value     = safe_select("div[data-selen='product-price']").replace('\xa0', ' ') # zbog whitespaces koji stavljaju
     color_value     = safe_select("span[data-testid='color-picker-color-name']")
@@ -42,7 +43,6 @@ def parse_product(browser: WebDriver, url: str, gender: str, category: str):
             material_value = match.group(1)
 
     return {
-        "id": id_value,
         "image_url": cloudinary_url,
         "gender": gender,
         "category": category,
@@ -82,9 +82,14 @@ def extract_category_product_links(browser: WebDriver, url: str):
 
 if __name__ == "__main__":
     browser = webdriver.Firefox()
-    # print(parse_product(browser, "https://www.sinsay.com/rs/sr/jogger-farmerke-445fb-90j", "m", "farmerke"))
+    print("Started scrapping...");
     for category in links.categories:
+        parsed_products = []
         product_links = extract_category_product_links(browser, category.link)
         for product_link in product_links:
-            print(parse_product(browser, product_link, category.gender, category.name));
+            parsed_products.append(parse_product(browser, product_link, category.gender, category.name));
+        print(parsed_products);
+        print("Parsed " + str(len(parsed_products)) + " products!");
+        mongodb_uploader.upload(parsed_products);
+    print("Finished scrapping...!");
     browser.close()

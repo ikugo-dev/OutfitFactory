@@ -20,8 +20,8 @@
         <label>Gender</label>
         <div class="gender-options">
           <label><input type="radio" value="both" v-model="localFilters.gender" /> Both</label>
-          <label><input type="radio" value="male" v-model="localFilters.gender" /> Male</label>
-          <label><input type="radio" value="female" v-model="localFilters.gender" /> Female</label>
+          <label><input type="radio" value="m" v-model="localFilters.gender" /> Male</label>
+          <label><input type="radio" value="f" v-model="localFilters.gender" /> Female</label>
         </div>
       </div>
 
@@ -66,7 +66,7 @@
           <div class="info">
             <div class="name">{{ a.name }}</div>
             <div class="meta">
-              {{ a.brand }} • €{{ a.price }} • {{ a.material }}
+              {{ a.brand }} • {{ a.price }} RSD • {{ a.material }}
             </div>
             <div class="desc">
               <span>Color: {{ a.color }}</span>
@@ -106,11 +106,23 @@ const localFilters = reactive({
 
 const selectedCategory = ref(props.category ?? "");
 const availableCategories = ref<string[]>([
-  "top",
-  "bottom",
-  "shoes",
-  "outerwear",
-  "accessories",
+  "basic-shorts",
+  "cipele",
+  "dukserice",
+  "dzemperi",
+  "farmerke",
+  "haljine-i-suknje",
+  "jakne",
+  "kacketi",
+  "kosulje",
+  "majice",
+  "naocare",
+  "novcanici",
+  "pantalone",
+  "rukavice",
+  "salovi",
+  "salovi-i-marame",
+  "sesiri",
 ]);
 
 const allGarments = ref<GarmentType[]>([]);

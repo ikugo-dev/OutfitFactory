@@ -3,6 +3,6 @@
 
 <template>
   <main>
-    <h1>We did it, joe!</h1>
+    <h1>Welcome to OutfitFactory!</h1>
   </main>
 </template>

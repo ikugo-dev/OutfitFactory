@@ -1,5 +1,5 @@
 <template>
-  <div class="profile-page">
+  <div class="profile-view">
     <div v-if="profile" class="profile-header">
       <img class="avatar" :src="profile.avatar" alt="avatar" />
 

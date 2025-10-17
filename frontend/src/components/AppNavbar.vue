@@ -1,20 +1,31 @@
 <template>
   <nav class="navbar">
-    <router-link to="/explore"   :class="{'active-link' :route.path==='/explore'       }">New</router-link>
-    <router-link to="/following" :class="{'active-link' :route.path==='/following' }">Following</router-link>
-    <router-link to="/create"    :class="{'active-link' :route.path==='/create'    }">Create</router-link>
-    <router-link to="/profile"   :class="{'active-link' :route.path==='/profile'   }">Profile</router-link>
-    <LogoutButton v-if="currentUserId" />
+    <router-link to="/explore" :class="{ 'active-link': route.path === '/explore' }">New</router-link>
+    <router-link to="/following" :class="{ 'active-link': route.path === '/following' }">Following</router-link>
+    <router-link to="/create" :class="{ 'active-link': route.path === '/create' }">Create</router-link>
+    <router-link to="/profile" :class="{ 'active-link': route.path === '/profile' }">Profile</router-link>
+    <button class="logout-button" v-if="currentUserId" @click="logout()">Logout</button>
+    <button class="login-button" v-else @click="login()">Login</button>
+
   </nav>
 </template>
 
 
 <script setup lang="ts">
 import { useRoute } from "vue-router"
-import LogoutButton from "./LogoutButton.vue"
+import { clearUser } from "@/stores/userStore";
 import { currentUserId } from "@/stores/userStore";
+import router from "@/router";
 
 const route = useRoute();
+
+function logout() {
+  clearUser();
+  router.push('/login')
+}
+function login() {
+  router.push('/login')
+}
 </script>
 
 <style scoped>
@@ -42,15 +53,17 @@ const route = useRoute();
 .navbar a.active-link {
   color: var(--accent);
 }
-</style>
 
-<!-- .navbar a { -->
-<!--   box-shadow: 6px 6px; -->
-<!--   text-decoration: none; -->
-<!--   background-color: var(--primary); -->
-<!--   padding: 0.5em; -->
-<!-- } -->
-<!---->
-<!-- .navbar a:hover { -->
-<!--   box-shadow: 0px 0px; -->
-<!-- } -->
+button {
+  position: relative;
+  top: -0.2em;
+}
+
+.login-button {
+  background-color: var(--accent);
+}
+
+.logout-button {
+  background-color: var(--secondary);
+}
+</style>

@@ -1,21 +1,21 @@
 <template>
   <div class="login-view">
-    <div class="auth-card">
+    <div class="panel">
       <h2 class="title">{{ isRegister ? "Create Account" : "Login" }}</h2>
 
       <form @submit.prevent="handleSubmit" class="auth-form">
         <div class="form-group">
-          <label>Username</label>
+          <label>Username:</label>
           <input type="text" v-model="username" placeholder="Enter your username" required />
         </div>
 
         <div v-if="isRegister" class="form-group">
-          <label>Email</label>
+          <label>Email:</label>
           <input type="email" v-model="email" placeholder="Enter your email" required />
         </div>
 
         <div class="form-group">
-          <label>Password</label>
+          <label>Password:</label>
           <input type="password" v-model="password" placeholder="Enter your password" required />
         </div>
 
@@ -66,68 +66,45 @@ async function handleSubmit() {
 }
 </script>
 
-<style scoped>
+<style>
 .login-view {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: #fafafa;
 }
 
-.auth-card {
+.panel {
+  width: 24rem;
+  border: 0.2rem solid black;
+  padding: 12px;
+  margin-bottom: 1rem;
   background: white;
-  padding: 2rem 3rem;
-  border-radius: 1rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  width: 320px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
-.title {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
+.panel>* {
   margin-bottom: 1rem;
 }
 
-input {
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
-  padding: 0.5rem;
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.btn.primary {
-  width: 100%;
-  background: #222;
-  color: white;
-  padding: 0.6rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-weight: bold;
-  border: none;
-  margin-top: 0.5rem;
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.switch-mode {
-  text-align: center;
-  margin-top: 1rem;
+.form-group {
+  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr
 }
 
-.switch-mode a {
-  color: #007bff;
-  cursor: pointer;
-}
-
-.error {
-  color: red;
-  text-align: center;
-  margin-top: 1rem;
+.form-group>label {
+  text-align: right;
+  margin-right: 1rem;
 }
 </style>

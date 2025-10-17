@@ -1,5 +1,5 @@
 <template>
-  <aside class="panel">
+  <div class="panel">
     <div class="panel-header">
       <h4>Choose a garment</h4>
       <button class="btn-close" @click="$emit('close')">✕</button>
@@ -59,7 +59,7 @@
       <div v-else-if="filteredGarments.length === 0">No items match.</div>
 
       <ul v-else class="items">
-        <li v-for="a in filteredGarments" :key="a.id" class="item" @click="select(a)">
+        <li v-for="a in filteredGarments" :key="a._id" class="item" @click="select(a)">
           <div class="image">
             <img :src="a.image_url" alt="item image" />
           </div>
@@ -76,7 +76,7 @@
         </li>
       </ul>
     </div>
-  </aside>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -123,7 +123,6 @@ async function loadGarments() {
   filteredGarments.value = allGarments.value;
   loading.value = false;
 }
-
 
 function applyFilters() {
   loading.value = true;

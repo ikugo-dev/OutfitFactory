@@ -1,6 +1,6 @@
 <template>
   <div class="explore-view">
-    <h2>Following</h2>
+    <h2>Explore</h2>
 
     <PostGrid :posts="posts" />
 

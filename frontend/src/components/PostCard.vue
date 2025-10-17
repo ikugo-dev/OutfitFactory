@@ -51,11 +51,12 @@ onMounted(async () => {
   }
 });
 
-const color =
-  "#" +
-  ((1 << 24) * Math.random() | 0)
-    .toString(16)
-    .padStart(6, "0");
+const color = (function randomColor() {
+  const h = Math.floor(Math.random() * 360);
+  const s = 70 + Math.random() * 30;
+  const l = 70 + Math.random() * 30;
+  return `hsl(${h}, ${s}%, ${l}%)`;
+})();
 </script>
 <style scoped>
 .post-card {

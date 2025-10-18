@@ -323,7 +323,7 @@ async deletePost (req: Request, res: Response) : Promise <void> {
         const deleteRes = await PostModel.deleteOne({_id: id});
         if (deleteRes.modifiedCount == 0) throw Error("500");
 
-        res.status(200);  
+        res.status(200).send();
         
         return;
     }

@@ -3,19 +3,22 @@
     <button @click="handleLike"><font-awesome-icon icon="fa-solid fa-thumbs-up" /></button>
     <button @click="handleUnlike"><font-awesome-icon icon="fa-solid fa-thumbs-down" /></button>
     <button><font-awesome-icon icon="fa-solid fa-comment" /></button>
-    <button><font-awesome-icon icon="fa-solid fa-thumbtack" /></button>
-    <button><font-awesome-icon icon="fa-solid fa-shirt" /></button>
+    <!-- <button><font-awesome-icon icon="fa-solid fa-thumbtack" /></button> -->
+    <!-- <button><font-awesome-icon icon="fa-solid fa-shirt" /></button> -->
+    <button @click="handleDelete" v-if="isProfileOwner"><font-awesome-icon icon="fa-solid fa-trash" /></button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { like, unlike } from "@/api/postInteractionsApi.ts"
+import { deletePost, like, unlike } from "@/api/postInteractionsApi.ts"
 const props = defineProps<{
-  postId: string
+  postId: string,
+  isProfileOwner: boolean
 }>()
 const emit = defineEmits<{
   (e: "liked"): void
   (e: "unliked"): void
+  (e: "deletedPost"): void
 }>()
 
 const handleLike = async () => {
@@ -26,6 +29,13 @@ const handleLike = async () => {
 const handleUnlike = async () => {
   await unlike(props.postId)
   emit("unliked")
+}
+
+const handleDelete = async () => {
+  if (confirm("Are you sure you want to delete that post?")) {
+    await deletePost(props.postId);
+    emit("deletedPost")
+  }
 }
 </script>
 

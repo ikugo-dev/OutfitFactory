@@ -26,7 +26,7 @@
 
       <p class="switch-mode">
         <span>
-          {{ isRegister ? "Already have an account?" : "Don’t have an account?" }}
+          {{ isRegister ? "Already have an account? " : "Don’t have an account? " }}
         </span>
         <a href="#" @click.prevent="isRegister = !isRegister">
           {{ isRegister ? "Log in" : "Sign up" }}

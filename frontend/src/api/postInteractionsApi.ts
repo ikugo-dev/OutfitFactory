@@ -38,3 +38,8 @@ export async function createComment(text: string) {
   });
   return res.data;
 }
+
+export async function deletePost(postId: string) {
+  const res = await api.delete(`/post/${postId}`);
+  return res.status;
+}

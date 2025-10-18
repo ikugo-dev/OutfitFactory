@@ -15,6 +15,7 @@ import {
   faThumbsDown,
   faThumbsUp,
   faThumbtack,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 
 // add icons to library
@@ -24,6 +25,7 @@ library.add(
   faThumbsDown,
   faThumbsUp,
   faThumbtack,
+  faTrash,
 );
 const app = createApp(App);
 app.component("infinite-loading", InfiniteLoading);

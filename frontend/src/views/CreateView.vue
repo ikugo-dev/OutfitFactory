@@ -26,6 +26,7 @@
 <script setup lang="ts">
 import OutfitSlot from '@/components/OutfitSlot.vue'
 import OutfitSelectionPanel from '@/components/OutfitSelectionPanel.vue'
+import router from "@/router";
 import { ref } from "vue";
 import { createOutfit, addGarmentToOutfit, createPost } from "@/api/postApi.ts";
 import { type GarmentType } from "@/types.ts";
@@ -48,8 +49,8 @@ function removeItem(index: number) {
   garments.value.splice(index, 1);
 }
 async function submitPost() {
-  if (garments.value.length === 0) {
-    alert("You must add at least one garment!");
+  if (garments.value.length <= 1) {
+    alert("You must add at least two garments!");
     return;
   }
 
@@ -61,9 +62,8 @@ async function submitPost() {
     }
     await createPost(caption.value, outfitId);
 
-    alert("Post created successfully!");
-    caption.value = "";
-    garments.value = [];
+    console.log("Post created successfully!");
+    router.push("/profile");
   } catch (err) {
     console.error(err);
     alert("Error creating post!");

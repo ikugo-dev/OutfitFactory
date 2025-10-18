@@ -62,8 +62,4 @@ button {
 .login-button {
   background-color: var(--accent);
 }
-
-.logout-button {
-  background-color: var(--secondary);
-}
 </style>

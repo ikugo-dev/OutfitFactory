@@ -17,9 +17,6 @@ const props = defineProps<{ outfit: OutfitType }>();
 const garments = ref<GarmentType[]>([]);
 
 onMounted(async () => {
-  // garments.value = await Promise.all(
-  //   props.outfit.garments((id: string) => fetchGarment(id))
-  // );
   garments.value = await Promise.all(
     props.outfit.garments.map(async (garment) => {
       return await fetchGarment(garment.toString());

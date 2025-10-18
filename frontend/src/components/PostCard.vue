@@ -1,5 +1,5 @@
 <template>
-  <div class="post-card" :style="{ backgroundColor: color }">
+  <div v-if="!isDeleted" class="post-card" :style="{ backgroundColor: color }">
 
     <div class="outfit-container">
       <OutfitViewer v-if="outfit" :outfit="outfit" />
@@ -21,7 +21,8 @@
       <span class="likes">{{ post.likes + (likedByUser ? 1 : 0) }} likes</span>
     </div>
 
-    <PostCardControls :postId="post._id" @liked="likedByUser = true" @unliked="likedByUser = false" />
+    <PostCardControls :postId="post._id" :isProfileOwner="isProfileOwner" @liked="likedByUser = true"
+      @unliked="likedByUser = false" @deletedPost="isDeleted = true" />
   </div>
 </template>
 
@@ -32,9 +33,16 @@ import type { PostType, OutfitType, UserType } from "@/types";
 import { ref, computed, onMounted } from "vue";
 import { fetchOutfit } from "@/api/postApi.ts";
 
+import { currentUserId } from "@/stores/userStore";
+const isProfileOwner = computed(() => user.value?._id === currentUserId.value);
+const isDeleted = ref(false);
+
 const { post } = defineProps<{
   post: PostType
 }>();
+const emit = defineEmits<{
+  (e: "deletedPost"): void
+}>()
 
 const outfit = ref<OutfitType | null>(null);
 const likedByUser = ref(false);

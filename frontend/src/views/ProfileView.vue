@@ -40,7 +40,6 @@ const router = useRouter();
 const profile = ref<UserType | null>(null);
 const posts = ref<PostType[]>([]);
 const isFollowing = ref(false);
-const userId = ref("");
 
 const isProfileOwner = computed(() => profile.value?._id === currentUserId.value);
 
@@ -51,15 +50,14 @@ async function loadProfile() {
       const username = route.params.username as string;;
       const userData = await fetchUserByUsername(username);;
       profile.value = userData;
-      userId.value = userData._id;
     } else {
-      userId.value = currentUserId.value || "";
-      profile.value = await fetchUserById(userId.value);
+      const userData = await fetchUserById(currentUserId.value || "");
+      profile.value = userData;
     }
-    posts.value = await fetchUserPosts(userId.value);
+    posts.value = await fetchUserPosts(profile.value!._id);
 
     isFollowing.value = await getFollowingList().then((res) => {
-      return (res as string[]).includes(userId.value)
+      return (res as string[]).includes(profile.value!._id)
     });
   } catch (err) {
     console.error("Failed to load profile:", err);
@@ -68,9 +66,9 @@ async function loadProfile() {
 
 function toggleFollow() {
   if (isFollowing.value) {
-    unfollowUserId(userId.value);
+    unfollowUserId(profile.value!._id);
   } else {
-    followUserId(userId.value);
+    followUserId(profile.value!._id);
   }
   isFollowing.value = !isFollowing.value;
 }

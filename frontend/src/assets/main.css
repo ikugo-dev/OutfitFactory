@@ -43,7 +43,7 @@
 }
 
 button {
-  background-color: var(--primary);
+  background-color: var(--secondary);
   border: 0.15rem solid black;
   box-shadow: 0.2rem 0.2rem black;
   padding: 0.2rem 0.4rem;

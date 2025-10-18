@@ -68,6 +68,7 @@ function toggleFollow() {
   if (isFollowing.value) {
     unfollowUserId(profile.value!._id);
   } else {
+    console.log(profile.value!._id);
     followUserId(profile.value!._id);
   }
   isFollowing.value = !isFollowing.value;

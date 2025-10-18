@@ -134,21 +134,18 @@ async like(req: Request, res: Response): Promise <void> {
         const post = await getPostOr404(id);
         const user = await getUserOr404(userId);
 
-        const findRes = await PostModel.find({likers: userId}).exec();
-        if(findRes.length != 0){
+        const findRes = await PostModel.findOne({ _id: id, likers: userId }).exec();
+        if (findRes){
             res.status(200).json({message: "Already liked."}); return;
         }
-
-
-        let newLikes = new Number(post.likes +1);
-        const updateRes = await PostModel.updateOne({_id: id}, {$set: {likes: newLikes}});
+        const updateRes = await PostModel.updateOne({_id: id}, {$set: {likes: post.likes + 1}});
         const updateRes2 = await PostModel.updateOne({_id: id}, {$push: {likers: userId}});
 
         if (updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0){
             res.status(500).json({message: "Server error. (Update error)"}); return;
         }
 
-        res.status(200).json(newLikes);
+        res.status(200).json(post.likes + 1);
         return;
     }
     catch(error) {

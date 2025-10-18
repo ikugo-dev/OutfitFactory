@@ -329,7 +329,7 @@ async follow(req: Request, res: Response) : Promise<any>
         const userToFollow = await getUserOr404(idToFollow);
 
         if (user.following.find((id: string) => id == idToFollow)) throw Error("401");
-        if (userToFollow.following.find((id: string)=> id == id)) throw Error("401");
+        if (userToFollow.followers.find((id: string)=> id == id)) throw Error("401");
         
         console.log("proslo")
 

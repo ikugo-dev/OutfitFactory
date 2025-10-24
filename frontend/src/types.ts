@@ -6,20 +6,20 @@ export interface UserType {
   email: string;
   password: string;
   avatar: string;
-  posts: Ref<PostType>[];
-  followers: Ref<UserType>[];
-  following: Ref<UserType>[];
-  liked: Ref<PostType>[];
-  closet: Ref<GarmentType>[];
-  outfits: Ref<OutfitType>[];
+  posts: (string | PostType)[];
+  followers: (string | UserType)[];
+  following: (string | UserType)[];
+  liked: (string | PostType)[];
+  closet: (string | GarmentType)[];
+  outfits: (string | OutfitType)[];
 }
 
 export interface CommentType {
   _id: string;
-  user: Ref<UserType>;
+  user: string | UserType;
   text: string;
   likes: number;
-  likers: Ref<UserType>[];
+  likers: (string | UserType)[];
 }
 
 export interface GarmentType {
@@ -36,7 +36,7 @@ export interface GarmentType {
 
 export interface GradeType {
   _id: string;
-  user: Ref<UserType>;
+  user: string | UserType;
   fit_quality: number;
   material_quality: number;
   design: number;
@@ -45,18 +45,18 @@ export interface GradeType {
 
 export interface OutfitType {
   _id: string;
-  owner: Ref<UserType>;
-  garments: Ref<GarmentType>[];
+  owner: string | UserType;
+  garments: (string | GarmentType)[];
 }
 
 export interface PostType {
   _id: string;
-  user: Ref<UserType>;
-  outfit: Ref<OutfitType>;
+  user: string | UserType;
+  outfit: string | OutfitType;
   text: string | null;
   likes: number;
-  likers: Ref<UserType>[];
-  comments: Ref<CommentType>[];
-  grades: Ref<GradeType>[];
+  likers: (string | UserType)[];
+  comments: (string | CommentType)[];
+  grades: (string | GradeType)[];
   createdAt: string;
 }

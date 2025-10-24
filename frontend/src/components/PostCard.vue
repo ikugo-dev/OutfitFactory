@@ -22,13 +22,15 @@
     </div>
 
     <PostCardControls :postId="post._id" :isProfileOwner="isProfileOwner" @liked="likedByUser = true"
-      @unliked="likedByUser = false" @deletedPost="isDeleted = true" />
+      @unliked="likedByUser = false" @deletedPost="isDeleted = true" @showComments="showComments = true" />
+    <PostComments v-if="showComments" :color="color" :post="post" @close="showComments = false" />
   </div>
 </template>
 
 <script setup lang="ts">
 import OutfitViewer from "./OutfitViewer.vue";
 import PostCardControls from "./PostCardControls.vue";
+import PostComments from "./PostComments.vue";
 import type { PostType, OutfitType, UserType } from "@/types";
 import { ref, computed, onMounted } from "vue";
 import { fetchOutfit } from "@/api/postApi.ts";
@@ -36,6 +38,7 @@ import { fetchOutfit } from "@/api/postApi.ts";
 import { currentUserId } from "@/stores/userStore";
 const isProfileOwner = computed(() => user.value?._id === currentUserId.value);
 const isDeleted = ref(false);
+const showComments = ref(false);
 
 const { post } = defineProps<{
   post: PostType

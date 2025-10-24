@@ -57,7 +57,7 @@ async function loadProfile() {
     posts.value = await fetchUserPosts(profile.value!._id);
 
     isFollowing.value = await getFollowingList().then((res) => {
-      return (res as string[]).includes(profile.value!._id)
+      return res.includes(profile.value!._id)
     });
   } catch (err) {
     console.error("Failed to load profile:", err);

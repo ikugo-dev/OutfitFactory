@@ -2,7 +2,7 @@
   <div class="post-controls">
     <button @click="handleLike"><font-awesome-icon icon="fa-solid fa-thumbs-up" /></button>
     <button @click="handleUnlike"><font-awesome-icon icon="fa-solid fa-thumbs-down" /></button>
-    <button><font-awesome-icon icon="fa-solid fa-comment" /></button>
+    <button @click="handleComments"><font-awesome-icon icon="fa-solid fa-comment" /></button>
     <!-- <button><font-awesome-icon icon="fa-solid fa-thumbtack" /></button> -->
     <!-- <button><font-awesome-icon icon="fa-solid fa-shirt" /></button> -->
     <button @click="handleDelete" v-if="isProfileOwner"><font-awesome-icon icon="fa-solid fa-trash" /></button>
@@ -19,16 +19,21 @@ const emit = defineEmits<{
   (e: "liked"): void
   (e: "unliked"): void
   (e: "deletedPost"): void
+  (e: "showComments"): void
 }>()
 
 const handleLike = async () => {
-  await like(props.postId)
-  emit("liked")
+  await like(props.postId);
+  emit("liked");
 }
 
 const handleUnlike = async () => {
-  await unlike(props.postId)
-  emit("unliked")
+  await unlike(props.postId);
+  emit("unliked");
+}
+
+const handleComments = async () => {
+  emit("showComments");
 }
 
 const handleDelete = async () => {

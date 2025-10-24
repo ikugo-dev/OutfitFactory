@@ -3,7 +3,6 @@ const { Schema } = mongoose;
 
 const commentSchema = new Schema(
     {
-        
         user: 
         {
             type: mongoose.Types.ObjectId,
@@ -31,9 +30,10 @@ const commentSchema = new Schema(
             type: mongoose.Types.ObjectId,
             ref: 'UserModel'
         }
-
-
-
-    });
+    },
+    { 
+        timestamps: true
+    }
+);
 
 module.exports = mongoose.model('CommentModel', commentSchema);

@@ -1,0 +1,91 @@
+<template>
+  <div class="comments-overlay">
+    <div class="comments-container">
+      <h3>Comments</h3>
+      <div v-if="loading">Loading comments...</div>
+      <div v-else>
+        <div v-for="comment in comments" :key="comment._id" class="comment">
+          <strong>{{ comment.user.username }}:</strong> {{ comment.text }}
+        </div>
+      </div>
+
+      <div class="add-comment">
+        <textarea v-model="newComment" placeholder="Write a comment..."></textarea>
+        <button class="close-overlay" @click="$emit('close')">Close</button>
+        <button @click="postComment">Post</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import type { CommentType, PostType } from "@/types";
+import { ref, onMounted } from "vue";
+import { addCommentToPost, createComment, fetchPostComments } from "@/api/postInteractionsApi.ts";
+
+const props = defineProps<{
+  post: PostType
+  color: string
+}>()
+
+const emit = defineEmits<{
+  (e: "close"): void
+}>()
+
+const comments = ref<CommentType[]>([])
+const newComment = ref("")
+const loading = ref(false)
+
+onMounted(async () => {
+  loading.value = true
+  comments.value = await fetchPostComments(props.post._id);
+  loading.value = false
+})
+
+const postComment = async () => {
+  if (!newComment.value.trim()) return
+  const comment = await createComment(newComment.value)
+  await addCommentToPost(comment._id, props.post._id);
+  comments.value.push(comment)
+  newComment.value = ""
+}
+</script>
+
+<style scoped>
+.comments-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: v-bind(color);
+  filter: opacity(95%);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 1rem;
+  z-index: 10;
+}
+
+.comments-container {
+  overflow-y: auto;
+  width: 90%;
+  height: 90%;
+  padding: 1rem;
+  background-color: white;
+  border: 0.2rem solid black;
+}
+
+.add-comment {
+  display: flex;
+  margin-top: 1rem;
+}
+
+.add-comment>* {
+  margin-right: 0.5rem;
+}
+
+.add-comment textarea {
+  flex: 1;
+}
+</style>

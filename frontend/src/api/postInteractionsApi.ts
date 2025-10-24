@@ -25,7 +25,14 @@ export async function unlike(postId: string) {
 export async function fetchCommentById(
   commentId: string,
 ): Promise<CommentType> {
-  const res = await api.delete(`/comment/${commentId}`);
+  const res = await api.get(`/comment/${commentId}`);
+  return res.data;
+}
+
+export async function fetchPostComments(
+  postId: string,
+): Promise<CommentType[]> {
+  const res = await api.get(`post/${postId}/comments`);
   return res.data;
 }
 
@@ -39,8 +46,8 @@ export async function createComment(text: string): Promise<CommentType> {
 
 export async function addCommentToPost(commentId: string, postId: string) {
   await api.patch("/post/add_comment", {
-    id: commentId,
-    postId: postId,
+    id: postId,
+    commentId: commentId,
   });
 }
 

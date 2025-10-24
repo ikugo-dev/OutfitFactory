@@ -229,6 +229,31 @@ async addComment(req: Request, res: Response) : Promise <void>{
 
 },
 
+async getComments (req: Request, res: Response) : Promise <void> {
+    try{
+        const postId  = req.params.postId;
+
+        const postWithComments = await PostModel.findById(postId)
+            .select("comments")
+            .populate({
+                path: "comments",
+                select: "_id user text likes likers createdAt",
+                options: { sort: { createdAt: -1 } },
+                populate: {
+                    path: "user",
+                    select: "_id username avatar",
+                },
+            })
+            .exec();
+
+        res.status(200).json(postWithComments.comments);
+        return;
+    } 
+    catch(error) {
+        res.status(500).json({message: `Server error. ${error}`}); return;
+    }
+},
+
 async addGrade(req: Request, res: Response) : Promise <void> {
     try {
         const { id, gradeId } = req.body;

@@ -8,6 +8,7 @@ const commentCtrl = require("../controllers/commentController");
 const router = Router();
 
 router.patch("/post/add_comment", postCtrl.addComment);
+router.get("/post/:postId/comments", postCtrl.getComments);
 router.patch("/post/like", postCtrl.like);
 router.patch("/post/unlike", postCtrl.unlike); //treba li mi
 router.patch("/post/add_grade", postCtrl.addGrade);

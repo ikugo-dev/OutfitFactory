@@ -1,5 +1,6 @@
-import { currentUserId, setUser } from "@/stores/userStore.ts";
 import axios from "axios";
+import { currentUserId, setUser } from "@/stores/userStore.ts";
+import type { UserType } from "@/types.ts";
 
 const api = axios.create({
   baseURL: "http://localhost:3000/api/user",
@@ -30,41 +31,38 @@ export async function registerUser(
   email: string,
   password: string,
 ) {
-  const res = await api.post("/create_account", {
+  await api.post("/create_account", {
     username: username,
     email: email,
     password: password,
   });
-  return res.status;
 }
 
-export async function fetchUserById(id: string) {
+export async function fetchUserById(id: string): Promise<UserType> {
   const res = await api.get(`/${id}`);
   return res.data;
 }
 
-export async function fetchUserByUsername(id: string) {
+export async function fetchUserByUsername(id: string): Promise<UserType> {
   const res = await api.get(`/by_username/${id}`);
   return res.data;
 }
 
 export async function unfollowUserId(idToFollow: string) {
-  const res = await api.patch("/unfollow", {
+  await api.patch("/unfollow", {
     id: currentUserId.value,
     idToUnfollow: idToFollow,
   });
-  return res.status;
 }
 
 export async function followUserId(idToFollow: string) {
-  const res = await api.patch("/follow", {
+  await api.patch("/follow", {
     id: currentUserId.value,
     idToFollow: idToFollow,
   });
-  return res.status;
 }
 
-export async function getFollowingList() {
+export async function getFollowingList(): Promise<string[]> {
   const res = await api.get(`${currentUserId.value}/following`);
   return res.data;
 }

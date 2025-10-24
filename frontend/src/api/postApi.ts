@@ -1,5 +1,5 @@
-import { currentUserId } from "@/stores/userStore.ts";
 import axios from "axios";
+import { currentUserId } from "@/stores/userStore.ts";
 
 const api = axios.create({
   baseURL: "http://localhost:3000/api",
@@ -7,12 +7,14 @@ const api = axios.create({
 });
 export default api;
 
-export async function fetchAllGarments() {
+import type { GarmentType, OutfitType, PostType } from "@/types.ts";
+
+export async function fetchAllGarments(): Promise<GarmentType[]> {
   const res = await api.get("/garments");
   return res.data;
 }
 
-export async function createOutfit() {
+export async function createOutfit(): Promise<OutfitType> {
   const res = await api.post("/create_outfit", {
     id: currentUserId.value,
   });
@@ -26,6 +28,16 @@ export async function addGarmentToOutfit(outfitId: string, garmentId: string) {
   });
 }
 
+export async function fetchOutfit(id: string): Promise<OutfitType> {
+  const res = await api.get(`/outfit/${id}`);
+  return res.data;
+}
+
+export async function fetchGarment(id: string): Promise<GarmentType> {
+  const res = await api.get(`/garment/${id}`);
+  return res.data;
+}
+
 export async function createPost(
   text: string,
   outfitId: string,
@@ -37,7 +49,7 @@ export async function createPost(
   });
 }
 
-export async function fetchPosts(userId: string = "") {
+export async function fetchPosts(userId: string = ""): Promise<PostType[]> {
   const res = await api.get("/posts", {
     params: {
       userId: userId,
@@ -46,22 +58,12 @@ export async function fetchPosts(userId: string = "") {
   return res.data;
 }
 
-export async function fetchUserPosts(id: string) {
+export async function fetchUserPosts(id: string): Promise<PostType[]> {
   const res = await api.get(`/user/${id}/posts`);
   return res.data;
 }
 
-export async function fetchPostById(id: string) {
+export async function fetchPostById(id: string): Promise<PostType> {
   const res = await api.get(`/post/${id}`);
-  return res.data;
-}
-
-export async function fetchOutfit(id: string) {
-  const res = await api.get(`/outfit/${id}`);
-  return res.data;
-}
-
-export async function fetchGarment(id: string) {
-  const res = await api.get(`/garment/${id}`);
   return res.data;
 }

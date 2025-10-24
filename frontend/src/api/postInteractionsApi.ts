@@ -1,5 +1,6 @@
-import { currentUserId } from "@/stores/userStore.ts";
 import axios from "axios";
+import { currentUserId } from "@/stores/userStore.ts";
+import type { CommentType } from "@/types.ts";
 
 const api = axios.create({
   baseURL: "http://localhost:3000/api",
@@ -8,30 +9,27 @@ const api = axios.create({
 export default api;
 
 export async function like(postId: string) {
-  const res = await api.patch("/post/like", {
+  await api.patch("/post/like", {
     id: postId,
     userId: currentUserId.value,
   });
-  return res.data;
 }
 
 export async function unlike(postId: string) {
-  const res = await api.patch("/post/unlike", {
+  await api.patch("/post/unlike", {
     id: postId,
     userId: currentUserId.value,
   });
+}
+
+export async function fetchCommentById(
+  commentId: string,
+): Promise<CommentType> {
+  const res = await api.delete(`/comment/${commentId}`);
   return res.data;
 }
 
-export async function addComment(postId: string) {
-  const res = await api.patch("/post/add_comment", {
-    id: postId,
-    userId: currentUserId.value,
-  });
-  return res.data;
-}
-
-export async function createComment(text: string) {
+export async function createComment(text: string): Promise<CommentType> {
   const res = await api.post("/create_comment", {
     id: currentUserId.value,
     text: text,
@@ -39,7 +37,13 @@ export async function createComment(text: string) {
   return res.data;
 }
 
+export async function addCommentToPost(commentId: string, postId: string) {
+  await api.patch("/post/add_comment", {
+    id: commentId,
+    postId: postId,
+  });
+}
+
 export async function deletePost(postId: string) {
-  const res = await api.delete(`/post/${postId}`);
-  return res.status;
+  await api.delete(`/post/${postId}`);
 }

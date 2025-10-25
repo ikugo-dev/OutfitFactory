@@ -3,12 +3,13 @@ import cors from "cors";
 const dbCon = require("./tools/db-connection");
 const postRouter = require("./routes/postRoute.js");
 const userRouter = require("./routes/userRoute.js");
+import "dotenv";
 
 const app = express();
 
 app.use(express.json());
 
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173" }));
 
 app.use("/api", postRouter);
 app.use("/api/user", userRouter);

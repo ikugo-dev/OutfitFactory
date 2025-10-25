@@ -1,7 +1,7 @@
 <template>
   <div class="profile-view">
     <div v-if="profile" class="profile-header">
-      <img class="avatar" :src="profile.avatar" alt="avatar" />
+      <img class="avatar" :src="profile.avatar" />
 
       <div class="profile-info">
         <h2>{{ profile.username }}</h2>
@@ -17,7 +17,7 @@
     </div>
 
     <PostGrid v-if="posts.length" :posts="posts" />
-    <p v-else class="no-posts">No posts yet.</p>
+    <p v-else class="no-posts">No posts yet</p>
   </div>
 </template>
 
@@ -68,12 +68,9 @@ async function loadProfile() {
 
 function toggleFollow() {
   requireLogin();
-  if (isFollowing.value) {
-    unfollowUserId(profile.value!._id);
-  } else {
-    console.log(profile.value!._id);
-    followUserId(profile.value!._id);
-  }
+  isFollowing.value
+    ? unfollowUserId(profile.value!._id)
+    : followUserId(profile.value!._id);
   isFollowing.value = !isFollowing.value;
 }
 
@@ -90,5 +87,10 @@ watch(() => route.params.username, loadProfile, { immediate: true });
   align-items: center;
   gap: 1rem;
   padding: 1rem;
+}
+
+.avatar {
+  width: 6em;
+  height: 6em;
 }
 </style>

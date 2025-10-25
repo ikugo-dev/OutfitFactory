@@ -2,7 +2,8 @@
   <div class="explore-view">
     <h2>Following</h2>
 
-    <PostGrid :posts="posts" />
+    <PostGrid v-if="posts.length" :posts="posts" />
+    <p v-else class="no-posts">Follow someone to see their posts</p>
 
     <InfiniteLoading @infinite="load" />
   </div>

@@ -18,7 +18,7 @@ defineProps<{
 }>();
 </script>
 
-<style>
+<style scoped>
 .profile-with-text {
   display: flex;
   align-items: center;

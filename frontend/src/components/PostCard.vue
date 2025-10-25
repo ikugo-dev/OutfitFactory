@@ -6,21 +6,13 @@
       <div v-else class="loading">Loading outfit...</div>
     </div>
 
-    <div class="post-footer" v-if="user">
-      <RouterLink :to="`/profile/${user.username}`" class="user-link">
-        <img v-if="user.avatar" class="avatar" :src="user.avatar" :alt="user.username" />
-      </RouterLink>
-      <div class="username">{{ user.username }} :</div>
-      <div class="caption">{{ post.text }}</div>
-    </div>
-
-
     <div class="post-info">
       <span class="date">{{ new Date(post.createdAt).toLocaleDateString() }}</span>
       •
       <span class="likes">{{ post.likes + (likedByUser ? 1 : 0) }} likes</span>
     </div>
 
+    <ProfileWithText v-if="user" :user="user" :avatarSize="3" :text="post.text || ''" />
     <PostCardControls :postId="post._id" :isProfileOwner="isProfileOwner" @liked="likedByUser = true"
       @unliked="likedByUser = false" @deletedPost="isDeleted = true" @showComments="showComments = true" />
     <PostComments v-if="showComments" :color="color" :post="post" @close="showComments = false" />
@@ -36,6 +28,7 @@ import { ref, computed, onMounted } from "vue";
 import { fetchOutfit } from "@/api/postApi.ts";
 
 import { currentUserId } from "@/stores/userStore";
+import ProfileWithText from "./ProfileWithText.vue";
 const isProfileOwner = computed(() => user.value?._id === currentUserId.value);
 const isDeleted = ref(false);
 const showComments = ref(false);
@@ -88,20 +81,5 @@ const color = (function randomColor() {
   padding: 0.5rem 0.2rem 0.5rem;
   display: flex;
   justify-content: center;
-}
-
-.post-footer {
-  display: flex;
-  align-items: center;
-  margin: 0.6rem 0rem 0.6rem 0rem;
-}
-
-.post-footer * {
-  margin-right: 0.5rem;
-}
-
-.avatar {
-  width: 3em;
-  height: 3em;
 }
 </style>

@@ -5,7 +5,7 @@
       <div v-if="loading">Loading comments...</div>
       <div v-else>
         <div v-for="comment in comments" :key="comment._id" class="comment">
-          <strong>{{ comment.user.username }}:</strong> {{ comment.text }}
+          <ProfileWithText :user="comment.user as UserType" :avatarSize="2" :text="comment.text" />
         </div>
       </div>
 
@@ -19,11 +19,12 @@
 </template>
 
 <script setup lang="ts">
-import type { CommentType, PostType } from "@/types";
+import type { CommentType, PostType, UserType } from "@/types";
 import { ref, onMounted } from "vue";
 import { addCommentToPost, createComment, fetchPostComments } from "@/api/postInteractionsApi.ts";
 import { authCheck } from "@/stores/authCheck.ts";
 const { requireLogin } = authCheck();
+import ProfileWithText from "./ProfileWithText.vue";
 
 const props = defineProps<{
   post: PostType

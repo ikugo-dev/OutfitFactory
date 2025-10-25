@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
+import "dotenv/config";
 
 const dbCon = {
     async connectDB(): Promise<void> {
-        const uri =
-            "mongodb+srv://aleksandarristic_db_user:kzeg3091337@outfitfactory.nvliqpd.mongodb.net/OutfitFactory?retryWrites=true&w=majority&appName=OutfitFactory";
+        const uri = process.env.MONGO_URI;
         if (!uri) {
             throw new Error(); //("MONGO_URI is not defined in .env");
         }

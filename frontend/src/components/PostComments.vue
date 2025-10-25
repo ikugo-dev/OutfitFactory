@@ -22,6 +22,8 @@
 import type { CommentType, PostType } from "@/types";
 import { ref, onMounted } from "vue";
 import { addCommentToPost, createComment, fetchPostComments } from "@/api/postInteractionsApi.ts";
+import { authCheck } from "@/stores/authCheck.ts";
+const { requireLogin } = authCheck();
 
 const props = defineProps<{
   post: PostType
@@ -43,6 +45,7 @@ onMounted(async () => {
 })
 
 const postComment = async () => {
+  requireLogin();
   if (!newComment.value.trim()) return
   const comment = await createComment(newComment.value)
   await addCommentToPost(comment._id, props.post._id);

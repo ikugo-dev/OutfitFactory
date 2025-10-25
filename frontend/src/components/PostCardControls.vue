@@ -11,6 +11,8 @@
 
 <script setup lang="ts">
 import { deletePost, like, unlike } from "@/api/postInteractionsApi.ts"
+import { authCheck } from "@/stores/authCheck.ts";
+const { requireLogin } = authCheck();
 const props = defineProps<{
   postId: string,
   isProfileOwner: boolean
@@ -23,11 +25,13 @@ const emit = defineEmits<{
 }>()
 
 const handleLike = async () => {
+  requireLogin();
   await like(props.postId);
   emit("liked");
 }
 
 const handleUnlike = async () => {
+  requireLogin();
   await unlike(props.postId);
   emit("unliked");
 }
@@ -37,6 +41,7 @@ const handleComments = async () => {
 }
 
 const handleDelete = async () => {
+  requireLogin();
   if (confirm("Are you sure you want to delete that post?")) {
     await deletePost(props.postId);
     emit("deletedPost")

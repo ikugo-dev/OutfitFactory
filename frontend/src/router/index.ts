@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
-import ExploreView from "../views/ExploreView.vue";
-import FollowingView from "../views/FollowingView.vue";
-import CreateView from "../views/CreateView.vue";
-import ProfileView from "../views/ProfileView.vue";
-import LoginView from "../views/LoginView.vue";
+import HomeView from "@/views/HomeView.vue";
+import ExploreView from "@/views/ExploreView.vue";
+import FollowingView from "@/views/FollowingView.vue";
+import CreateView from "@/views/CreateView.vue";
+import ProfileView from "@/views/ProfileView.vue";
+import LoginView from "@/views/LoginView.vue";
+import { currentUserId } from "@/stores/userStore.ts";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,9 +45,8 @@ const router = createRouter({
 });
 
 router.beforeEach((to, _from, next) => {
-  const loggedIn = !!localStorage.getItem("userId");
-  if (to.meta.requiresAuth && !loggedIn) {
-    next({ name: "login page", query: { redirect: to.fullPath } });
+  if (to.meta.requiresAuth && !currentUserId.value) {
+    next({ name: "login page" });
   } else {
     next();
   }

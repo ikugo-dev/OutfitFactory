@@ -26,6 +26,8 @@ import { ref, computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import PostGrid from "../components/PostGrid.vue";
 import type { UserType, PostType } from "@/types.ts";
+import { authCheck } from "@/stores/authCheck.ts";
+const { requireLogin } = authCheck();
 
 import {
   fetchUserById, fetchUserByUsername,
@@ -65,6 +67,7 @@ async function loadProfile() {
 }
 
 function toggleFollow() {
+  requireLogin();
   if (isFollowing.value) {
     unfollowUserId(profile.value!._id);
   } else {

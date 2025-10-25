@@ -1,9 +1,10 @@
 import axios from "axios";
 import { currentUserId } from "@/stores/userStore.ts";
 import type { CommentType } from "@/types.ts";
+import "dotenv";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: `${import.meta.env.BACKEND_URL}/api`,
   withCredentials: false,
 });
 export default api;

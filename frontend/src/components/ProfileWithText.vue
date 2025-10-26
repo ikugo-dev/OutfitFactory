@@ -2,8 +2,8 @@
   <div class="profile-with-text">
     <RouterLink :to="`/profile/${user.username}`" class="user-link">
       <img v-if="user.avatar" class="avatar" :src="user.avatar" :alt="user.username" />
+      <div class="username">{{ user.username }} :</div>
     </RouterLink>
-    <div class="username">{{ user.username }} :</div>
     <div class="caption">{{ text }}</div>
   </div>
 </template>
@@ -19,6 +19,12 @@ defineProps<{
 </script>
 
 <style scoped>
+.user-link {
+  display: flex;
+  align-items: center;
+  color: black;
+}
+
 .profile-with-text {
   display: flex;
   align-items: center;

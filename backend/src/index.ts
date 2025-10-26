@@ -9,7 +9,13 @@ const app = express();
 
 app.use(express.json());
 
-app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173" }));
+app.use(cors({
+    origin: [
+        "http://localhost:5173",
+        process.env.FRONTEND_URL || "http://localhost:5173",
+        "https://outfit-factory.vercel.app",
+    ],
+}));
 
 app.use("/api", postRouter);
 app.use("/api/user", userRouter);

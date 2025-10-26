@@ -4,7 +4,7 @@ import type { CommentType } from "@/types.ts";
 import "dotenv";
 
 const api = axios.create({
-  baseURL: `${import.meta.env.BACKEND_URL}/api`,
+  baseURL: `${import.meta.env.VITE_BACKEND_URL}/api`,
   withCredentials: false,
 });
 export default api;

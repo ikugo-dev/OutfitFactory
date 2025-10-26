@@ -1,7 +1,7 @@
 <template>
   <div class="post-controls">
-    <button @click="handleLike"><font-awesome-icon icon="fa-solid fa-thumbs-up" /></button>
-    <button @click="handleUnlike"><font-awesome-icon icon="fa-solid fa-thumbs-down" /></button>
+    <button :class="{ liked: likedByUser }" @click="toggleLike"><font-awesome-icon
+        icon="fa-solid fa-thumbs-up" /></button>
     <button @click="handleComments"><font-awesome-icon icon="fa-solid fa-comment" /></button>
     <!-- <button><font-awesome-icon icon="fa-solid fa-thumbtack" /></button> -->
     <!-- <button><font-awesome-icon icon="fa-solid fa-shirt" /></button> -->
@@ -15,25 +15,21 @@ import { authCheck } from "@/stores/authCheck.ts";
 const { requireLogin } = authCheck();
 const props = defineProps<{
   postId: string,
-  isProfileOwner: boolean
+  isProfileOwner: boolean,
+  likedByUser: boolean
 }>()
 const emit = defineEmits<{
-  (e: "liked"): void
-  (e: "unliked"): void
+  (e: "toggleLike"): void
   (e: "deletedPost"): void
   (e: "showComments"): void
 }>()
 
-const handleLike = async () => {
+const toggleLike = async () => {
   requireLogin();
-  await like(props.postId);
-  emit("liked");
-}
-
-const handleUnlike = async () => {
-  requireLogin();
-  await unlike(props.postId);
-  emit("unliked");
+  emit("toggleLike");
+  props.likedByUser
+    ? await unlike(props.postId)
+    : await like(props.postId)
 }
 
 const handleComments = async () => {
@@ -56,5 +52,9 @@ const handleDelete = async () => {
   right: 0.5rem;
   display: flex;
   gap: 0.4rem;
+}
+
+button.liked {
+  background-color: var(--accent);
 }
 </style>

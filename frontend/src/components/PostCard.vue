@@ -9,12 +9,12 @@
     <div class="post-info">
       <span class="date">{{ new Date(post.createdAt).toLocaleDateString() }}</span>
       •
-      <span class="likes">{{ post.likes + (likedByUser ? 1 : 0) }} likes</span>
+      <span class="likes">{{ post.likes }} likes</span>
     </div>
 
     <ProfileWithText v-if="user" :user="user" :avatarSize="3" :text="post.text || ''" />
-    <PostCardControls :postId="post._id" :isProfileOwner="isProfileOwner" @liked="likedByUser = true"
-      @unliked="likedByUser = false" @deletedPost="isDeleted = true" @showComments="showComments = true" />
+    <PostCardControls :postId="post._id" :isProfileOwner="isProfileOwner" :likedByUser="likedByUser"
+      @toggleLike="toggleLike" @deletedPost="isDeleted = true" @showComments="showComments = true" />
     <PostComments v-if="showComments" :color="color" :post="post" @close="showComments = false" />
   </div>
 </template>
@@ -47,12 +47,18 @@ const user = computed<UserType | null>(() => // to avoid stupid null warrning
   typeof post.user === "object" ? post.user : null
 );
 
+const toggleLike = () => {
+  likedByUser.value = !likedByUser.value;
+  post.likes += likedByUser.value ? 1 : -1;
+}
+
 onMounted(async () => {
   try {
     outfit.value = await fetchOutfit(post.outfit as string);
   } catch (err) {
     console.error("Failed to fetch outfit:", err);
   }
+  likedByUser.value = post.likers.includes(currentUserId.value!);
 });
 
 const color = (function randomColor() {

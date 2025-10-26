@@ -15,8 +15,8 @@ app.use("/api", postRouter);
 app.use("/api/user", userRouter);
 
 // for testing
-app.use(express.static("public"));
-app.get("", (_req, res) => {
+// app.use(express.static("public"));
+app.get("/api", (_req, res) => {
     res.send({ message: "pong" });
 });
 
@@ -24,7 +24,9 @@ app.get("", (_req, res) => {
     await dbCon.connectDB();
 })();
 
-const PORT = process.env.port || 3000;
-app.listen(PORT, () => {
-    console.log(`Server started on port ${PORT}`);
-});
+// CHANGED FOR VERCEL
+// const PORT = process.env.port || 3000;
+// app.listen(PORT, () => {
+//     console.log(`Server started on port ${PORT}`);
+// });
+export default app;

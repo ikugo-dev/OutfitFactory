@@ -5,6 +5,7 @@ const router = Router();
 
 router.post("/create_account", userCtrl.createUser);
 
+router.get("/all", userCtrl.getUsers);
 router.get("/by_username/:username", userCtrl.getUserByUsername);
 router.route("/:id")
     .get(userCtrl.getUser)

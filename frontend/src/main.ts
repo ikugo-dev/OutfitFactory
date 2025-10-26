@@ -11,8 +11,8 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
   faComment,
+  faMagnifyingGlass,
   faShirt,
-  faThumbsDown,
   faThumbsUp,
   faThumbtack,
   faTrash,
@@ -21,8 +21,8 @@ import {
 // add icons to library
 library.add(
   faComment,
+  faMagnifyingGlass,
   faShirt,
-  faThumbsDown,
   faThumbsUp,
   faThumbtack,
   faTrash,

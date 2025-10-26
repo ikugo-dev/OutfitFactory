@@ -41,6 +41,11 @@ export async function registerUser(
   });
 }
 
+export async function fetchAllUsers(): Promise<UserType[]> {
+  const res = await api.get("/all");
+  return res.data;
+}
+
 export async function fetchUserById(id: string): Promise<UserType> {
   const res = await api.get(`/${id}`);
   return res.data;

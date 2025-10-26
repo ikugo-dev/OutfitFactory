@@ -4,10 +4,13 @@
     <router-link to="/following" :class="{ 'active-link': route.path === '/following' }">Following</router-link>
     <router-link to="/create" :class="{ 'active-link': route.path === '/create' }">Create</router-link>
     <router-link to="/profile" :class="{ 'active-link': route.path === '/profile' }">Profile</router-link>
+
+    <button @click="isSearchOpen = true">Search <font-awesome-icon icon="fa-solid fa-magnifying-glass" /></button>
+
     <button class="logout-button" v-if="currentUserId" @click="logout()">Logout</button>
     <button class="login-button" v-else @click="login()">Login</button>
-
   </nav>
+  <SearchBar v-if="isSearchOpen" @close="isSearchOpen = false" />
 </template>
 
 
@@ -16,8 +19,11 @@ import { useRoute } from "vue-router"
 import { clearUser } from "@/stores/userStore";
 import { currentUserId } from "@/stores/userStore";
 import router from "@/router";
+import { ref } from "vue";
+import SearchBar from "./SearchBar.vue";
 
 const route = useRoute();
+const isSearchOpen = ref(false);
 
 function logout() {
   clearUser();

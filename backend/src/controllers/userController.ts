@@ -45,6 +45,18 @@ async getUser(req: Request, res: Response): Promise <void>
     }
 },
 
+async getUsers(req: Request, res: Response): Promise <void> 
+{
+    try {
+        const users = await UserModel.find();
+        res.status(200).json(users);
+        return;
+    }
+    catch (error) {
+        res.status(500).json({message: "Server error."}); return;
+    }
+},
+
 async getUserByUsername(req: Request, res: Response): Promise <void> {
     try {
         const username = req.params.username;

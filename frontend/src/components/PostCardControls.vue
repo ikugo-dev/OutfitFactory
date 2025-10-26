@@ -4,7 +4,6 @@
         icon="fa-solid fa-thumbs-up" /></button>
     <button @click="handleComments"><font-awesome-icon icon="fa-solid fa-comment" /></button>
     <!-- <button><font-awesome-icon icon="fa-solid fa-thumbtack" /></button> -->
-    <!-- <button><font-awesome-icon icon="fa-solid fa-shirt" /></button> -->
     <button @click="handleDelete" v-if="isProfileOwner"><font-awesome-icon icon="fa-solid fa-trash" /></button>
   </div>
 </template>

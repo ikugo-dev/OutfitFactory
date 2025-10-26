@@ -54,9 +54,10 @@ async function handleSubmit() {
   error.value = "";
   try {
     if (isRegister.value) {
-      registerUser(username.value, email.value, password.value);
+      await registerUser(username.value, email.value, password.value);
+      isRegister.value = false;
     } else {
-      loginUser(username.value, email.value, password.value);
+      await loginUser(username.value, email.value, password.value);
       router.push("/");
     }
   } catch (err: any) {

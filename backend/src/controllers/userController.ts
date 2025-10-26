@@ -328,13 +328,14 @@ async follow(req: Request, res: Response) : Promise<any>
         const user = await getUserOr404(id);
         const userToFollow = await getUserOr404(idToFollow);
 
-        if (user.following.find((id: string) => id == idToFollow)) throw Error("401");
-        if (userToFollow.followers.find((id: string)=> id == id)) throw Error("401");
+        if (user.following.find((id: string) => id == idToFollow) != undefined) throw Error("401");
+        if (userToFollow.followers.find((id: string)=> id == id) != undefined) throw Error("401");
         
         console.log("proslo")
 
         const updateRes = await UserModel.updateOne({_id: id}, {$push: { following: userToFollow._id } }).exec();
         const updateRes2= await UserModel.updateOne({_id: idToFollow}, {$push: { followers: user._id } }).exec();
+
         
         if(updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0) {
             res.status(500).json({error: "Server error. (Modified is zero)"});
@@ -582,7 +583,7 @@ async logIn(req: Request, res: Response): Promise<void>
         }
 
         if(findRes.length == 0) {
-            res.status(400).json({error: "Wrong paramegers for login."});
+            res.status(400).json({error: "Wrong parameters for login."});
             return;
         }
         res.status(200).json({findRes});

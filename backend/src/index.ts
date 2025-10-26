@@ -31,8 +31,8 @@ app.get("/api", (_req, res) => {
 })();
 
 // CHANGED FOR VERCEL
-// const PORT = process.env.port || 3000;
-// app.listen(PORT, () => {
-//     console.log(`Server started on port ${PORT}`);
-// });
-export default app;
+const PORT = process.env.port || 3000;
+app.listen(PORT, () => {
+    console.log(`Server started on port ${PORT}`);
+});
+// export default app;

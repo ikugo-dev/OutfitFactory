@@ -22,7 +22,9 @@ export async function loginUser(
   const user = res.data.findRes?.[0];
   if (!user) {
     console.error("User not found");
-    return;
+  }
+  if (res.status != 200) {
+    console.error("Error while logging in");
   }
   setUser(user._id, user.username);
 }

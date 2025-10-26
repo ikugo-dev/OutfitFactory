@@ -19,7 +19,7 @@ export async function loginUser(
     email: email,
     password: password,
   });
-  const user = res.data.findRes?.[0];
+  const user = res.data;
   if (!user) {
     console.error("User not found");
   }

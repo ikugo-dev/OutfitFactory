@@ -592,19 +592,18 @@ async logIn(req: Request, res: Response): Promise<void>
             return;
         }
 
-        const hashedPassword = await Auth.hashPassword(password);
-        let findRes;
-        if (username != "" ) {
-            findRes = await UserModel.find({username: username, password: hashedPassword}).exec();
-        } else {
-            findRes = await UserModel.find({email: email, password: hashedPassword}).exec();
-        }
+        const user = (username != "")
+            ? await UserModel.findOne({username: username }).exec()
+            : await UserModel.findOne({email: email }).exec();
 
-        if(findRes.length == 0) {
-            res.status(400).json({error: "Wrong parameters for login."});
-            return;
+            console.log(user);
+        if (!user) {
+            res.status(404).json({error: "User not found"}); return;
         }
-        res.status(200).json({findRes});
+        if (!(await Auth.verifyPassword(user.password, password))) {
+            res.status(400).json({error: "Wrong password."}); return;
+        }
+        res.status(200).json(user);
         return;
     }
     catch (error) { 

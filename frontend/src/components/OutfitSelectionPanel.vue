@@ -8,7 +8,7 @@
     <form class="filters" @submit.prevent>
       <div class="filter-row">
         <label>Category</label>
-        <select v-model="selectedCategory">
+        <select v-model="localFilters.category">
           <option value="">Any</option>
           <option v-for="cat in availableCategories" :key="cat" :value="cat">
             {{ cat }}
@@ -27,7 +27,10 @@
 
       <div class="filter-row">
         <label>Brand</label>
-        <div class="brand-label">{{ brand || '—' }}</div>
+        <select v-model="localFilters.brand">
+          <option value="">Any</option>
+          <option value="Sinsay">Sinsay</option>
+        </select>
       </div>
 
       <div class="filter-row">
@@ -49,7 +52,7 @@
       </div>
 
       <div class="filter-row actions">
-        <button type="button" @click="applyFilters">Apply</button>
+        <button type="button" @click="applyFilters">Apply filter</button>
         <button type="button" @click="resetFilters">Reset</button>
       </div>
     </form>
@@ -80,23 +83,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import type { GarmentType } from "@/types";
 import { fetchAllGarments } from "@/api/postApi";
-
-const props = defineProps<{
-  brand?: string | null;
-  category?: string | null;
-}>();
 
 const emit = defineEmits<{
   (e: "close"): void;
   (e: "selectGarment", article: GarmentType): void;
 }>();
 
-const brand = props.brand ?? "";
-
 const localFilters = reactive({
+  category: "",
+  brand: "Sinsay",
   gender: "both",
   colorSubstr: "",
   materialSubstr: "",
@@ -104,7 +102,6 @@ const localFilters = reactive({
   priceTo: null as number | null,
 });
 
-const selectedCategory = ref(props.category ?? "");
 const availableCategories = ref<string[]>([
   "basic-shorts",
   "cipele",
@@ -143,12 +140,12 @@ function applyFilters() {
   const color = localFilters.colorSubstr.trim().toLowerCase();
   const from = localFilters.priceFrom;
   const to = localFilters.priceTo;
-  const cat = selectedCategory.value.toLowerCase();
-  const br = brand;
+  const cat = localFilters.category.toLowerCase();
+  const br = localFilters.brand.toLowerCase();
   const gender = localFilters.gender;
 
   filteredGarments.value = allGarments.value.filter((a) => {
-    if (br && a.brand !== br) return false;
+    if (br && a.brand.toLowerCase() !== br) return false;
     if (cat && a.category.toLowerCase() !== cat) return false;
     if (gender !== "both" && a.gender.toLowerCase() !== gender) return false;
     if (material && !a.material.toLowerCase().includes(material)) return false;
@@ -166,7 +163,8 @@ function resetFilters() {
   localFilters.colorSubstr = "";
   localFilters.priceFrom = null;
   localFilters.priceTo = null;
-  selectedCategory.value = "";
+  localFilters.category = "";
+  localFilters.brand = "Sinsay";
   filteredGarments.value = allGarments.value;
 }
 
@@ -178,15 +176,6 @@ onMounted(() => {
   loadGarments();
 });
 
-watch(
-  () => props.category,
-  (val) => {
-    if (val !== undefined && val !== null) {
-      selectedCategory.value = val;
-      applyFilters();
-    }
-  }
-);
 </script>
 
 <style scoped>
@@ -219,15 +208,6 @@ watch(
   margin-bottom: 10px;
   display: flex;
   flex-direction: column;
-}
-
-.brand-label {
-  color: #777;
-  font-size: 14px;
-  background: #f7f7f7;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  padding: 6px;
 }
 
 .price-row input {

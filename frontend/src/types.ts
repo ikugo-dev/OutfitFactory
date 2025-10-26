@@ -24,6 +24,7 @@ export interface CommentType {
 
 export interface GarmentType {
   _id: string;
+  url: string;
   image_url: string;
   gender: string;
   category: string;

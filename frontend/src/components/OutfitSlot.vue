@@ -1,6 +1,7 @@
 <template>
   <div class="outfit-slot" :class="{ clickable: editable }" @mouseenter="showTooltip = true"
-    @mouseleave="showTooltip = false" @mousemove="updateTooltipPosition" @click="handleClick">
+    @mouseleave="showTooltip = false" @mousemove="updateTooltipPosition" @click="() =>
+      handleClick(item!.url || '')">
     <img v-if="item?.image_url" :src="item.image_url" alt="clothing" />
     <div v-else class="empty-slot">
       <span v-if="editable">+</span>
@@ -39,8 +40,12 @@ const showTooltip = ref(false);
 const tooltipX = ref(0);
 const tooltipY = ref(0);
 
-function handleClick() {
-  if (props.editable) emit("select");
+function handleClick(url: string) {
+  props.editable
+    ? emit("select")
+    : url == ""
+      ? window.open("https://sinsay.com", "_blank")
+      : window.open(url);
 }
 
 function updateTooltipPosition(e: MouseEvent) {

@@ -336,12 +336,13 @@ async follow(req: Request, res: Response) : Promise<any>
     try
     {
         const {id, idToFollow } = req.body;
+        console.log(`${id} -> ${idToFollow}`);
 
         const user = await getUserOr404(id);
         const userToFollow = await getUserOr404(idToFollow);
 
-        if (user.following.find((id: string) => id == idToFollow) != undefined) throw Error("401");
-        if (userToFollow.followers.find((id: string)=> id == id) != undefined) throw Error("401");
+        if (user.following.some((f: { toString: () => any; }) => f.toString() === idToFollow)) throw Error("401");
+        if (userToFollow.followers.some((f: { toString: () => any; }) => f.toString() === id)) throw Error("401");
         
         console.log("proslo")
 
@@ -353,7 +354,7 @@ async follow(req: Request, res: Response) : Promise<any>
             res.status(500).json({error: "Server error. (Modified is zero)"});
             return;
         }
-        res.status(200);
+        res.status(200).send();
         return;
     }
     catch(error)
@@ -363,7 +364,7 @@ async follow(req: Request, res: Response) : Promise<any>
             res.status(400).json({message: "User error."}); return;
         }
         if (error instanceof Error && error.message == "401"){
-            res.status(400).json({message: "Already following each other."}); return;
+            res.status(401).json({message: "Already following each other."}); return;
         }
         
         if (error instanceof Error && error.message == "404") {
@@ -381,19 +382,20 @@ async unfollow(req: Request, res: Response) : Promise<any>
     try
     {
         const {id, idToUnfollow } = req.body;
+        console.log(`${id} -> ${idToUnfollow}`);
 
         const user = await getUserOr404(id);
         const userToUnfollow = await getUserOr404(idToUnfollow);
 
-        if (user.following.find((id: string) => id == idToUnfollow) == undefined) throw Error("401");
-        if (userToUnfollow.followers.find((id: string)=> id == id) == undefined) throw Error("401");
+        if (!user.following.some((f: { toString: () => any; }) => f.toString() === idToUnfollow)) throw Error("401");
+        if (!userToUnfollow.followers.some((f: { toString: () => any; }) => f.toString() === id)) throw Error("401");
         
         const updateRes = await UserModel.updateOne( {_id : id}, {$pull: { following: idToUnfollow } }).exec();  
         const updateRes2 = await UserModel.updateOne( {_id: idToUnfollow}, {$pull: {followers: id } }).exec();
 
         if (updateRes.modifiedCount == 0 || updateRes2.modifiedCount == 0)
              throw Error("500");
-            
+        res.status(200).send();
     }
     catch(error)
     {
@@ -402,7 +404,7 @@ async unfollow(req: Request, res: Response) : Promise<any>
             res.status(400).json({message: "User error."}); return;
         }
         if (error instanceof Error && error.message == "401"){
-            res.status(400).json({message: "Not following each other."}); return;
+            res.status(401).json({message: "Not following each other."}); return;
         }
         
         if (error instanceof Error && error.message == "404") {

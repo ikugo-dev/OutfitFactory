@@ -64,12 +64,13 @@ async function loadProfile() {
   }
 }
 
-function toggleFollow() {
+async function toggleFollow() {
   requireLogin();
-  isFollowing.value
-    ? unfollowUserId(profile.value!._id)
-    : followUserId(profile.value!._id);
+  console.log(`${isFollowing.value} -> ${profile.value?._id}`);
   isFollowing.value = !isFollowing.value;
+  isFollowing.value
+    ? await unfollowUserId(profile.value!._id)
+    : await followUserId(profile.value!._id);
 }
 
 function openSettings() {

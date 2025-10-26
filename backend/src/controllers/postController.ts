@@ -210,7 +210,7 @@ async addComment(req: Request, res: Response) : Promise <void>{
         const updateRes = await PostModel.updateOne({_id: id}, {$push: {comments: commentId}}).exec();
         console.log(updateRes);
         if (updateRes.modifiedCount == 0) throw Error("500");
-        res.status(200);
+        res.status(200).send();
         return;
 
     } 

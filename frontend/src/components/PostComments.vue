@@ -40,18 +40,22 @@ const newComment = ref("")
 const loading = ref(false)
 
 onMounted(async () => {
+  loadComments();
+})
+
+const loadComments = async () => {
   loading.value = true
   comments.value = await fetchPostComments(props.post._id);
   loading.value = false
-})
+}
 
 const postComment = async () => {
   requireLogin();
   if (!newComment.value.trim()) return
   const comment = await createComment(newComment.value)
   await addCommentToPost(comment._id, props.post._id);
-  comments.value.push(comment)
   newComment.value = ""
+  loadComments();
 }
 </script>
 

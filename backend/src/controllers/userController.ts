@@ -592,11 +592,12 @@ async logIn(req: Request, res: Response): Promise<void>
             return;
         }
 
+        const hashedPassword = await Auth.hashPassword(password);
         let findRes;
         if (username != "" ) {
-            findRes = await UserModel.find({username: username, password: password}).exec();
+            findRes = await UserModel.find({username: username, password: hashedPassword}).exec();
         } else {
-            findRes = await UserModel.find({email: email, password: password}).exec();
+            findRes = await UserModel.find({email: email, password: hashedPassword}).exec();
         }
 
         if(findRes.length == 0) {
@@ -614,7 +615,7 @@ async logIn(req: Request, res: Response): Promise<void>
         if (error instanceof Error && error.message == "404") {
             res.status(404).json({message: "User not found."}); return;
         }
-        
+        console.log(error);
         res.status(500).json({message: "Server error."}); return;
     
     }

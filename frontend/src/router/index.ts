@@ -5,6 +5,7 @@ import FollowingView from "@/views/FollowingView.vue";
 import CreateView from "@/views/CreateView.vue";
 import ProfileView from "@/views/ProfileView.vue";
 import LoginView from "@/views/LoginView.vue";
+import SettingsView from "@/views/SettingsView.vue";
 import { currentUserId } from "@/stores/userStore.ts";
 
 const router = createRouter({
@@ -37,6 +38,10 @@ const router = createRouter({
     name: "user profile",
     component: ProfileView,
     props: true,
+  }, {
+    path: "/settings",
+    name: "user settings",
+    component: SettingsView,
   }, {
     path: "/login",
     name: "login page",

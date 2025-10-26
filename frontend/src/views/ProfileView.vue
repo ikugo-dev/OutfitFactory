@@ -7,12 +7,10 @@
         <h2>{{ profile.username }}</h2>
         <h3>Followers: {{ profile.followers?.length }}</h3>
 
-        <div class="profile-actions">
-          <button v-if="isProfileOwner" @click="openSettings">Settings</button>
-          <button v-else @click="toggleFollow">
-            {{ isFollowing ? "Unfollow" : "Follow" }}
-          </button>
-        </div>
+        <button v-if="isProfileOwner" @click="openSettings">Settings</button>
+        <button v-else @click="toggleFollow">
+          {{ isFollowing ? "Unfollow" : "Follow" }}
+        </button>
       </div>
     </div>
 

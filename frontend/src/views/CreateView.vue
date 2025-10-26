@@ -14,7 +14,7 @@
         </div>
         <textarea v-model="caption" placeholder="Describe your outfit..." class="caption-input" />
         <div>
-          <button class="submit-btn" @click="submitPost">Post Outfit</button>
+          <button :disabled="loading" class="submit-btn" @click="submitPost">Post Outfit</button>
           <!-- <button class="submit-btn" @click="submitPost">Post Outfit</button> -->
         </div>
       </div>
@@ -48,9 +48,15 @@ function addItem(garment: GarmentType) {
 function removeItem(index: number) {
   garments.value.splice(index, 1);
 }
+
+const loading = ref(false);
 async function submitPost() {
+  if (loading.value) return;
+  loading.value = true;
+
   if (garments.value.length <= 1) {
     alert("You must add at least two garments!");
+    loading.value = false;
     return;
   }
 
@@ -63,10 +69,12 @@ async function submitPost() {
     await createPost(caption.value, outfitId);
 
     console.log("Post created successfully!");
+    loading.value = false;
     router.push("/profile");
   } catch (err) {
     console.error(err);
     alert("Error creating post!");
+    loading.value = false;
   }
 }
 </script>

@@ -12,7 +12,7 @@
       <div class="add-comment">
         <textarea v-model="newComment" placeholder="Write a comment..."></textarea>
         <button class="close-overlay" @click="$emit('close')">Close</button>
-        <button @click="postComment">Post</button>
+        <button :disabled="loading" @click="postComment">Post</button>
       </div>
     </div>
   </div>
@@ -35,27 +35,35 @@ const emit = defineEmits<{
   (e: "close"): void
 }>()
 
-const comments = ref<CommentType[]>([])
-const newComment = ref("")
-const loading = ref(false)
+const comments = ref<CommentType[]>([]);
+const newComment = ref("");
+const loading = ref(false);
 
 onMounted(async () => {
   loadComments();
 })
 
 const loadComments = async () => {
-  loading.value = true
+  loading.value = true;
   comments.value = await fetchPostComments(props.post._id);
-  loading.value = false
+  loading.value = false;
 }
 
 const postComment = async () => {
+  if (loading.value) return;
+  loading.value = true;
+
   requireLogin();
-  if (!newComment.value.trim()) return
-  const comment = await createComment(newComment.value)
+  if (!newComment.value.trim()) {
+    loading.value = false;
+    return;
+  }
+  const comment = await createComment(newComment.value);
   await addCommentToPost(comment._id, props.post._id);
   newComment.value = ""
   loadComments();
+
+  loading.value = false;
 }
 </script>
 

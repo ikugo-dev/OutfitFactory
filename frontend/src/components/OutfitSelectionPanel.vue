@@ -297,4 +297,8 @@ onMounted(() => {
   flex-direction: column;
   gap: 2px;
 }
+
+.gender-options>* {
+  margin-right: 0.6rem;
+}
 </style>

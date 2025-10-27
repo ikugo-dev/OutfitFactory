@@ -4,6 +4,7 @@ import ExploreView from "@/views/ExploreView.vue";
 import FollowingView from "@/views/FollowingView.vue";
 import CreateView from "@/views/CreateView.vue";
 import ProfileView from "@/views/ProfileView.vue";
+import GarmentView from "@/views/GarmentView.vue";
 import LoginView from "@/views/LoginView.vue";
 import SettingsView from "@/views/SettingsView.vue";
 import { currentUserId } from "@/stores/userStore.ts";
@@ -33,6 +34,10 @@ const router = createRouter({
     name: "my profile",
     component: ProfileView,
     meta: { requiresAuth: true },
+  }, {
+    path: "/garments",
+    name: "garment search",
+    component: GarmentView,
   }, {
     path: "/profile/:username",
     name: "user profile",

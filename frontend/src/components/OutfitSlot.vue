@@ -45,7 +45,7 @@ function handleClick(url: string) {
     ? emit("select")
     : url == ""
       ? window.open("https://sinsay.com", "_blank")
-      : window.open(url);
+      : window.open(url, "_blank");
 }
 
 function updateTooltipPosition(e: MouseEvent) {

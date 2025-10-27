@@ -62,7 +62,8 @@
       <div v-else-if="filteredGarments.length === 0">No items match.</div>
 
       <ul v-else class="items">
-        <li v-for="a in filteredGarments" :key="a._id" class="item" @click="select(a)">
+        <li v-for="a in filteredGarments" :key="a._id" class="item" @click="$emit('selectGarment', a);
+        ">
           <div class="image">
             <img :src="a.image_url" alt="item image" />
           </div>
@@ -86,6 +87,9 @@
 import { ref, reactive, onMounted } from "vue";
 import type { GarmentType } from "@/types";
 import { fetchAllGarments } from "@/api/postApi";
+const { resultSize } = defineProps<{
+  resultSize: number
+}>();
 
 const emit = defineEmits<{
   (e: "close"): void;
@@ -168,9 +172,6 @@ function resetFilters() {
   filteredGarments.value = allGarments.value;
 }
 
-function select(article: GarmentType) {
-  emit("selectGarment", article);
-}
 
 onMounted(() => {
   loadGarments();
@@ -227,8 +228,9 @@ onMounted(() => {
 }
 
 .results {
+  background-color: white;
+  width: v-bind(resultSize*32+"rem");
   margin-top: 12px;
-  max-height: 480px;
   overflow-y: auto;
 }
 
@@ -237,15 +239,14 @@ onMounted(() => {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 10px;
+  grid-template-columns: repeat(v-bind(resultSize), 1fr);
 }
 
 .item {
   display: flex;
   border: 1px solid #eee;
-  border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   transition: background 0.2s;

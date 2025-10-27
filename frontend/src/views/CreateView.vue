@@ -18,7 +18,7 @@
           <!-- <button class="submit-btn" @click="submitPost">Post Outfit</button> -->
         </div>
       </div>
-      <OutfitSelectionPanel v-if="isSelecting" @close="isSelecting = false" @selectGarment="addItem" />
+      <OutfitSelectionPanel :resultSize="1" v-if="isSelecting" @close="isSelecting = false" @selectGarment="addItem" />
     </div>
   </div>
 </template>

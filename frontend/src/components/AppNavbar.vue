@@ -4,8 +4,11 @@
     <router-link to="/following" :class="{ 'active-link': route.path === '/following' }">Following</router-link>
     <router-link to="/create" :class="{ 'active-link': route.path === '/create' }">Create</router-link>
     <router-link to="/profile" :class="{ 'active-link': route.path === '/profile' }">Profile</router-link>
+    <router-link to="/garments" :class="{ 'active-link': route.path === '/garments' }">
+      Garment <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
+    </router-link>
 
-    <button @click="isSearchOpen = true">Search <font-awesome-icon icon="fa-solid fa-magnifying-glass" /></button>
+    <button @click="isSearchOpen = true">User <font-awesome-icon icon="fa-solid fa-magnifying-glass" /></button>
 
     <button class="logout-button" v-if="currentUserId" @click="logout()">Logout</button>
     <button class="login-button" v-else @click="login()">Login</button>

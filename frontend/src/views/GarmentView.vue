@@ -1,7 +1,7 @@
 <template>
   <div class="garments-view">
     <h2>Search for garments</h2>
-    <OutfitSelectionPanel :resultSize="2" @selectGarment="handleClick" />
+    <OutfitSelectionPanel :resultSize="3" @selectGarment="handleClick" />
   </div>
 </template>
 
@@ -15,3 +15,11 @@ const handleClick = (garment: GarmentType) => {
     : window.open(garment.url, "_blank");
 }
 </script>
+
+<style scoped>
+.garments-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+</style>

@@ -181,6 +181,9 @@ onMounted(() => {
 
 <style scoped>
 .panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 34rem;
   border: 0.2rem solid black;
   padding: 12px;
@@ -188,49 +191,30 @@ onMounted(() => {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
-.panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.panel-header button {
+  position: relative;
+  left: 10rem;
 }
 
-.btn-close {
-  border: 0;
-  background: transparent;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.filters {
-  margin-top: 8px;
+form {
+  width: 90%;
 }
 
 .filter-row {
-  margin-bottom: 10px;
+  margin-bottom: 0.4rem;
   display: flex;
   flex-direction: column;
-}
-
-.price-row input {
-  width: 48%;
-  margin-right: 4%;
 }
 
 .actions {
   display: flex;
   flex-direction: row;
-  gap: 8px;
-}
-
-.actions button {
-  padding: 6px 10px;
-  cursor: pointer;
+  gap: 1rem;
 }
 
 .results {
   background-color: white;
   width: v-bind(resultSize*32+"rem");
-  margin-top: 12px;
   overflow-y: auto;
 }
 
@@ -240,7 +224,7 @@ onMounted(() => {
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 10px;
+  gap: 0.6rem;
   grid-template-columns: repeat(v-bind(resultSize), 1fr);
 }
 

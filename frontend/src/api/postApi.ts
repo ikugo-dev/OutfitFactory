@@ -1,14 +1,12 @@
 import axios from "axios";
 import { currentUserId } from "@/stores/userStore.ts";
-import "dotenv";
+import type { GarmentType, OutfitType, PostType } from "@/types.ts";
 
+import "dotenv";
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_BACKEND_URL}/api`,
   withCredentials: false,
 });
-export default api;
-
-import type { GarmentType, OutfitType, PostType } from "@/types.ts";
 
 export async function fetchAllGarments(): Promise<GarmentType[]> {
   const res = await api.get("/garments");

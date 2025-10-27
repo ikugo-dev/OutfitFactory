@@ -74,6 +74,7 @@ async deleteComment(req: Request, res: Response): Promise<void> {
         if (deleteRes.deletedCount == 0) {
             throw new Error();
         }
+        res.status(200).send();
     } catch (error) {
         res.status(500).json({ error: "Server error." });
         return;

@@ -6,11 +6,13 @@
       <div v-else>
         <div v-for="comment in comments" :key="comment._id" class="comment">
           <ProfileWithText :user="comment.user as UserType" :avatarSize="2" :text="comment.text" />
+          <button v-if="checkCommentOwner(comment.user as UserType)" class="delete-button"
+            @click="removeComment(comment._id)">✕</button>
         </div>
       </div>
 
       <div class="add-comment">
-        <textarea v-model="newComment" placeholder="Write a comment..."></textarea>
+        <input type="text" v-model="newComment" placeholder="Write a comment..."></input>
         <button class="close-overlay" @click="$emit('close')">Close</button>
         <button :disabled="loading" @click="postComment">Post</button>
       </div>
@@ -21,10 +23,15 @@
 <script setup lang="ts">
 import type { CommentType, PostType, UserType } from "@/types";
 import { ref, onMounted } from "vue";
-import { addCommentToPost, createComment, fetchPostComments } from "@/api/postInteractionsApi.ts";
+import { addCommentToPost, createComment, deleteComment, fetchPostComments } from "@/api/postInteractionsApi.ts";
 import { authCheck } from "@/stores/authCheck.ts";
 const { requireLogin } = authCheck();
 import ProfileWithText from "./ProfileWithText.vue";
+import { currentUserId } from "@/stores/userStore";
+
+const checkCommentOwner = (user: UserType) => {
+  return user._id === currentUserId.value;
+}
 
 const props = defineProps<{
   post: PostType
@@ -40,14 +47,10 @@ const newComment = ref("");
 const loading = ref(false);
 
 onMounted(async () => {
-  loadComments();
-})
-
-const loadComments = async () => {
   loading.value = true;
   comments.value = await fetchPostComments(props.post._id);
   loading.value = false;
-}
+})
 
 const postComment = async () => {
   if (loading.value) return;
@@ -60,11 +63,21 @@ const postComment = async () => {
   }
   const comment = await createComment(newComment.value);
   await addCommentToPost(comment._id, props.post._id);
-  newComment.value = ""
-  loadComments();
+  newComment.value = "";
+  comments.value = await fetchPostComments(props.post._id);
 
   loading.value = false;
 }
+
+const removeComment = async (commentId: string) => {
+  if (loading.value) return;
+  loading.value = true;
+
+  await deleteComment(commentId);
+  comments.value = comments.value.filter(c => c._id !== commentId);
+
+  loading.value = false;
+};
 </script>
 
 <style scoped>
@@ -101,7 +114,13 @@ const postComment = async () => {
   margin-right: 0.5rem;
 }
 
-.add-comment textarea {
+.add-comment input {
   flex: 1;
+}
+
+.comment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 </style>

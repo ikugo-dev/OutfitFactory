@@ -4,7 +4,7 @@
       <img v-if="user.avatar" class="avatar" :src="user.avatar" :alt="user.username" />
       <div class="username">{{ user.username }}</div>
     </RouterLink>
-    <div v-if="text.length != 0" class="caption">: {{ text }}</div>
+    <span v-if="text.length != 0" class="caption">: {{ text }}</span>
   </div>
 </template>
 
@@ -35,5 +35,11 @@ defineProps<{
   margin-right: 0.4rem;
   width: v-bind(avatarSize+"em");
   height: v-bind(avatarSize+"em");
+}
+
+.caption {
+  width: 64%;
+  overflow: hidden;
+  white-space: nowrap;
 }
 </style>

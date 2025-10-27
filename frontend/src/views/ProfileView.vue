@@ -69,8 +69,8 @@ async function toggleFollow() {
   console.log(`${isFollowing.value} -> ${profile.value?._id}`);
   isFollowing.value = !isFollowing.value;
   isFollowing.value
-    ? await unfollowUserId(profile.value!._id)
-    : await followUserId(profile.value!._id);
+    ? await followUserId(profile.value!._id)
+    : await unfollowUserId(profile.value!._id);
 }
 
 function openSettings() {

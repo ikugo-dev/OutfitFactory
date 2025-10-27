@@ -54,6 +54,10 @@ onMounted(async () => {
 
 const postComment = async () => {
   if (loading.value) return;
+  if (newComment.value.length > 128) {
+    alert(`Comment too long (Current: ${newComment.value.length} Max: 128 characters)`);
+    return;
+  }
   loading.value = true;
 
   requireLogin();

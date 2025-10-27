@@ -4,7 +4,11 @@
       <img v-if="user.avatar" class="avatar" :src="user.avatar" :alt="user.username" />
       <div class="username">{{ user.username }}</div>
     </RouterLink>
-    <span v-if="text.length != 0" class="caption">: {{ text }}</span>
+    <div v-if="text.length" class="caption">
+      <span class="caption-text">:&nbsp;{{ text }}</span>
+      <!-- optional slot for anything else (buttons, icons, etc.) -->
+      <slot />
+    </div>
   </div>
 </template>
 
@@ -23,10 +27,13 @@ defineProps<{
   display: flex;
   align-items: center;
   color: black;
+  flex-shrink: 0;
 }
 
 .profile-with-text {
+  width: 100%;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   margin: 0.6rem 0rem 0.6rem 0rem;
 }
@@ -38,8 +45,17 @@ defineProps<{
 }
 
 .caption {
-  width: 64%;
-  overflow: hidden;
   white-space: nowrap;
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.caption-text {
+  white-space: normal;
 }
 </style>

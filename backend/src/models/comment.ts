@@ -13,7 +13,7 @@ const commentSchema = new Schema(
         text: 
         {
             type: String,
-            maxlength: 256,
+            maxlength: 128,
             minlength: 1,
             required: true
         },

@@ -52,6 +52,10 @@ function removeItem(index: number) {
 const loading = ref(false);
 async function submitPost() {
   if (loading.value) return;
+  if (caption.value.length > 128) {
+    alert(`Caption too long (Current: ${caption.value.length} Max: 128 characters)`);
+    return;
+  }
   loading.value = true;
 
   if (garments.value.length <= 1) {

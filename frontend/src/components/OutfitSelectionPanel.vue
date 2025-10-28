@@ -107,7 +107,6 @@ const localFilters = reactive({
 });
 
 const availableCategories = ref<string[]>([
-  "basic-shorts",
   "cipele",
   "dukserice",
   "dzemperi",
@@ -115,15 +114,15 @@ const availableCategories = ref<string[]>([
   "haljine-i-suknje",
   "jakne",
   "kacketi",
-  "kosulje",
+  "košulje",
   "majice",
   "naocare",
   "novcanici",
   "pantalone",
   "rukavice",
   "salovi",
-  "salovi-i-marame",
   "sesiri",
+  "šorc"
 ]);
 
 const allGarments = ref<GarmentType[]>([]);

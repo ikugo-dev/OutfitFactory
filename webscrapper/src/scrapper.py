@@ -24,7 +24,9 @@ def parse_product(browser: WebDriver, url: str, gender: str, category: str):
 
     # id_value        = url[29:] # da izbrisemo "https://www.sinsay.com/rs/sr/"
     name_value      = safe_select("h1[data-testid='product-name']")
-    price_value     = safe_select("div[data-selen='product-price']").replace('\xa0', ' ') # zbog whitespaces koji stavljaju
+    price_value     = safe_select("div[data-selen='product-price']")
+    if price_value != "N/A":
+        price_value = int(price_value.replace("RSD", "").replace("\xa0", "")) # zbog whitespaces koji stavljajub
     color_value     = safe_select("span[data-testid='color-picker-color-name']")
 
     cloudinary_url = "N/A"
@@ -45,6 +47,7 @@ def parse_product(browser: WebDriver, url: str, gender: str, category: str):
     return {
         "image_url": cloudinary_url,
         "gender": gender,
+        "url": url,
         "category": category,
         "name":  name_value,
         "color": color_value,
@@ -117,7 +120,7 @@ if __name__ == "__main__":
             start_time = time.time()
             product = parse_product(browser, product_link, category.gender, category.name)
             parsed_products.append(product)
-            
+
             print(f"[{product_index}/{total_products}] elapsed {(time.time() - category_start):.1f}s")
 
         print(f"✅ Finished category '{category.name}'")

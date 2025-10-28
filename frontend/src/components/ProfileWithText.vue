@@ -6,8 +6,6 @@
     </RouterLink>
     <div v-if="text.length" class="caption">
       <span class="caption-text">:&nbsp;{{ text }}</span>
-      <!-- optional slot for anything else (buttons, icons, etc.) -->
-      <slot />
     </div>
   </div>
 </template>

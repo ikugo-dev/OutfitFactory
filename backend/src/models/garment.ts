@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const garmentSchema = new Schema({
     image_url: { type: String, required: true },
+    url: { type: String, required: true },
     gender: { type: String, required: true },
     category: { type: String, required: true },
     name: { type: String, required: true },

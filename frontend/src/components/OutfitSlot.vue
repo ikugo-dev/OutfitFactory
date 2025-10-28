@@ -65,6 +65,7 @@ function updateTooltipPosition(e: MouseEvent) {
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
 
 img {
